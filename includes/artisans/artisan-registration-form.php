@@ -1255,26 +1255,24 @@ function render_artisan_registration_step_11() {
             const charCount      = document.getElementById('f11_char_count');
             const submitButton   = document.querySelector('.form-step-11 .submit-button');
             const errorContainer = document.querySelector('.step11-error');
+            const hiddenInput    = document.getElementById('kazverse_data'); // hidden input from main form
 
-            // Set minimum length for the description
-            const minDescriptionLength = 10; // Adjust as needed
-            const maxDescriptionLength = 1250; // Matches the textarea maxlength
+            const minDescriptionLength = 10; 
+            const maxDescriptionLength = 1250; 
 
+            // Validate text area length
             function validateStep11() {
                 let errors = [];
                 const descriptionValue = textarea.value.trim();
                 const length = descriptionValue.length;
 
-                // Check minimum length
                 if (length < minDescriptionLength) {
                     errors.push(`Description must be at least ${minDescriptionLength} characters long.`);
                 }
-                // Check maximum length (though textarea maxlength should prevent exceeding 1250)
                 if (length > maxDescriptionLength) {
                     errors.push(`Description cannot exceed ${maxDescriptionLength} characters.`);
                 }
 
-                // Enable/disable button based on errors
                 if (errors.length === 0) {
                     submitButton.disabled = false;
                     errorContainer.style.display = 'none';
@@ -1286,44 +1284,29 @@ function render_artisan_registration_step_11() {
                 }
             }
 
-            // Update character count
+            // Track input changes for character count and validation
             textarea.addEventListener('input', function () {
                 charCount.textContent = textarea.value.length;
                 validateStep11();
             });
 
-            // Validate on load in case the user tries to submit instantly
+            // Validate on load
             validateStep11();
 
-            // On final button click (Submit)
-            // If you want to actually submit the form to the backend,
-            // remove `e.preventDefault()`.
+            // On final "Submit" click
             submitButton.addEventListener('click', function(e) {
                 if (submitButton.disabled) {
-                    // If somehow clicked while disabled, do nothing
+                    // If still invalid, prevent submission
                     e.preventDefault();
                     return;
                 }
+                // Merge final text area data into global object
+                window.kazverseRegistrationData.step11 = window.kazverseRegistrationData.step11 || {};
+                window.kazverseRegistrationData.step11.description = textarea.value.trim();
 
-                // If valid, store data
-                const descriptionValue = textarea.value.trim();
-
-                // Initialize step11 object if not present
-                if (!window.kazverseRegistrationData.step11) {
-                    window.kazverseRegistrationData.step11 = {};
-                }
-
-                // Store the description in the global object
-                window.kazverseRegistrationData.step11.description = descriptionValue;
-
-                // Console log the entire data object
-                console.log('Current (or Final) Registration Data:', window.kazverseRegistrationData);
-
-                // If you'd like to actually submit the form, do not prevent default
-                // e.preventDefault() can be removed if you want the form to POST.
-                // e.preventDefault(); 
-                // If you do want the data to actually post, call:
-                // document.getElementById('artisanForm').submit();
+                // Serialize entire object into the hidden input
+                hiddenInput.value = JSON.stringify(window.kazverseRegistrationData);
+                // DO NOT prevent default -> let form submit normally
             });
         });
     </script>
@@ -1335,15 +1318,26 @@ function kazverse_render_registration_form() {
     ob_start();
     ?>
     <div id="artisan-registration-form">
-        <!-- Global data object initialization -->
+        <!-- Global data object initialization in JS -->
         <script>
             // Make a global object to store form data across steps
             window.kazverseRegistrationData = {};
         </script>
 
-        <form id="artisanForm" method="post">
+        <!-- The form posts to admin-post.php with our custom action & nonce -->
+        <form 
+            id="artisanForm" 
+            method="post"
+            action="<?php echo esc_url( admin_url('admin-post.php') ); ?>"
+        >
+            <input type="hidden" name="action" value="kazverse_artisan_submit" />
+            <?php wp_nonce_field( 'kazverse_artisan_submit_action', 'kazverse_artisan_nonce' ); ?>
+
+            <!-- Hidden input to store our entire global data as JSON at final submission -->
+            <input type="hidden" name="kazverse_data" id="kazverse_data" value="" />
+
             <?php
-            // Render the steps
+            // Render each step
             render_artisan_registration_step_1();
             render_artisan_registration_step_2();
             render_artisan_registration_step_3();
@@ -1354,9 +1348,7 @@ function kazverse_render_registration_form() {
             render_artisan_registration_step_9();
             render_artisan_registration_step_10();
             render_artisan_registration_step_11();
-            
             ?>
-
         </form>
     </div>
     
@@ -1366,22 +1358,24 @@ function kazverse_render_registration_form() {
             const nextButtons = document.querySelectorAll('.next-button');
             const previousButtons = document.querySelectorAll('.previous-button');
 
+            // "Next" buttons move to the specified step, no submission
             nextButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const currentStep = document.querySelector('.form-step.active');
                     const nextStep = document.querySelector(`.form-step-${button.dataset.nextStep}`);
-                    if (nextStep) {
+                    if (currentStep && nextStep) {
                         currentStep.classList.remove('active');
                         nextStep.classList.add('active');
                     }
                 });
             });
 
+            // "Back" buttons move to the previous step
             previousButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const currentStep = document.querySelector('.form-step.active');
                     const previousStep = document.querySelector(`.form-step-${button.dataset.previousStep}`);
-                    if (previousStep) {
+                    if (currentStep && previousStep) {
                         currentStep.classList.remove('active');
                         previousStep.classList.add('active');
                     }
