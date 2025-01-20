@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Render a Bootstrap-styled checkbox field
+ * Render a styled full-width checkbox field with right-aligned checkbox.
  *
  * @param string $name Field name (required).
  * @param string $id Field ID (required).
@@ -13,10 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 function render_checkbox_field($name, $id, $label = '', $checked = false, $required = false, $additional_attrs = []) {
     // Start rendering
-    $field = '<div class="mb-3 form-check">'; // Bootstrap's margin-bottom utility class and form-check class
+    $field = '<div class="kz-checkbox-container">'; // Prefixed container class
     
+    // Add label if provided
+    if ($label) {
+        $field .= '<label for="' . esc_attr($id) . '" class="kz-checkbox-label">' . esc_html($label) . '</label>';
+    }
+
     // Add checkbox input
-    $field .= '<input type="checkbox" class="form-check-input" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
+    $field .= '<input type="checkbox" class="kz-checkbox" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
     if ($checked) {
         $field .= ' checked';
     }
@@ -28,17 +33,13 @@ function render_checkbox_field($name, $id, $label = '', $checked = false, $requi
     }
     $field .= ' />';
     
-    // Add label if provided
-    if ($label) {
-        $field .= '<label for="' . esc_attr($id) . '" class="form-check-label">' . esc_html($label) . '</label>';
-    }
-    
     // Close container
     $field .= '</div>';
     
     // Echo or return the field
     echo $field;
 }
+
 
 // Add Bootstrap CDN for styling
 add_action('wp_head', function() {

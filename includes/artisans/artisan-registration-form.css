@@ -368,3 +368,131 @@
     background-color: #573d9e;
     cursor: pointer;
 }
+
+/* Full-width checkbox container with kz prefix */
+.kz-checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: rgb(38, 38, 39);
+    border: 1px solid rgb(223, 223, 228);
+    border-radius: 4px;
+    padding: 12px;
+    background-color: rgb(255, 255, 255); /* Light grey background */
+    width: 100%; /* Full width */
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover and focus state for the container */
+.kz-checkbox-container:hover {
+    border-color: rgb(97, 55, 110);
+  
+}
+
+.kz-checkbox-container:has(.kz-checkbox:checked) {
+    border-color: rgb(38, 38, 39);
+    background-color: rgb(244, 246, 250);
+    box-shadow: rgb(38, 38, 39) 0px 0px 0px 1px inset;
+}
+
+
+
+/* Checkbox styling with kz prefix */
+.kz-checkbox {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    background-color: #fff;
+    position: relative;
+    flex-shrink: 0; /* Prevent shrinking in flexbox */
+}
+
+/* Checked state */
+.kz-checkbox:checked {
+    background-color: #333;
+    border-color: #333;
+    position: relative;
+}
+
+/* Add a checkmark inside the checkbox */
+.kz-checkbox:checked::after {
+    content: '✔';
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+}
+
+/* Label styling with kz prefix */
+.kz-checkbox-label {
+    flex-grow: 1; /* Take up remaining space */
+    font-size: 1em;
+    color: #333;
+    margin-right: 15px;
+    text-align: start;
+}
+
+
+
+
+/* Styling for the form group */
+.f4_form_group {
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+/* Label styling */
+.f4_trade-label {
+    display: block;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #696969;
+    z-index: 2; /* Ensure the label stays above the scrollable content */
+    position: relative;
+    background-color: #fff; /* Match label background with the page background */
+    padding-right: 10px;
+    text-align: start;
+}
+
+/* Wrapper for the scrollable container */
+.tags_group_wrapper {
+    border-radius: 6px;
+    overflow: hidden; /* Ensure clean rounded edges */
+    position: relative;
+    background-color: #fff;
+    padding-top: 10px; /* Space to separate the label visually */
+}
+
+/* Scrollable container */
+.tags_group {
+    max-height: 200px; /* Set a fixed height for the scrollable area */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Padding inside the scrollable area */
+    scrollbar-width: thin; /* For modern browsers: thin scrollbar */
+    scrollbar-color: #ccc #f8f9fa; /* Custom scrollbar colors */
+}
+
+/* Custom scrollbar styling for Webkit browsers */
+.tags_group::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tags_group::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.tags_group::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+}

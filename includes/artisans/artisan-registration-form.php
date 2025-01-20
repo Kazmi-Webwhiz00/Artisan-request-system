@@ -470,20 +470,21 @@ function render_artisan_registration_step_4() {
 
         <!-- Trades Cards with Checkboxes (using render_checkbox_field) -->
         <div class="f4_form_group form-group">
-            <label for="f4_trade_select">Select Trade(s)</label>
-            <div id="f4_trade_cards" class="f4_trade-cards">
-                <?php
-                foreach ($trades as $trade) {
-                    render_checkbox_field(
-                        'f4_trade_select[]',                // Name (array)
-                        'f4_trade_' . sanitize_title($trade), // ID
-                        esc_html($trade),                    // Label
-                        false,                               // Checked (default)
-                        false                                // Not strictly required at the HTML level,
-                                                            // but we enforce in JS
-                    );
-                }
-                ?>
+            <label for="f4_trade_select" class="f4_trade-label">Select Trade(s)</label>
+            <div class="tags_group_wrapper">
+                <div id="f4_trade_cards" class="tags_group">
+                    <?php
+                    foreach ($trades as $trade) {
+                        render_checkbox_field(
+                            'f4_trade_select[]',                // Name (array)
+                            'f4_trade_' . sanitize_title($trade), // ID
+                            esc_html($trade),                    // Label
+                            false,                               // Checked (default)
+                            false                                // Not strictly required at the HTML level
+                        );
+                    }
+                    ?>
+                </div>
             </div>
         </div>
 
