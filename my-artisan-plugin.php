@@ -23,6 +23,8 @@ include_once plugin_dir_path(__FILE__) . 'includes/taxonomies/global-services-ta
 
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/service-form-cpt.php';
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/form-field-table-sql.php';
+include_once plugin_dir_path(__FILE__) .  'includes/service-form/FieldTypes.php';
+include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/admin-view.php';
 
 
 

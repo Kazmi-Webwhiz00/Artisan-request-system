@@ -1,0 +1,105 @@
+#kz-add-new-field {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #0073aa;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.kz-field-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kz-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f7f7f7;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.kz-field-header:hover {
+    background-color: #eaeaea;
+}
+
+.kz-field-header .kz-remove-field {
+    background-color: #d33;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.kz-field-header .kz-remove-field:hover {
+    background-color: #a00;
+}
+
+.kz-field-body {
+    display: none; /* Initially collapsed */
+    padding: 15px;
+    background-color: #fff;
+}
+
+.kz-field-body label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.kz-field-body input, .kz-field-body select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.kz-field-body input:focus, .kz-field-body select:focus {
+    border-color: #0073aa;
+    outline: none;
+}
+
+.kz-radio-group {
+    margin: 10px 0;
+}
+
+.kz-radio-group label {
+    margin-right: 15px;
+    font-weight: normal;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.kz-radio-group input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Placeholder for sortable items */
+.kz-sortable-placeholder {
+    border: 2px dashed #0073aa;
+    height: 50px;
+    margin: 10px 0;
+    background: #f3f3f3;
+}
+
+.kz-drag-handle {
+    cursor: move;
+    margin-right: 10px;
+    font-size: 18px;
+    color: #0073aa;
+}
