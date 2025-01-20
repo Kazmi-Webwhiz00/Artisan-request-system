@@ -13,9 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 function render_radio_button_field($name, $id, $label = '', $checked = false, $required = false, $additional_attrs = []) {
     // Start rendering
-    $field = '<div class="mb-3 form-check">';
+    $field = '<div class="kz-radio-container">'; // Add specific class for styling
+    
     // Add radio button input
-    $field .= '<input type="radio" class="form-check-input" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
+    $field .= '<input type="radio" class="kz-radio" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
     if ($checked) {
         $field .= ' checked';
     }
@@ -29,7 +30,7 @@ function render_radio_button_field($name, $id, $label = '', $checked = false, $r
     
     // Add label if provided
     if ($label) {
-        $field .= '<label for="' . esc_attr($id) . '" class="form-check-label">' . esc_html($label) . '</label>';
+        $field .= '<label for="' . esc_attr($id) . '" class="kz-radio-label">' . esc_html($label) . '</label>';
     }
     
     // Close container
