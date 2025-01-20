@@ -27,27 +27,27 @@ function register_global_services_taxonomy() {
         'hierarchical'      => true, // True for categories, false for tags
         'public'            => true,
         'show_ui'           => true,
-        'show_in_menu'      => 'global-services-menu', // Standalone menu slug
+        'show_in_menu'      => true, // Prevent it from being added under post types
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud'     => true,
         'show_in_rest'      => true, // For Gutenberg support
-        'menu_icon'         => 'dashicons-networking', // Custom Dashicon
     );
-    
-    register_taxonomy('global_services', array('post'), $args);
+
+    // Register the taxonomy and allow it to be added to multiple post types
+    register_taxonomy('global_services', array('page', 'service_form'), $args);
 }
 add_action('init', 'register_global_services_taxonomy');
 
 /**
- * Add Menu Page for Global Services
+ * Add Global Services Shortcut Menu
  */
 function add_global_services_menu() {
     add_menu_page(
         __('Global Services', 'textdomain'),
         __('Global Services', 'textdomain'),
         'manage_options', // Capability required to access
-        'edit-tags.php?taxonomy=global_services',
+        'edit-tags.php?taxonomy=global_services&post_type=service_form', // Direct link to the taxonomy page
         '',
         'dashicons-networking', // Dashicon for the menu
         5                      // Position in admin menu

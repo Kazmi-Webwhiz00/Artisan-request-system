@@ -21,6 +21,8 @@ include_once plugin_dir_path( __FILE__ ) . 'includes/general-helpers/image-uploa
 
 include_once plugin_dir_path(__FILE__) . 'includes/taxonomies/global-services-taxonomy.php';
 
+include_once plugin_dir_path(__FILE__) . 'includes/service-form/service-form-cpt.php';
+
 
 // Plugin initialization function
 // function kazverse_artisan_plugin_init() {
