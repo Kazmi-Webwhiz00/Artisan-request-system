@@ -43,49 +43,148 @@ function render_artisan_registration_step_1() {
             'trade',                // Name
             'trade',                // ID
             'Trade',                // Label
-            [                       // Options array
+            [
                 '' => 'Select your trade',
                 'well-builder' => 'Well Builder',
                 'electrician' => 'Electrician',
                 'plumber' => 'Plumber',
                 // Add more trades as needed
             ],
-            '',                     // Default selected value
-            true                    // Required
+            '',   // Default selected value
+            true  // Required
         );
 
         // Render the zip code field using render_text_field
         render_text_field(
-            'zip_code',             // Name
-            'zip_code',             // ID
-            'Zip Code',             // Label
-            'Enter your zip code',  // Placeholder
-            '',                     // Default value
-            true                    // Required
+            'zip_code',
+            'zip_code',
+            'Zip Code',
+            'Enter your zip code',
+            '',
+            true // Required
         );
+
         // Render the email field using render_email_field
         render_email_field(
-            'email',                // Name
-            'email',                // ID
-            'Email Address',        // Label
-            'Enter your email address', // Placeholder
-            '',                     // Default value
-            true                    // Required
+            'email',
+            'email',
+            'Email Address',
+            'Enter your email address',
+            '',
+            true // Required
         );
         ?>
-        
+
         <div class="form-group terms">
-            <p>By clicking on “Register for free” you agree to Kazverse’s 
+            <p>
+                By clicking on “Register for free” you agree to Kazverse’s 
                 <a href="#">terms and conditions</a>. Information about how we process your data can be found in our 
                 <a href="#">privacy policy</a>.
             </p>
         </div>
-        <button type="button" class="next-button" data-next-step="2">Register for free</button>
+
+        <!-- "Next" button is disabled by default; enabled only when validation passes -->
+        <button 
+            type="button" 
+            class="next-button" 
+            data-next-step="2" 
+            disabled
+        >
+            Register for free
+        </button>
+
+        <!-- Error message container -->
+        <div class="step1-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Step 1 specific JS logic (if any)
+            const tradeSelect = document.getElementById('trade');
+            const zipInput    = document.getElementById('zip_code');
+            const emailInput  = document.getElementById('email');
+            const nextButton  = document.querySelector('.form-step-1 .next-button');
+            const errorContainer = document.querySelector('.step1-error');
+
+            // Simple email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Check validity of Step 1 inputs
+            function validateStep1() {
+                const trade = tradeSelect.value.trim();
+                const zip   = zipInput.value.trim();
+                const email = emailInput.value.trim();
+
+                let errors = [];
+
+                // Validate trade (required and not empty)
+                if (!trade) {
+                    errors.push('Please select a trade.');
+                }
+
+                // Validate zip code (must be numeric and non-empty)
+                if (!zip) {
+                    errors.push('Zip code is required.');
+                } else if (!/^[0-9]+$/.test(zip)) {
+                    errors.push('Zip code must be numeric only.');
+                }
+
+                // Validate email
+                if (!email) {
+                    errors.push('Email is required.');
+                } else if (!emailRegex.test(email)) {
+                    errors.push('Please enter a valid email address.');
+                }
+
+                // If no errors, enable button; otherwise disable it
+                if (errors.length === 0) {
+                    nextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    nextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Validate on every input/change
+            tradeSelect.addEventListener('change', validateStep1);
+            zipInput.addEventListener('input', validateStep1);
+            emailInput.addEventListener('input', validateStep1);
+
+            // Final check on button click (in case it somehow gets clicked)
+            nextButton.addEventListener('click', function () {
+                // If disabled, do nothing
+                if (nextButton.disabled) {
+                    return;
+                }
+
+                // Once valid, store data and move to the next step
+                const trade = tradeSelect.value.trim();
+                const zip   = zipInput.value.trim();
+                const email = emailInput.value.trim();
+
+                // Initialize step1 object if not present
+                if (!window.kazverseRegistrationData.step1) {
+                    window.kazverseRegistrationData.step1 = {};
+                }
+
+                // Store Step 1 data in the global object
+                window.kazverseRegistrationData.step1.trade    = trade;
+                window.kazverseRegistrationData.step1.zip_code = zip;
+                window.kazverseRegistrationData.step1.email    = email;
+
+                // Console log the entire data object
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually switch to the next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep = document.querySelector('.form-step-2');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
+            });
         });
     </script>
     <?php
@@ -102,7 +201,7 @@ function render_artisan_registration_step_2() {
         render_text_field(
             'first_name',           // Name
             'first_name',           // ID
-            'Company Owner',           // Label
+            'Company Owner',        // Label
             'First name',           // Placeholder
             '',                     // Default value
             true                    // Required
@@ -112,13 +211,13 @@ function render_artisan_registration_step_2() {
         render_text_field(
             'last_name',            // Name
             'last_name',            // ID
-            '',            // Label
+            '',                     // Label
             'Last name',            // Placeholder
             '',                     // Default value
             true                    // Required
         );
 
-        // Render the phone field
+        // Render the phone field (Note: +43 prefix is already shown, so user enters only the remaining digits)
         render_phone_field(
             'phone',                // Name
             'phone',                // ID
@@ -126,7 +225,7 @@ function render_artisan_registration_step_2() {
             'Enter your phone number', // Placeholder
             '',                     // Default value
             true,                   // Required
-            '+43'                   // Phone prefix
+            '+43'                   // Phone prefix (displayed but not typed by user)
         );
 
         // Render the password field using the render_password_field function
@@ -134,42 +233,144 @@ function render_artisan_registration_step_2() {
             'password',             // Name
             'password',             // ID
             'Password (at least 6 characters)', // Label
-            'Create password',     // Placeholder
+            'Create password',      // Placeholder
             '',                     // Default value
             true                    // Required
         );
 
-        // Subscribe checkbox
+        // Subscribe checkbox - not mandatory
         render_checkbox_field(
             'subscribe',           // Name
             'subscribe',           // ID
             'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', // Label
-            false,                 // Checked (set to true if checked by default)
-            true                   // Required
+            false,                 // Checked by default
+            false                  // Not required
         );
-
         ?>
 
         <!-- Navigation buttons -->
-        <button type="button" class="previous-button" data-previous-step="1">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="3">Continue</button>
+        <button 
+            type="button" 
+            class="previous-button" 
+            data-previous-step="1"
+        >
+            Back
+        </button>
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="3"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step2-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const showPasswordButton = document.querySelector('.show-password');
-            const passwordField = document.getElementById('password');
+            const firstNameInput  = document.getElementById('first_name');
+            const lastNameInput   = document.getElementById('last_name');
+            const phoneInput      = document.getElementById('phone');
+            const passwordInput   = document.getElementById('password');
+            const subscribeBox    = document.getElementById('subscribe');
+            const nextButton      = document.querySelector('.form-step-2 .next-button');
+            const errorContainer  = document.querySelector('.step2-error');
 
-            if (showPasswordButton && passwordField) {
-                showPasswordButton.addEventListener('click', function () {
-                    if (passwordField.type === 'password') {
-                        passwordField.type = 'text';
-                        showPasswordButton.textContent = 'Hide';
-                    } else {
-                        passwordField.type = 'password';
-                        showPasswordButton.textContent = 'Show';
-                    }
-                });
+            // We'll assume user only enters digits for phoneInput (excluding +43, already shown in UI).
+            // Must be 6..13 digits. Example: '1234567' => final becomes '+43 1234567'
+            const phoneDigitsRegex = /^\d{6,13}$/;
+
+            // Validate step 2 fields
+            function validateStep2() {
+                const firstName    = firstNameInput.value.trim();
+                const lastName     = lastNameInput.value.trim();
+                const phoneDigits  = phoneInput.value.trim();
+                const password     = passwordInput.value.trim();
+                let errors = [];
+
+                // First name required
+                if (!firstName) {
+                    errors.push('First name is required.');
+                }
+
+                // Last name required
+                if (!lastName) {
+                    errors.push('Last name is required.');
+                }
+
+                // Phone must be 6..13 digits if user has typed anything
+                if (!phoneDigits) {
+                    errors.push('Phone number is required.');
+                } else if (!phoneDigitsRegex.test(phoneDigits)) {
+                    errors.push('Phone number must be 6 to 13 digits (excluding the +43 prefix).');
+                }
+
+                // Password required, at least 6 characters
+                if (!password) {
+                    errors.push('Password is required.');
+                } else if (password.length < 6) {
+                    errors.push('Password must be at least 6 characters long.');
+                }
+
+                if (errors.length === 0) {
+                    nextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    nextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
             }
+
+            // Listen to all relevant fields
+            firstNameInput.addEventListener('input', validateStep2);
+            lastNameInput.addEventListener('input', validateStep2);
+            phoneInput.addEventListener('input', validateStep2);
+            passwordInput.addEventListener('input', validateStep2);
+            if (subscribeBox) {
+                subscribeBox.addEventListener('change', validateStep2);
+            }
+
+            // On final button click, store data if not disabled
+            nextButton.addEventListener('click', function() {
+                if (nextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                const firstName    = firstNameInput.value.trim();
+                const lastName     = lastNameInput.value.trim();
+                // We create final phone by prefixing '+43 ' (or however you want to format).
+                const phoneDigits  = phoneInput.value.trim();
+                const phoneFinal   = '+43 ' + phoneDigits;
+                const password     = passwordInput.value.trim();
+                // Subscription is optional
+                const isSubscribed = subscribeBox && subscribeBox.checked ? true : false;
+
+                // Initialize step2 object if not present
+                if (!window.kazverseRegistrationData.step2) {
+                    window.kazverseRegistrationData.step2 = {};
+                }
+
+                window.kazverseRegistrationData.step2.first_name = firstName;
+                window.kazverseRegistrationData.step2.last_name  = lastName;
+                window.kazverseRegistrationData.step2.phone      = phoneFinal;
+                window.kazverseRegistrationData.step2.password   = password;
+                window.kazverseRegistrationData.step2.subscribe  = isSubscribed;
+
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually switch steps
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-3');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
+            });
         });
     </script>
     <?php
@@ -228,18 +429,18 @@ function render_artisan_registration_step_4() {
         </div>
 
         <!-- Trades Cards with Checkboxes (using render_checkbox_field) -->
-        <div class="f4_form-group form-group">
+        <div class="f4_form_group form-group">
             <label for="f4_trade_select">Select Trade(s)</label>
             <div id="f4_trade_cards" class="f4_trade-cards">
                 <?php
                 foreach ($trades as $trade) {
-                    // Render each trade as a checkbox field
                     render_checkbox_field(
-                        'f4_trade_select[]',         // Name (with [] to make it an array)
+                        'f4_trade_select[]',                // Name (array)
                         'f4_trade_' . sanitize_title($trade), // ID
-                        esc_html($trade),         // Label
-                        false,                    // Checked (false by default)
-                        true                      // Required
+                        esc_html($trade),                    // Label
+                        false,                               // Checked (default)
+                        false                                // Not strictly required at the HTML level,
+                                                            // but we enforce in JS
                     );
                 }
                 ?>
@@ -248,26 +449,108 @@ function render_artisan_registration_step_4() {
 
         <!-- Navigation Buttons -->
         <button type="button" class="previous-button" data-previous-step="3">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="5">Continue</button>
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="5"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step4-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Simple trade search functionality (for filtering the trades)
             const tradeSearchInput = document.getElementById('f4_trade_search');
-            const tradeCards = document.getElementById('f4_trade_cards').querySelectorAll('.f4_trade-card');
-            
-            tradeSearchInput.addEventListener('input', function() {
-                const filterValue = tradeSearchInput.value.toLowerCase();
-                tradeCards.forEach(function(card) {
-                    const tradeText = card.querySelector('label').textContent.toLowerCase();
-                    if (tradeText.indexOf(filterValue) === -1) {
-                        card.style.display = 'none';
-                    } else {
-                        card.style.display = 'flex';
-                    }
+            const tradeCards       = document.querySelectorAll('#f4_trade_cards .f4_trade-card');
+            const checkboxes       = document.querySelectorAll('input[name="f4_trade_select[]"]');
+            const step4NextButton  = document.querySelector('.form-step-4 .next-button');
+            const errorContainer   = document.querySelector('.step4-error');
+
+            // Simple trade search functionality (for filtering the trades)
+            if (tradeSearchInput && tradeCards.length > 0) {
+                tradeSearchInput.addEventListener('input', function() {
+                    const filterValue = tradeSearchInput.value.toLowerCase();
+                    tradeCards.forEach(function(card) {
+                        const labelElement = card.querySelector('label');
+                        if (!labelElement) return;
+
+                        const tradeText = labelElement.textContent.toLowerCase();
+                        if (tradeText.indexOf(filterValue) === -1) {
+                            card.style.display = 'none';
+                        } else {
+                            card.style.display = 'flex';
+                        }
+                    });
                 });
+            }
+
+            // Validation: user must select between 1 and 5 trades
+            function validateStep4() {
+                // Count how many checkboxes are checked
+                const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                let errors = [];
+
+                if (checkedBoxes.length === 0) {
+                    errors.push('You must select at least one trade.');
+                } else if (checkedBoxes.length > 5) {
+                    errors.push('You can select a maximum of five trades.');
+                }
+
+                if (errors.length === 0) {
+                    step4NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step4NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Run validation on each checkbox change
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', validateStep4);
             });
+
+            // On final button click, store data if not disabled
+            step4NextButton.addEventListener('click', function() {
+                if (step4NextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                // Gather selected trades
+                const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                const selectedTrades = checkedBoxes.map(cb => {
+                    // Get the label text for each checked trade
+                    const labelElement = document.querySelector(`label[for="${cb.id}"]`);
+                    return labelElement ? labelElement.innerText.trim() : cb.id;
+                });
+
+                // Initialize step4 object if not present
+                if (!window.kazverseRegistrationData.step4) {
+                    window.kazverseRegistrationData.step4 = {};
+                }
+
+                // Store selected trades
+                window.kazverseRegistrationData.step4.selected_trades = selectedTrades;
+
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually move to next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-5');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
+            });
+
+            // Initially run validation in case user tries to proceed without any interaction
+            validateStep4();
         });
     </script>
     <?php
@@ -285,18 +568,26 @@ function render_artisan_registration_step_5() {
         <h2>In which area do you work?</h2>
         <p>Set maximum distance by gear.</p>
 
-        <!-- Map displaying work area (using Mapbox or Leaflet) -->
+        <!-- Map displaying work area (using Leaflet) -->
         <div id="f5_work_area_map" style="height: 300px; width: 100%;"></div>
 
         <!-- Slider for maximum distance -->
         <div class="f5_form-group form-group">
             <label for="f5_distance_slider">Maximum Distance</label>
-            <input type="range" class="form-range" id="f5_distance_slider" min="1" max="500" value="50" step="1">
+            <input 
+                type="range" 
+                class="form-range" 
+                id="f5_distance_slider" 
+                min="1" 
+                max="500" 
+                value="50" 
+                step="1"
+            >
             <span id="f5_distance_value">50 km</span>
         </div>
 
-        <!-- Checkbox for "I work throughout Austria" -->
-        <div class="f5_form-group form-group">
+        <!-- Checkbox for "I work throughout Austria" (not mandatory) -->
+        <div class="f5_form_group form-group">
             <label for="f5_work_throughout_austria">
                 <input type="checkbox" id="f5_work_throughout_austria"> I work throughout Austria
             </label>
@@ -304,35 +595,99 @@ function render_artisan_registration_step_5() {
 
         <!-- Navigation buttons -->
         <button type="button" class="previous-button" data-previous-step="4">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="6">Continue</button>
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="6"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step5-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Update slider value
-            const slider = document.getElementById('f5_distance_slider');
-            const distanceValue = document.getElementById('f5_distance_value');
-            slider.addEventListener('input', function () {
-                distanceValue.textContent = slider.value + ' km';
-            });
+            // DOM references
+            const slider            = document.getElementById('f5_distance_slider');
+            const distanceValueSpan = document.getElementById('f5_distance_value');
+            const austriaCheckbox   = document.getElementById('f5_work_throughout_austria');
+            const step5NextButton   = document.querySelector('.form-step-5 .next-button');
+            const errorContainer    = document.querySelector('.step5-error');
 
-            // Initialize map (using Leaflet.js or Mapbox)
-            const map = L.map('f5_work_area_map').setView([48.2082, 16.3738], 13); // Example coordinates (Vienna, Austria)
-
-            // Set up Mapbox tile layer (replace with your own Mapbox API key)
+            // Initialize Leaflet map
+            const map = L.map('f5_work_area_map').setView([48.2082, 16.3738], 13); // Example: Vienna, Austria
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            // Draw a circle around the center point with a radius of 50 km (default)
+            // Draw initial circle with default 50 km radius
             let circle = L.circle([48.2082, 16.3738], {
                 color: 'purple',
                 fillColor: '#6b52ae',
                 fillOpacity: 0.3,
-                radius: slider.value * 1000 // Radius in meters
+                radius: slider.value * 1000 // Convert km to meters
             }).addTo(map);
 
-            // Update circle radius when slider value changes
+            // Update the slider value text & circle radius on input
             slider.addEventListener('input', function () {
-                circle.setRadius(slider.value * 1000); // Update radius in meters
+                distanceValueSpan.textContent = slider.value + ' km';
+                circle.setRadius(slider.value * 1000);
+                validateStep5();
+            });
+
+            // Validate step 5
+            function validateStep5() {
+                const distance = parseInt(slider.value, 10);
+                let errors = [];
+
+                // Basic check: distance must be between 1 and 500
+                if (isNaN(distance) || distance < 1 || distance > 500) {
+                    errors.push('Distance must be between 1 and 500 km.');
+                }
+
+                if (errors.length === 0) {
+                    step5NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step5NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Run initial validation to set button state
+            validateStep5();
+
+            // On final button click, store data if not disabled
+            step5NextButton.addEventListener('click', function() {
+                if (step5NextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                const distance = parseInt(slider.value, 10);
+                const worksThroughoutAustria = austriaCheckbox.checked;
+
+                // Initialize step5 object if not present
+                if (!window.kazverseRegistrationData.step5) {
+                    window.kazverseRegistrationData.step5 = {};
+                }
+
+                // Store Step 5 data in the global object
+                window.kazverseRegistrationData.step5.distance = distance;
+                window.kazverseRegistrationData.step5.work_throughout_austria = worksThroughoutAustria;
+
+                // Console log the entire data object
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually switch to the next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-6');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
             });
         });
     </script>
@@ -351,7 +706,7 @@ function render_artisan_registration_step_6() {
         <h2>What is your current professional status?</h2>
         
         <!-- Radio buttons for professional status -->
-        <div class="form-group">
+        <div class="form-group" id="professional-status-group">
             <?php
             // Array of professional status options
             $status_options = [
@@ -369,20 +724,105 @@ function render_artisan_registration_step_6() {
                     'status_' . $index,                   // ID (unique for each option)
                     $status,                              // Label
                     false,                                // Checked (default is false)
-                    true                                   // Required
+                    false                                 // Not strictly required by HTML, but we enforce in JS
                 );
             }
             ?>
         </div>
 
         <!-- Navigation buttons -->
-        <button type="button" class="previous-button" data-previous-step="5">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="8">Continue</button>
+        <button 
+            type="button" 
+            class="previous-button" 
+            data-previous-step="5"
+        >
+            Back
+        </button>
+
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="8"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step6-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // No additional JS functionality needed for this step
+            const step6NextButton   = document.querySelector('.form-step-6 .next-button');
+            const errorContainer    = document.querySelector('.step6-error');
+            const radioButtons      = document.querySelectorAll('input[name="professional_status"]');
+
+            // Validate step 6: user must pick exactly one professional status
+            function validateStep6() {
+                let errors = [];
+                const checkedRadio = Array.from(radioButtons).find(rb => rb.checked);
+
+                if (!checkedRadio) {
+                    errors.push('Please select your current professional status.');
+                }
+
+                if (errors.length === 0) {
+                    step6NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step6NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Add event listeners to each radio button
+            radioButtons.forEach(rb => {
+                rb.addEventListener('change', validateStep6);
+            });
+
+            // Initial validation in case none are selected yet
+            validateStep6();
+
+            // On final button click, store data if not disabled
+            step6NextButton.addEventListener('click', function() {
+                if (step6NextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                // Get the selected radio button
+                const selectedRadio = Array.from(radioButtons).find(rb => rb.checked);
+                let selectedStatus = '';
+
+                if (selectedRadio) {
+                    // Get label text for the selected radio
+                    const labelElement = document.querySelector(`label[for="${selectedRadio.id}"]`);
+                    if (labelElement) {
+                        selectedStatus = labelElement.innerText.trim();
+                    }
+                }
+
+                // Initialize step6 object if not present
+                if (!window.kazverseRegistrationData.step6) {
+                    window.kazverseRegistrationData.step6 = {};
+                }
+
+                // Store selected status in the global object
+                window.kazverseRegistrationData.step6.professional_status = selectedStatus;
+
+                // Console log the entire data object
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually switch to the next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-8');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
+            });
         });
     </script>
     <?php
@@ -401,7 +841,7 @@ function render_artisan_registration_step_8() {
         <p>Only qualified tradesmen and service providers can use MyHammer.</p>
 
         <!-- GISA Number (Optional) -->
-        <div class="f8_form-group form-group">
+        <div class="f8_form_group form-group">
             <?php
             render_text_field(
                 'f8_gisa_number',      // Name
@@ -415,7 +855,7 @@ function render_artisan_registration_step_8() {
         </div>
 
         <!-- Company Name (Required) -->
-        <div class="f8_form-group form-group">
+        <div class="f8_form_group form-group">
             <?php
             render_text_field(
                 'f8_company_name',     // Name
@@ -429,7 +869,7 @@ function render_artisan_registration_step_8() {
         </div>
 
         <!-- Address (Required) -->
-        <div class="f8_form-group form-group">
+        <div class="f8_form_group form-group">
             <?php
             render_text_field(
                 'f8_address',          // Name
@@ -443,24 +883,139 @@ function render_artisan_registration_step_8() {
         </div>
 
         <!-- Zip Code and City (Grouped) -->
-        <div class="f8_form-group form-group">
+        <div class="f8_form_group form-group">
             <?php
             render_grouped_fields(
                 'f8_zip_code', 'f8_zip_code', 'Zip Code *',    // Zip Code Field
-                'f8_city', 'f8_city', 'City *',                 // City Field
-                '', '', true                                    // Default values and required
+                'f8_city', 'f8_city', 'City *',                // City Field
+                '', '', true                                   // Default values and required
             );
             ?>
         </div>
 
         <!-- Navigation Buttons -->
-        <button type="button" class="previous-button" data-previous-step="6">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="9">Continue</button>
+        <button 
+            type="button" 
+            class="previous-button" 
+            data-previous-step="6"
+        >
+            Back
+        </button>
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="9"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step8-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // No specific JS for Step 8 yet
+            // DOM Elements
+            const gisaInput       = document.getElementById('f8_gisa_number');    // optional
+            const companyNameInput= document.getElementById('f8_company_name');   // required
+            const addressInput    = document.getElementById('f8_address');        // required
+            const zipCodeInput    = document.getElementById('f8_zip_code');       // required
+            const cityInput       = document.getElementById('f8_city');           // required
+            const step8NextButton = document.querySelector('.form-step-8 .next-button');
+            const errorContainer  = document.querySelector('.step8-error');
+
+            // Basic regex to check zip code is numeric (adjust if you need different logic)
+            const zipRegex = /^[0-9]+$/;
+
+            // Validate Step 8
+            function validateStep8() {
+                const gisaNumberVal    = gisaInput.value.trim();         // optional
+                const companyNameVal   = companyNameInput.value.trim();  // required
+                const addressVal       = addressInput.value.trim();      // required
+                const zipVal           = zipCodeInput.value.trim();      // required
+                const cityVal          = cityInput.value.trim();         // required
+
+                let errors = [];
+
+                // Company Name
+                if (!companyNameVal) {
+                    errors.push('Company Name is required.');
+                }
+
+                // Address
+                if (!addressVal) {
+                    errors.push('Address is required.');
+                }
+
+                // Zip Code
+                if (!zipVal) {
+                    errors.push('Zip Code is required.');
+                } else if (!zipRegex.test(zipVal)) {
+                    errors.push('Zip Code must be numeric only.');
+                }
+
+                // City
+                if (!cityVal) {
+                    errors.push('City is required.');
+                }
+
+                // If no errors => enable button, else disable
+                if (errors.length === 0) {
+                    step8NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step8NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Add event listeners
+            gisaInput.addEventListener('input', validateStep8);        // even though it's optional, let's watch it 
+            companyNameInput.addEventListener('input', validateStep8);
+            addressInput.addEventListener('input', validateStep8);
+            zipCodeInput.addEventListener('input', validateStep8);
+            cityInput.addEventListener('input', validateStep8);
+
+            // Initial validation
+            validateStep8();
+
+            // On final button click, store data if not disabled
+            step8NextButton.addEventListener('click', function() {
+                if (step8NextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                const gisaNumberVal    = gisaInput.value.trim();
+                const companyNameVal   = companyNameInput.value.trim();
+                const addressVal       = addressInput.value.trim();
+                const zipVal           = zipCodeInput.value.trim();
+                const cityVal          = cityInput.value.trim();
+
+                // Initialize step8 object if not present
+                if (!window.kazverseRegistrationData.step8) {
+                    window.kazverseRegistrationData.step8 = {};
+                }
+
+                // Store Step 8 data in the global object
+                window.kazverseRegistrationData.step8.gisa_number   = gisaNumberVal;
+                window.kazverseRegistrationData.step8.company_name  = companyNameVal;
+                window.kazverseRegistrationData.step8.address       = addressVal;
+                window.kazverseRegistrationData.step8.zip_code      = zipVal;
+                window.kazverseRegistrationData.step8.city          = cityVal;
+
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually move to the next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-9');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
+            });
         });
     </script>
     <?php
@@ -496,17 +1051,107 @@ function render_artisan_registration_step_9() {
         </div>
 
         <!-- Navigation Buttons -->
-        <button type="button" class="previous-button" data-previous-step="8">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="10">Continue</button>
+        <button 
+            type="button" 
+            class="previous-button" 
+            data-previous-step="8"
+        >
+            Back
+        </button>
+
+        <button 
+            type="button" 
+            class="next-button purple-btn" 
+            data-next-step="10"
+            disabled
+        >
+            Continue
+        </button>
+
+        <!-- Error message container -->
+        <div class="step9-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Add any specific JS logic for file validation or submission here
-            const submitButton = document.querySelector('.f9_submit-button');
-            submitButton.addEventListener('click', function () {
-                alert('File submitted successfully!'); // Replace with actual logic as needed
+            const businessLicenseInput = document.getElementById('business_license');
+            const step9NextButton      = document.querySelector('.form-step-9 .next-button');
+            const errorContainer       = document.querySelector('.step9-error');
+
+            // Allowed file extensions
+            const allowedExtensions = ['png', 'jpg', 'jpeg', 'pdf'];
+            // Maximum file size in bytes (15 MB)
+            const maxFileSize = 15 * 1024 * 1024;
+
+            // Validate Step 9
+            function validateStep9() {
+                let errors = [];
+
+                const files = businessLicenseInput.files;
+                if (!files || files.length === 0) {
+                    errors.push('Please select a file to upload.');
+                } else {
+                    const file = files[0];
+                    const fileName = file.name;
+                    const fileSize = file.size;
+
+                    // Check extension
+                    const ext = fileName.split('.').pop().toLowerCase();
+                    if (!allowedExtensions.includes(ext)) {
+                        errors.push('File must be PNG, JPG, or PDF.');
+                    }
+
+                    // Check size
+                    if (fileSize > maxFileSize) {
+                        errors.push('File must not exceed 15 MB.');
+                    }
+                }
+
+                if (errors.length === 0) {
+                    step9NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step9NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            // Listen for file changes
+            businessLicenseInput.addEventListener('change', validateStep9);
+
+            // On final button click, store data if not disabled
+            step9NextButton.addEventListener('click', function() {
+                if (step9NextButton.disabled) {
+                    return; // If disabled, do nothing
+                }
+
+                const file = businessLicenseInput.files[0];
+                const fileName = file ? file.name : '';
+
+                // Initialize step9 object if not present
+                if (!window.kazverseRegistrationData.step9) {
+                    window.kazverseRegistrationData.step9 = {};
+                }
+
+                // Save file name in the global data object
+                window.kazverseRegistrationData.step9.business_license = fileName;
+
+                // Console log the entire data object
+                console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+                // Manually switch to the next step
+                const currentStep = document.querySelector('.form-step.active');
+                const nextStep    = document.querySelector('.form-step-10');
+                if (currentStep && nextStep) {
+                    currentStep.classList.remove('active');
+                    nextStep.classList.add('active');
+                }
             });
+
+            // Initial check in case no file is selected at the start
+            validateStep9();
         });
     </script>
     <?php
@@ -577,25 +1222,108 @@ function render_artisan_registration_step_11() {
                 class="f11_textarea form-control" 
                 placeholder="Describe your professional experience and expertise..." 
                 maxlength="1250" 
-                rows="5"></textarea>
+                rows="5"
+            ></textarea>
             <div class="f11_character-count">
                 <span id="f11_char_count">0</span> / 1250
             </div>
         </div>
 
         <!-- Navigation Buttons -->
-        <button type="button" class="previous-button purple-btn" data-previous-step="10">Back</button>
-        <button type="submit" class="submit-button purple-btn">Submit</button>
+        <button 
+            type="button" 
+            class="previous-button purple-btn" 
+            data-previous-step="10"
+        >
+            Back
+        </button>
+        <button 
+            type="submit" 
+            class="submit-button purple-btn"
+            disabled
+        >
+            Submit
+        </button>
+
+        <!-- Error message container -->
+        <div class="step11-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const textarea = document.getElementById('f11_professional_description');
-            const charCount = document.getElementById('f11_char_count');
+            const textarea       = document.getElementById('f11_professional_description');
+            const charCount      = document.getElementById('f11_char_count');
+            const submitButton   = document.querySelector('.form-step-11 .submit-button');
+            const errorContainer = document.querySelector('.step11-error');
+
+            // Set minimum length for the description
+            const minDescriptionLength = 10; // Adjust as needed
+            const maxDescriptionLength = 1250; // Matches the textarea maxlength
+
+            function validateStep11() {
+                let errors = [];
+                const descriptionValue = textarea.value.trim();
+                const length = descriptionValue.length;
+
+                // Check minimum length
+                if (length < minDescriptionLength) {
+                    errors.push(`Description must be at least ${minDescriptionLength} characters long.`);
+                }
+                // Check maximum length (though textarea maxlength should prevent exceeding 1250)
+                if (length > maxDescriptionLength) {
+                    errors.push(`Description cannot exceed ${maxDescriptionLength} characters.`);
+                }
+
+                // Enable/disable button based on errors
+                if (errors.length === 0) {
+                    submitButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    submitButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
 
             // Update character count
             textarea.addEventListener('input', function () {
                 charCount.textContent = textarea.value.length;
+                validateStep11();
+            });
+
+            // Validate on load in case the user tries to submit instantly
+            validateStep11();
+
+            // On final button click (Submit)
+            // If you want to actually submit the form to the backend,
+            // remove `e.preventDefault()`.
+            submitButton.addEventListener('click', function(e) {
+                if (submitButton.disabled) {
+                    // If somehow clicked while disabled, do nothing
+                    e.preventDefault();
+                    return;
+                }
+
+                // If valid, store data
+                const descriptionValue = textarea.value.trim();
+
+                // Initialize step11 object if not present
+                if (!window.kazverseRegistrationData.step11) {
+                    window.kazverseRegistrationData.step11 = {};
+                }
+
+                // Store the description in the global object
+                window.kazverseRegistrationData.step11.description = descriptionValue;
+
+                // Console log the entire data object
+                console.log('Current (or Final) Registration Data:', window.kazverseRegistrationData);
+
+                // If you'd like to actually submit the form, do not prevent default
+                // e.preventDefault() can be removed if you want the form to POST.
+                // e.preventDefault(); 
+                // If you do want the data to actually post, call:
+                // document.getElementById('artisanForm').submit();
             });
         });
     </script>
@@ -607,8 +1335,15 @@ function kazverse_render_registration_form() {
     ob_start();
     ?>
     <div id="artisan-registration-form">
+        <!-- Global data object initialization -->
+        <script>
+            // Make a global object to store form data across steps
+            window.kazverseRegistrationData = {};
+        </script>
+
         <form id="artisanForm" method="post">
             <?php
+            // Render the steps
             render_artisan_registration_step_1();
             render_artisan_registration_step_2();
             render_artisan_registration_step_3();
@@ -619,8 +1354,9 @@ function kazverse_render_registration_form() {
             render_artisan_registration_step_9();
             render_artisan_registration_step_10();
             render_artisan_registration_step_11();
-            // Additional steps will go here
+            
             ?>
+
         </form>
     </div>
     
