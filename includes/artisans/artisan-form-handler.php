@@ -122,8 +122,8 @@ function kazverse_artisan_process_form() {
     }
 
     // ========== Step 9 ==========
-    if ( isset($data['step9']['business_license']) ) {
-        store_artisan_meta($post_id, 'business_license', $data['step9']['business_license']);
+    if ( isset($data['step9']['business_license_url']) ) {
+        store_artisan_meta($post_id, 'business_license_url', esc_url_raw($data['step9']['business_license_url']));
     }
 
     // ========== Step 11 ==========

@@ -16,6 +16,7 @@ include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-registrati
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-form-handler.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-helpers.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-user-registration.php';
+include_once plugin_dir_path( __FILE__ ) . 'includes/general-helpers/image-upload.php';
 
 // Plugin initialization function
 // function kazverse_artisan_plugin_init() {

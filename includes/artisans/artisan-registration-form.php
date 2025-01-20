@@ -1290,7 +1290,7 @@ function render_artisan_registration_step_9() {
             <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>qualifications</h2>
+        <h2>Qualifications</h2>
         <p>Please upload your business license</p>
         <p class="f9_subtitle">
             You can upload either each page individually or a file with multiple pages.
@@ -1302,12 +1302,17 @@ function render_artisan_registration_step_9() {
             render_file_upload_field(
                 'business_license',                 // Name
                 'business_license',                 // ID
-                '',                                 // Label (No label required)
+                '',                                 // Label
                 true,                               // Required
-                ['accept' => 'image/png, image/jpeg, application/pdf'] // Accept specific file types
+                ['accept' => 'image/png, image/jpeg, application/pdf'] // Accept specific types
             );
             ?>
             <p class="f9_file-info">File: PNG, JPG, PDF, max. 15 MB</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="upload-loading" style="display:none; margin-top:10px;">
+            <span>Uploading...</span>
         </div>
 
         <!-- Error message container -->
@@ -1322,102 +1327,139 @@ function render_artisan_registration_step_9() {
             Back
         </button>
 
+        <!-- Remove data-next-step to handle manually -->
         <button 
             type="button" 
             class="next-button purple-btn" 
-            data-next-step="10"
-            disabled
+            id="step9ContinueBtn"
         >
             Continue
         </button>
-
-        
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const businessLicenseInput = document.getElementById('business_license');
-            const step9NextButton      = document.querySelector('.form-step-9 .next-button');
-            const errorContainer       = document.querySelector('.step9-error');
+    document.addEventListener('DOMContentLoaded', function () {
+        const businessLicenseInput = document.getElementById('business_license');
+        const step9NextButton      = document.getElementById('step9ContinueBtn');
+        const errorContainer       = document.querySelector('.step9-error');
+        const loadingIndicator     = document.getElementById('upload-loading');
 
-            // Allowed file extensions
-            const allowedExtensions = ['png', 'jpg', 'jpeg', 'pdf'];
-            // Maximum file size in bytes (15 MB)
-            const maxFileSize = 15 * 1024 * 1024;
+        // Nonce for security
+        const uploadNonce = '<?php echo wp_create_nonce("kazverse_upload_nonce"); ?>';
 
-            // Validate Step 9
-            function validateStep9() {
-                let errors = [];
+        // Allowed file extensions and size
+        const allowedExtensions = ['png', 'jpg', 'jpeg', 'pdf'];
+        const maxFileSize = 15 * 1024 * 1024; // 15 MB
 
-                const files = businessLicenseInput.files;
-                if (!files || files.length === 0) {
-                    errors.push('Please select a file to upload.');
-                } else {
-                    const file = files[0];
-                    const fileName = file.name;
-                    const fileSize = file.size;
+        // Validate file before upload
+        function validateFile() {
+            let errors = [];
+            const files = businessLicenseInput.files;
 
-                    // Check extension
-                    const ext = fileName.split('.').pop().toLowerCase();
-                    if (!allowedExtensions.includes(ext)) {
-                        errors.push('File must be PNG, JPG, or PDF.');
-                    }
+            if (!files || files.length === 0) {
+                errors.push('Please select a file to upload.');
+            } else {
+                const file = files[0];
+                const fileName = file.name;
+                const fileSize = file.size;
+                const ext = fileName.split('.').pop().toLowerCase();
 
-                    // Check size
-                    if (fileSize > maxFileSize) {
-                        errors.push('File must not exceed 15 MB.');
-                    }
+                if (!allowedExtensions.includes(ext)) {
+                    errors.push('File must be PNG, JPG, or PDF.');
                 }
-
-                if (errors.length === 0) {
-                    step9NextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    step9NextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
+                if (fileSize > maxFileSize) {
+                    errors.push('File must not exceed 15 MB.');
                 }
             }
 
-            // Listen for file changes
-            businessLicenseInput.addEventListener('change', validateStep9);
+            if (errors.length > 0) {
+                errorContainer.style.display = 'block';
+                errorContainer.innerHTML = errors.join('<br>');
+                return false;
+            } else {
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML = '';
+                return true;
+            }
+        }
 
-            // On final button click, store data if not disabled
-            step9NextButton.addEventListener('click', function() {
-                if (step9NextButton.disabled) {
-                    return; // If disabled, do nothing
+        // Handle "Continue" button click
+        step9NextButton.addEventListener('click', function() {
+            if (!validateFile()) {
+                return;
+            }
+
+            const file = businessLicenseInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Show loading and disable button
+            loadingIndicator.style.display = 'block';
+            step9NextButton.disabled = true;
+
+            // Prepare FormData
+            const formData = new FormData();
+            formData.append('action', 'upload_business_license');
+            formData.append('nonce', uploadNonce);
+            formData.append('business_license', file);
+
+            // AJAX upload
+            fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                step9NextButton.disabled = false;
+
+                if (data.success) {
+                    // Store the URL in the global object
+                    window.kazverseRegistrationData.step9 = window.kazverseRegistrationData.step9 || {};
+                    window.kazverseRegistrationData.step9.business_license_url = data.data.url;
+
+                    console.log('Uploaded File URL:', data.data.url);
+
+                    // Proceed to next step
+                    const currentStep = document.querySelector('.form-step.active');
+                    const nextStep    = document.querySelector('.form-step-10');
+                    if (currentStep && nextStep) {
+                        currentStep.classList.remove('active');
+                        nextStep.classList.add('active');
+                    }
+                } else {
+                    // Show error
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = data.data || 'Upload failed.';
                 }
-
-                const file = businessLicenseInput.files[0];
-                const fileName = file ? file.name : '';
-
-                // Initialize step9 object if not present
-                if (!window.kazverseRegistrationData.step9) {
-                    window.kazverseRegistrationData.step9 = {};
-                }
-
-                // Save file name in the global data object
-                window.kazverseRegistrationData.step9.business_license = fileName;
-
-                // Console log the entire data object
-                console.log('Current Registration Data:', window.kazverseRegistrationData);
-
-                // Manually switch to the next step
-                const currentStep = document.querySelector('.form-step.active');
-                const nextStep    = document.querySelector('.form-step-10');
-                if (currentStep && nextStep) {
-                    currentStep.classList.remove('active');
-                    nextStep.classList.add('active');
-                }
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                step9NextButton.disabled = false;
+                console.error('Upload error:', error);
+                errorContainer.style.display = 'block';
+                errorContainer.innerHTML = 'Something went wrong. Please try again.';
             });
-
-            // Initial check in case no file is selected at the start
-            validateStep9();
         });
+
+        // Optional: Re-validate on file change if needed
+        businessLicenseInput.addEventListener('change', validateFile);
+    });
     </script>
+
+    <style>
+        .error-field {
+            border: 1px solid red !important;
+            outline: none;
+        }
+        .error-msg {
+            margin-left: 10px;
+        }
+    </style>
     <?php
 }
+
 
 // Function to render Step 10
 function render_artisan_registration_step_10() {

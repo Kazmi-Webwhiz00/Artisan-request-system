@@ -25,8 +25,6 @@ function enqueue_admin_styles() {
 add_action('admin_enqueue_scripts', 'enqueue_admin_styles');
 
 
-
-
 /**
  * Register "artisan" Custom Post Type
  */
@@ -201,10 +199,6 @@ function my_artisan_save_meta_box_data( $post_id ) {
 }
 add_action( 'save_post', 'my_artisan_save_meta_box_data' );
 
-
-
-
-
 function my_artisan_meta_box_callback($post) {
     // Use nonce for verification
     wp_nonce_field('my_artisan_save_meta_box_data', 'my_artisan_meta_box_nonce');
@@ -227,7 +221,7 @@ function my_artisan_meta_box_callback($post) {
         'address' => get_post_meta($post->ID, 'address', true),
         'business_zip_code' => get_post_meta($post->ID, 'business_zip_code', true),
         'city' => get_post_meta($post->ID, 'city', true),
-        'business_license' => get_post_meta($post->ID, 'business_license', true),
+        'business_license_url' => get_post_meta($post->ID, 'business_license_url', true),
         'description' => get_post_meta($post->ID, 'description', true),
     ];
 
@@ -289,10 +283,14 @@ function my_artisan_meta_box_callback($post) {
 
     // Step 7: Business License
     echo '<div class="artisan-meta-group">';
-    echo '<div class="artisan-meta-group-title">Step 7: Business License</div>';
-    echo '<div class="artisan-meta-group-content">';
-    echo '<label>Business License File</label><input type="text" name="business_license" value="' . esc_attr($meta_fields['business_license']) . '" class="widefat" />';
-    echo '</div></div>';
+        echo '<div class="artisan-meta-group-title">Step 7: Business License</div>';
+        echo '<div class="artisan-meta-group-content">';
+        if ( ! empty($meta_fields['business_license_url']) ) {
+            echo '<label>Business License File</label><a href="' . esc_url($meta_fields['business_license_url']) . '" target="_blank">View License</a>';
+        } else {
+            echo '<label>Business License File</label><span>No file uploaded.</span>';
+        }
+        echo '</div></div>';
 
     // Step 8: Description
     echo '<div class="artisan-meta-group">';
