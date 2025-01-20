@@ -217,7 +217,7 @@ function render_artisan_registration_step_2() {
             true                    // Required
         );
 
-        // Render the phone field (Note: +43 prefix is already shown, so user enters only the remaining digits)
+        // Render the phone field (Note: +43 prefix is already shown, so user enters only remaining digits)
         render_phone_field(
             'phone',                // Name
             'phone',                // ID
@@ -228,23 +228,23 @@ function render_artisan_registration_step_2() {
             '+43'                   // Phone prefix (displayed but not typed by user)
         );
 
-        // Render the password field using the render_password_field function
+        // Render the password field
         render_password_field(
-            'password',             // Name
-            'password',             // ID
-            'Password (at least 6 characters)', // Label
-            'Create password',      // Placeholder
-            '',                     // Default value
+            'password',             
+            'password',             
+            'Password (at least 6 characters)', 
+            'Create password',      
+            '',                     
             true                    // Required
         );
 
         // Subscribe checkbox - not mandatory
         render_checkbox_field(
-            'subscribe',           // Name
-            'subscribe',           // ID
-            'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', // Label
-            false,                 // Checked by default
-            false                  // Not required
+            'subscribe',           
+            'subscribe',           
+            'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', 
+            false,                 // default unchecked
+            false
         );
         ?>
 
@@ -256,10 +256,11 @@ function render_artisan_registration_step_2() {
         >
             Back
         </button>
+        <!-- Note: we REMOVE data-next-step="3" so it doesn't auto-jump to Step 3 -->
         <button 
             type="button" 
             class="next-button purple-btn" 
-            data-next-step="3"
+            id="step2ContinueBtn"
             disabled
         >
             Continue
@@ -276,39 +277,32 @@ function render_artisan_registration_step_2() {
             const phoneInput      = document.getElementById('phone');
             const passwordInput   = document.getElementById('password');
             const subscribeBox    = document.getElementById('subscribe');
-            const nextButton      = document.querySelector('.form-step-2 .next-button');
+            const nextButton      = document.getElementById('step2ContinueBtn');
             const errorContainer  = document.querySelector('.step2-error');
 
-            // We'll assume user only enters digits for phoneInput (excluding +43, already shown in UI).
-            // Must be 6..13 digits. Example: '1234567' => final becomes '+43 1234567'
+            // Phone must be 6..13 digits (excluding +43)
             const phoneDigitsRegex = /^\d{6,13}$/;
 
-            // Validate step 2 fields
+            // Validate fields for Step 2
             function validateStep2() {
-                const firstName    = firstNameInput.value.trim();
-                const lastName     = lastNameInput.value.trim();
-                const phoneDigits  = phoneInput.value.trim();
-                const password     = passwordInput.value.trim();
+                const firstName   = firstNameInput.value.trim();
+                const lastName    = lastNameInput.value.trim();
+                const phoneDigits = phoneInput.value.trim();
+                const password    = passwordInput.value.trim();
                 let errors = [];
 
-                // First name required
+                // Required fields
                 if (!firstName) {
                     errors.push('First name is required.');
                 }
-
-                // Last name required
                 if (!lastName) {
                     errors.push('Last name is required.');
                 }
-
-                // Phone must be 6..13 digits if user has typed anything
                 if (!phoneDigits) {
                     errors.push('Phone number is required.');
                 } else if (!phoneDigitsRegex.test(phoneDigits)) {
                     errors.push('Phone number must be 6 to 13 digits (excluding the +43 prefix).');
                 }
-
-                // Password required, at least 6 characters
                 if (!password) {
                     errors.push('Password is required.');
                 } else if (password.length < 6) {
@@ -326,7 +320,7 @@ function render_artisan_registration_step_2() {
                 }
             }
 
-            // Listen to all relevant fields
+            // Real-time validation
             firstNameInput.addEventListener('input', validateStep2);
             lastNameInput.addEventListener('input', validateStep2);
             phoneInput.addEventListener('input', validateStep2);
@@ -335,41 +329,87 @@ function render_artisan_registration_step_2() {
                 subscribeBox.addEventListener('change', validateStep2);
             }
 
-            // On final button click, store data if not disabled
+            // On "Continue" click, create user via AJAX before moving to Step 3
             nextButton.addEventListener('click', function() {
-                if (nextButton.disabled) {
-                    return; // If disabled, do nothing
-                }
+                if (nextButton.disabled) return;
 
                 const firstName    = firstNameInput.value.trim();
                 const lastName     = lastNameInput.value.trim();
-                // We create final phone by prefixing '+43 ' (or however you want to format).
                 const phoneDigits  = phoneInput.value.trim();
                 const phoneFinal   = '+43 ' + phoneDigits;
                 const password     = passwordInput.value.trim();
-                // Subscription is optional
                 const isSubscribed = subscribeBox && subscribeBox.checked ? true : false;
 
-                // Initialize step2 object if not present
+                // Save data to global object
                 if (!window.kazverseRegistrationData.step2) {
                     window.kazverseRegistrationData.step2 = {};
                 }
-
                 window.kazverseRegistrationData.step2.first_name = firstName;
                 window.kazverseRegistrationData.step2.last_name  = lastName;
                 window.kazverseRegistrationData.step2.phone      = phoneFinal;
                 window.kazverseRegistrationData.step2.password   = password;
                 window.kazverseRegistrationData.step2.subscribe  = isSubscribed;
 
-                console.log('Current Registration Data:', window.kazverseRegistrationData);
-
-                // Manually switch steps
-                const currentStep = document.querySelector('.form-step.active');
-                const nextStep    = document.querySelector('.form-step-3');
-                if (currentStep && nextStep) {
-                    currentStep.classList.remove('active');
-                    nextStep.classList.add('active');
+                // We'll do an AJAX call to create the WP user now
+                const step1Email = window.kazverseRegistrationData.step1?.email || '';
+                if (!step1Email) {
+                    alert("No email found from Step 1!");
+                    return;
                 }
+
+                // Disable "Continue" again & hide errors
+                nextButton.disabled = true;
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML = '';
+
+                fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'create_artisan_user',
+                        email: step1Email,
+                        first_name: firstName,
+                        last_name: lastName,
+                        password: password,
+                        phone: phoneFinal
+                    })
+                })
+                .then(res => res.json())
+                .then(response => {
+                    if (!response) throw new Error("No response from server");
+
+                    if (response.success) {
+                        // User creation success
+                        console.log('User created:', response.data);
+
+                        // Make Step 2 fields read-only
+                        firstNameInput.readOnly = true;
+                        lastNameInput.readOnly  = true;
+                        phoneInput.readOnly     = true;
+                        passwordInput.readOnly  = true;
+                        if (subscribeBox) subscribeBox.disabled = true;
+
+                        // Move to Step 3
+                        const currentStep = document.querySelector('.form-step.active');
+                        const nextStep    = document.querySelector('.form-step-3');
+                        if (currentStep && nextStep) {
+                            currentStep.classList.remove('active');
+                            nextStep.classList.add('active');
+                        }
+                    } else {
+                        // Show error => do not proceed to Step 3
+                        const errMsg = response.data || "An unknown error occurred.";
+                        errorContainer.style.display = 'block';
+                        errorContainer.innerHTML = errMsg;
+                        nextButton.disabled = false; // let them try again
+                    }
+                })
+                .catch(err => {
+                    console.error('AJAX error:', err);
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = "Something went wrong. Check console.";
+                    nextButton.disabled = false;
+                });
             });
         });
     </script>
