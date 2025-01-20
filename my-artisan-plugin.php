@@ -22,6 +22,8 @@ include_once plugin_dir_path( __FILE__ ) . 'includes/general-helpers/image-uploa
 include_once plugin_dir_path(__FILE__) . 'includes/taxonomies/global-services-taxonomy.php';
 
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/service-form-cpt.php';
+include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/form-field-table-sql.php';
+
 
 
 // Plugin initialization function
@@ -36,3 +38,14 @@ function kazverse_artisan_form_shortcode() {
     return kazverse_render_registration_form();
 }
 add_shortcode( 'artisan_registration_form', 'kazverse_artisan_form_shortcode' );
+
+
+
+/**
+ * Hook into plugin activation to create the table
+ */
+function form_field_table_activation_hook() {
+    create_form_field_table();
+}
+
+register_activation_hook(__FILE__, 'form_field_table_activation_hook');
