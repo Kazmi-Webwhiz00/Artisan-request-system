@@ -131,5 +131,7 @@ function kazverse_artisan_process_form() {
         store_artisan_meta($post_id, 'description', $data['step11']['description'], 'sanitize_textarea_field');
     }
 
+    // 6. All done! Redirect to a thank-you page or show success
+    wp_redirect( home_url('/') );
     exit;
 }
