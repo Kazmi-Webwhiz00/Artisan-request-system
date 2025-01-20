@@ -922,11 +922,11 @@ function render_artisan_registration_step_6() {
             // Loop through options and render each as a radio button
             foreach ($status_options as $index => $status) {
                 render_radio_button_field(
-                    'professional_status',                // Name
-                    'status_' . $index,                   // ID (unique for each option)
-                    $status,                              // Label
-                    false,                                // Checked (default is false)
-                    false                                 // Not strictly required by HTML, but we enforce in JS
+                    'professional_status',
+                    'status_' . $index,
+                    $status,
+                    false, // not checked by default
+                    false
                 );
             }
             ?>
@@ -941,83 +941,88 @@ function render_artisan_registration_step_6() {
             Back
         </button>
 
+        <!-- We remove data-next-step to handle validation ourselves -->
         <button 
             type="button" 
             class="next-button purple-btn" 
-            data-next-step="8"
-            disabled
+            id="step6ContinueBtn"
         >
             Continue
         </button>
 
-        <!-- Error message container -->
-        <div class="step6-error" style="display:none; color:red; margin-top:10px;"></div>
+        <!-- Inline error container -->
+        <div id="step6-inline-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const step6NextButton   = document.querySelector('.form-step-6 .next-button');
-            const errorContainer    = document.querySelector('.step6-error');
-            const radioButtons      = document.querySelectorAll('input[name="professional_status"]');
+            const step6NextButton = document.getElementById('step6ContinueBtn');
+            const errorContainer  = document.getElementById('step6-inline-error');
+            const radioButtons    = document.querySelectorAll('input[name="professional_status"]');
 
-            // Validate step 6: user must pick exactly one professional status
-            function validateStep6() {
-                let errors = [];
-                const checkedRadio = Array.from(radioButtons).find(rb => rb.checked);
+            // Track if user has clicked "Continue" at least once
+            let attemptedNext = false;
 
-                if (!checkedRadio) {
-                    errors.push('Please select your current professional status.');
-                }
-
-                if (errors.length === 0) {
-                    step6NextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    step6NextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
-                }
-            }
-
-            // Add event listeners to each radio button
+            // Whenever a radio changes, if user already tried to go next,
+            // re-validate => removing errors if now selected
             radioButtons.forEach(rb => {
-                rb.addEventListener('change', validateStep6);
+                rb.addEventListener('change', function() {
+                    if (attemptedNext) {
+                        validateStep6();
+                    }
+                });
             });
 
-            // Initial validation in case none are selected yet
-            validateStep6();
+            function validateStep6() {
+                // Clear old error
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML     = '';
 
-            // On final button click, store data if not disabled
-            step6NextButton.addEventListener('click', function() {
-                if (step6NextButton.disabled) {
-                    return; // If disabled, do nothing
+                let isValid = true;
+
+                // Check if any radio is checked
+                const selectedRadio = Array.from(radioButtons).find(rb => rb.checked);
+                if (!selectedRadio) {
+                    isValid = false;
+                    showError('Please select your current professional status.');
                 }
 
-                // Get the selected radio button
+                return isValid;
+            }
+
+            function showError(msg) {
+                errorContainer.style.display = 'block';
+                errorContainer.innerHTML     = msg;
+            }
+
+            // On button click => show errors if invalid, else proceed
+            step6NextButton.addEventListener('click', function() {
+                attemptedNext = true;
+
+                const valid = validateStep6();
+                if (!valid) {
+                    // Stop here
+                    return;
+                }
+
+                // Otherwise, store data
                 const selectedRadio = Array.from(radioButtons).find(rb => rb.checked);
                 let selectedStatus = '';
-
                 if (selectedRadio) {
-                    // Get label text for the selected radio
                     const labelElement = document.querySelector(`label[for="${selectedRadio.id}"]`);
                     if (labelElement) {
                         selectedStatus = labelElement.innerText.trim();
                     }
                 }
 
-                // Initialize step6 object if not present
                 if (!window.kazverseRegistrationData.step6) {
                     window.kazverseRegistrationData.step6 = {};
                 }
-
-                // Store selected status in the global object
                 window.kazverseRegistrationData.step6.professional_status = selectedStatus;
 
-                // Console log the entire data object
                 console.log('Current Registration Data:', window.kazverseRegistrationData);
 
-                // Manually switch to the next step
+                // Move to Step 8
                 const currentStep = document.querySelector('.form-step.active');
                 const nextStep    = document.querySelector('.form-step-8');
                 if (currentStep && nextStep) {
@@ -1029,6 +1034,7 @@ function render_artisan_registration_step_6() {
     </script>
     <?php
 }
+
 
 // Function to render Step 8
 function render_artisan_registration_step_8() {
@@ -1054,6 +1060,7 @@ function render_artisan_registration_step_8() {
                 false                  // Not required
             );
             ?>
+            <span id="gisa-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
 
         <!-- Company Name (Required) -->
@@ -1062,12 +1069,13 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_company_name',     // Name
                 'f8_company_name',     // ID
-                'Company Name',      // Label
-                'Enter your company name', // Placeholder
+                'Company Name',        // Label
+                'Enter your company name', 
                 '',                    // Default value
                 true                   // Required
             );
             ?>
+            <span id="companyName-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
 
         <!-- Address (Required) -->
@@ -1076,23 +1084,25 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_address',          // Name
                 'f8_address',          // ID
-                'Address',           // Label
-                'Enter your address',  // Placeholder
-                '',                    // Default value
-                true                   // Required
+                'Address',             // Label
+                'Enter your address',
+                '',                    
+                true // Required
             );
             ?>
+            <span id="address-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
 
         <!-- Zip Code and City (Grouped) -->
         <div class="f8_form_group form-group">
             <?php
             render_grouped_fields(
-                'f8_zip_code', 'f8_zip_code', 'Zip Code',    // Zip Code Field
-                'f8_city', 'f8_city', 'City *',                // City Field
-                '', '', true                                   // Default values and required
+                'f8_zip_code', 'f8_zip_code', 'Zip Code',
+                'f8_city', 'f8_city', 'City',
+                '', '', true  // Both required
             );
             ?>
+            <span id="zipCity-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
 
         <!-- Navigation Buttons -->
@@ -1103,125 +1113,173 @@ function render_artisan_registration_step_8() {
         >
             Back
         </button>
+        <!-- Remove data-next-step so we can handle it ourselves -->
         <button 
             type="button" 
             class="next-button purple-btn" 
-            data-next-step="9"
-            disabled
+            id="step8ContinueBtn"
         >
             Continue
         </button>
 
-        <!-- Error message container -->
-        <div class="step8-error" style="display:none; color:red; margin-top:10px;"></div>
+        <!-- Error container if needed for combined messages -->
+        <div id="step8-inline-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // DOM Elements
-            const gisaInput       = document.getElementById('f8_gisa_number');    // optional
-            const companyNameInput= document.getElementById('f8_company_name');   // required
-            const addressInput    = document.getElementById('f8_address');        // required
-            const zipCodeInput    = document.getElementById('f8_zip_code');       // required
-            const cityInput       = document.getElementById('f8_city');           // required
-            const step8NextButton = document.querySelector('.form-step-8 .next-button');
-            const errorContainer  = document.querySelector('.step8-error');
+    document.addEventListener('DOMContentLoaded', function () {
+        // DOM Elements
+        const gisaInput       = document.getElementById('f8_gisa_number');  
+        const companyNameInput= document.getElementById('f8_company_name'); 
+        const addressInput    = document.getElementById('f8_address');
+        const zipCodeInput    = document.getElementById('f8_zip_code');
+        const cityInput       = document.getElementById('f8_city');
+        const step8NextButton = document.getElementById('step8ContinueBtn');
+        const globalError     = document.getElementById('step8-inline-error');
 
-            // Basic regex to check zip code is numeric (adjust if you need different logic)
-            const zipRegex = /^[0-9]+$/;
+        // Inline spans
+        const gisaError       = document.getElementById('gisa-error');
+        const companyError    = document.getElementById('companyName-error');
+        const addressError    = document.getElementById('address-error');
+        const zipCityError    = document.getElementById('zipCity-error');
 
-            // Validate Step 8
-            function validateStep8() {
-                const gisaNumberVal    = gisaInput.value.trim();         // optional
-                const companyNameVal   = companyNameInput.value.trim();  // required
-                const addressVal       = addressInput.value.trim();      // required
-                const zipVal           = zipCodeInput.value.trim();      // required
-                const cityVal          = cityInput.value.trim();         // required
+        // Basic numeric regex for zip
+        const zipRegex = /^[0-9]+$/;
 
-                let errors = [];
+        // Track if user clicked "Continue" at least once
+        let attemptedNext = false;
 
-                // Company Name
-                if (!companyNameVal) {
-                    errors.push('Company Name is required.');
-                }
-
-                // Address
-                if (!addressVal) {
-                    errors.push('Address is required.');
-                }
-
-                // Zip Code
-                if (!zipVal) {
-                    errors.push('Zip Code is required.');
-                } else if (!zipRegex.test(zipVal)) {
-                    errors.push('Zip Code must be numeric only.');
-                }
-
-                // City
-                if (!cityVal) {
-                    errors.push('City is required.');
-                }
-
-                // If no errors => enable button, else disable
-                if (errors.length === 0) {
-                    step8NextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    step8NextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
-                }
-            }
-
-            // Add event listeners
-            gisaInput.addEventListener('input', validateStep8);        // even though it's optional, let's watch it 
-            companyNameInput.addEventListener('input', validateStep8);
-            addressInput.addEventListener('input', validateStep8);
-            zipCodeInput.addEventListener('input', validateStep8);
-            cityInput.addEventListener('input', validateStep8);
-
-            // Initial validation
-            validateStep8();
-
-            // On final button click, store data if not disabled
-            step8NextButton.addEventListener('click', function() {
-                if (step8NextButton.disabled) {
-                    return; // If disabled, do nothing
-                }
-
-                const gisaNumberVal    = gisaInput.value.trim();
-                const companyNameVal   = companyNameInput.value.trim();
-                const addressVal       = addressInput.value.trim();
-                const zipVal           = zipCodeInput.value.trim();
-                const cityVal          = cityInput.value.trim();
-
-                // Initialize step8 object if not present
-                if (!window.kazverseRegistrationData.step8) {
-                    window.kazverseRegistrationData.step8 = {};
-                }
-
-                // Store Step 8 data in the global object
-                window.kazverseRegistrationData.step8.gisa_number   = gisaNumberVal;
-                window.kazverseRegistrationData.step8.company_name  = companyNameVal;
-                window.kazverseRegistrationData.step8.address       = addressVal;
-                window.kazverseRegistrationData.step8.zip_code      = zipVal;
-                window.kazverseRegistrationData.step8.city          = cityVal;
-
-                console.log('Current Registration Data:', window.kazverseRegistrationData);
-
-                // Manually move to the next step
-                const currentStep = document.querySelector('.form-step.active');
-                const nextStep    = document.querySelector('.form-step-9');
-                if (currentStep && nextStep) {
-                    currentStep.classList.remove('active');
-                    nextStep.classList.add('active');
+        // Whenever user types, if they've tried once, re-check
+        [gisaInput, companyNameInput, addressInput, zipCodeInput, cityInput].forEach(field => {
+            field.addEventListener('input', function() {
+                if (attemptedNext) {
+                    validateAndShowErrors();
                 }
             });
         });
+
+        function validateAndShowErrors() {
+            clearErrors();
+
+            let isValid = true;
+
+            // GISA is optional => no error if empty
+            // If you had GISA format rules, you'd add them here.
+
+            const companyVal = companyNameInput.value.trim();
+            if (!companyVal) {
+                isValid = false;
+                showError(companyNameInput, companyError, 'Company Name is required.');
+            }
+
+            const addressVal = addressInput.value.trim();
+            if (!addressVal) {
+                isValid = false;
+                showError(addressInput, addressError, 'Address is required.');
+            }
+
+            const zipVal = zipCodeInput.value.trim();
+            const cityVal= cityInput.value.trim();
+            if (!zipVal) {
+                isValid = false;
+                showError(zipCodeInput, zipCityError, 'Zip Code is required.');
+            } else if (!zipRegex.test(zipVal)) {
+                isValid = false;
+                showError(zipCodeInput, zipCityError, 'Zip Code must be numeric only.');
+            }
+            if (!cityVal) {
+                isValid = false;
+                // If there's already an error for zip, append or show new?
+                // We'll just reuse same span:
+                const existing = zipCityError.textContent;
+                const cityErr  = existing ? existing + ' City is required.' : 'City is required.';
+                showError(cityInput, zipCityError, cityErr);
+            }
+
+            return isValid;
+        }
+
+        function showError(inputEl, errorEl, msg) {
+            errorEl.style.display = 'inline';
+            // If errorEl already has text, append with space for clarity
+            if (errorEl.textContent) {
+                errorEl.textContent += ' ' + msg;
+            } else {
+                errorEl.textContent = msg;
+            }
+            inputEl.classList.add('error-field');
+        }
+
+        function clearError(inputEl, errorEl) {
+            errorEl.style.display = 'none';
+            errorEl.textContent    = '';
+            inputEl.classList.remove('error-field');
+        }
+
+        function clearErrors() {
+            clearError(gisaInput,       gisaError);
+            clearError(companyNameInput,companyError);
+            clearError(addressInput,    addressError);
+            clearError(zipCodeInput,    zipCityError);
+            clearError(cityInput,       zipCityError);
+            // Also hide global error if any
+            globalError.style.display = 'none';
+            globalError.innerHTML     = '';
+        }
+
+        // On button click => show errors if any. If valid => store data, next step
+        step8NextButton.addEventListener('click', function() {
+            attemptedNext = true;
+            if (!validateAndShowErrors()) {
+                return; // do not proceed
+            }
+
+            // If valid => store data
+            const gisaVal       = gisaInput.value.trim();
+            const companyVal    = companyNameInput.value.trim();
+            const addressVal    = addressInput.value.trim();
+            const zipVal        = zipCodeInput.value.trim();
+            const cityVal       = cityInput.value.trim();
+
+            if (!window.kazverseRegistrationData.step8) {
+                window.kazverseRegistrationData.step8 = {};
+            }
+            window.kazverseRegistrationData.step8.gisa_number   = gisaVal;
+            window.kazverseRegistrationData.step8.company_name  = companyVal;
+            window.kazverseRegistrationData.step8.address       = addressVal;
+            window.kazverseRegistrationData.step8.zip_code      = zipVal;
+            window.kazverseRegistrationData.step8.city          = cityVal;
+
+            console.log('Current Registration Data:', window.kazverseRegistrationData);
+
+            // Move to step 9
+            const currentStep = document.querySelector('.form-step.active');
+            const nextStep    = document.querySelector('.form-step-9');
+            if (currentStep && nextStep) {
+                currentStep.classList.remove('active');
+                nextStep.classList.add('active');
+            }
+        });
+
+        // Optionally add styling for .error-field
+        (function addErrorStylingCSS() {
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .error-field {
+                    border: 1px solid red !important;
+                    outline: none;
+                }
+                .error-msg {
+                    margin-left: 10px;
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+    });
     </script>
     <?php
 }
+
 
 // Function to render Step 9
 function render_artisan_registration_step_9() {
@@ -1252,6 +1310,9 @@ function render_artisan_registration_step_9() {
             <p class="f9_file-info">File: PNG, JPG, PDF, max. 15 MB</p>
         </div>
 
+        <!-- Error message container -->
+        <div class="step9-error" style="display:none; color:red; margin-top:10px;"></div>
+
         <!-- Navigation Buttons -->
         <button 
             type="button" 
@@ -1270,8 +1331,7 @@ function render_artisan_registration_step_9() {
             Continue
         </button>
 
-        <!-- Error message container -->
-        <div class="step9-error" style="display:none; color:red; margin-top:10px;"></div>
+        
     </div>
 
     <script>
@@ -1431,6 +1491,9 @@ function render_artisan_registration_step_11() {
             </div>
         </div>
 
+        <!-- Error message container -->
+        <div class="step11-error" style="display:none; color:red; margin-top:10px;"></div>
+
         <!-- Navigation Buttons -->
         <button 
             type="button" 
@@ -1447,8 +1510,7 @@ function render_artisan_registration_step_11() {
             Submit
         </button>
 
-        <!-- Error message container -->
-        <div class="step11-error" style="display:none; color:red; margin-top:10px;"></div>
+        
     </div>
 
     <script>
