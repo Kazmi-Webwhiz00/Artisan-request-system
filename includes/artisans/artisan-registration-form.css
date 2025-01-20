@@ -68,16 +68,16 @@
 }
 .form-step-4 .f4_trade-cards {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     gap: 15px;
+    flex-direction: column;
 }
 .form-step-4 .f4_trade-card {
     background-color: #f8f9fa;
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 8px;
-    width: 200px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -449,6 +449,8 @@
     margin-bottom: 20px;
     font-family: Arial, sans-serif;
     position: relative;
+    overflow-y: auto;
+    max-height: 400px;
 }
 
 /* Label styling */

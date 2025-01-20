@@ -46,43 +46,60 @@ function render_artisan_registration_step_1() {
     ?>
     <div class="form-step form-step-1 active">
         <h2>View orders from the region</h2>
-        <?php
-        // Render the trade select field using render_select_field
-        render_select_field(
-            'trade',                // Name
-            'trade',                // ID
-            'Trade',                // Label
-            [
-                '' => 'Select your trade',
-                'well-builder' => 'Well Builder',
-                'electrician' => 'Electrician',
-                'plumber' => 'Plumber',
-                // Add more trades as needed
-            ],
-            '',   // Default selected value
-            true  // Required
-        );
 
-        // Render the zip code field using render_text_field
-        render_text_field(
-            'zip_code',
-            'zip_code',
-            'Zip Code',
-            'Enter your zip code',
-            '',
-            true // Required
-        );
+        <!-- Trade Field -->
+        <div class="form-group">
+            <?php
+            render_select_field(
+                'trade',
+                'trade',
+                'Trade',
+                [
+                    '' => 'Select your trade',
+                    'well-builder' => 'Well Builder',
+                    'electrician' => 'Electrician',
+                    'plumber' => 'Plumber',
+                    // Add more trades as needed
+                ],
+                '',
+                true // Required
+            );
+            ?>
+            <!-- Inline error for trade -->
+            <span id="trade-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
-        // Render the email field using render_email_field
-        render_email_field(
-            'email',
-            'email',
-            'Email Address',
-            'Enter your email address',
-            '',
-            true // Required
-        );
-        ?>
+        <!-- Zip Code Field -->
+        <div class="form-group">
+            <?php
+            render_text_field(
+                'zip_code',
+                'zip_code',
+                'Zip Code',
+                'Enter your zip code',
+                '',
+                true // Required
+            );
+            ?>
+            <!-- Inline error for zip -->
+            <span id="zip-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+            <?php
+            render_email_field(
+                'email',
+                'email',
+                'Email Address',
+                'Enter your email address',
+                '',
+                true // Required
+            );
+            ?>
+            <!-- Inline error for email -->
+            <span id="email-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
         <div class="form-group terms">
             <p>
@@ -92,18 +109,14 @@ function render_artisan_registration_step_1() {
             </p>
         </div>
 
-        <!-- "Next" button is disabled by default; enabled only when validation passes -->
+        <!-- Always clickable; we handle validation on click -->
         <button 
             type="button" 
             class="next-button" 
-            data-next-step="2" 
-            disabled
+            id="step1ContinueBtn"
         >
             Register for free
         </button>
-
-        <!-- Error message container -->
-        <div class="step1-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
@@ -111,89 +124,132 @@ function render_artisan_registration_step_1() {
             const tradeSelect = document.getElementById('trade');
             const zipInput    = document.getElementById('zip_code');
             const emailInput  = document.getElementById('email');
-            const nextButton  = document.querySelector('.form-step-1 .next-button');
-            const errorContainer = document.querySelector('.step1-error');
+            const nextButton  = document.getElementById('step1ContinueBtn');
+
+            // Inline error elements
+            const tradeError  = document.getElementById('trade-error');
+            const zipError    = document.getElementById('zip-error');
+            const emailError  = document.getElementById('email-error');
 
             // Simple email validation regex
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            // Check validity of Step 1 inputs
-            function validateStep1() {
-                const trade = tradeSelect.value.trim();
-                const zip   = zipInput.value.trim();
-                const email = emailInput.value.trim();
+            // This flag indicates if we've shown errors once
+            // so that subsequent field edits can clear them proactively
+            let hasClickedNext = false;
 
-                let errors = [];
-
-                // Validate trade (required and not empty)
-                if (!trade) {
-                    errors.push('Please select a trade.');
-                }
-
-                // Validate zip code (must be numeric and non-empty)
-                if (!zip) {
-                    errors.push('Zip code is required.');
-                } else if (!/^[0-9]+$/.test(zip)) {
-                    errors.push('Zip code must be numeric only.');
-                }
-
-                // Validate email
-                if (!email) {
-                    errors.push('Email is required.');
-                } else if (!emailRegex.test(email)) {
-                    errors.push('Please enter a valid email address.');
-                }
-
-                // If no errors, enable button; otherwise disable it
-                if (errors.length === 0) {
-                    nextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    nextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
+            // Whenever a field changes, if we've already tried to go next,
+            // recheck validity => remove error highlights on corrected fields.
+            function onFieldChange() {
+                if (hasClickedNext) {
+                    validateAndShowErrors();
                 }
             }
 
-            // Validate on every input/change
-            tradeSelect.addEventListener('change', validateStep1);
-            zipInput.addEventListener('input', validateStep1);
-            emailInput.addEventListener('input', validateStep1);
+            // Attach listeners for changes
+            tradeSelect.addEventListener('change', onFieldChange);
+            zipInput.addEventListener('input', onFieldChange);
+            emailInput.addEventListener('input', onFieldChange);
 
-            // Final check on button click (in case it somehow gets clicked)
-            nextButton.addEventListener('click', function () {
-                // If disabled, do nothing
-                if (nextButton.disabled) {
+            // Validation + inline errors
+            function validateAndShowErrors() {
+                let isValid = true;
+
+                // Clear old errors
+                clearError(tradeSelect, tradeError);
+                clearError(zipInput,   zipError);
+                clearError(emailInput, emailError);
+
+                // Trade
+                const tradeVal = tradeSelect.value.trim();
+                if (!tradeVal) {
+                    isValid = false;
+                    showError(tradeSelect, tradeError, 'Please select a trade.');
+                }
+
+                // Zip
+                const zipVal = zipInput.value.trim();
+                if (!zipVal) {
+                    isValid = false;
+                    showError(zipInput, zipError, 'Zip code is required.');
+                } else if (!/^[0-9]+$/.test(zipVal)) {
+                    isValid = false;
+                    showError(zipInput, zipError, 'Zip code must be numeric only.');
+                }
+
+                // Email
+                const emailVal = emailInput.value.trim();
+                if (!emailVal) {
+                    isValid = false;
+                    showError(emailInput, emailError, 'Email is required.');
+                } else if (!emailRegex.test(emailVal)) {
+                    isValid = false;
+                    showError(emailInput, emailError, 'Please enter a valid email address.');
+                }
+
+                return isValid;
+            }
+
+            function showError(inputEl, errorEl, msg) {
+                errorEl.textContent   = msg;
+                errorEl.style.display = 'inline';
+                inputEl.classList.add('error-field');
+            }
+
+            function clearError(inputEl, errorEl) {
+                errorEl.textContent   = '';
+                errorEl.style.display = 'none';
+                inputEl.classList.remove('error-field');
+            }
+
+            // On Next button click => show errors if invalid, else proceed
+            nextButton.addEventListener('click', function() {
+                hasClickedNext = true; // Now we can show errors
+                const valid = validateAndShowErrors();
+                if (!valid) {
+                    // Stop here
                     return;
                 }
 
-                // Once valid, store data and move to the next step
+                // If valid => store data, go to next step
                 const trade = tradeSelect.value.trim();
                 const zip   = zipInput.value.trim();
                 const email = emailInput.value.trim();
 
-                // Initialize step1 object if not present
                 if (!window.kazverseRegistrationData.step1) {
                     window.kazverseRegistrationData.step1 = {};
                 }
-
-                // Store Step 1 data in the global object
                 window.kazverseRegistrationData.step1.trade    = trade;
                 window.kazverseRegistrationData.step1.zip_code = zip;
                 window.kazverseRegistrationData.step1.email    = email;
 
-                // Console log the entire data object
                 console.log('Current Registration Data:', window.kazverseRegistrationData);
 
-                // Manually switch to the next step
+                // Manually switch step
                 const currentStep = document.querySelector('.form-step.active');
-                const nextStep = document.querySelector('.form-step-2');
+                const nextStep    = document.querySelector('.form-step-2');
                 if (currentStep && nextStep) {
                     currentStep.classList.remove('active');
                     nextStep.classList.add('active');
                 }
             });
+
+            // Helper styling for red border
+            function addErrorStylingCSS() {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                  .error-field {
+                      border: 1px solid red !important;
+                      outline: none;
+                  }
+                  .error-msg {
+                      margin-left: 10px;
+                  }
+                `;
+                document.head.appendChild(style);
+            }
+            addErrorStylingCSS();
+
         });
     </script>
     <?php
@@ -205,59 +261,82 @@ function render_artisan_registration_step_2() {
     <div class="form-step form-step-2">
         <h2>Create an Account</h2>
         <p>Enter your name exactly as it appears on your company documents.</p>
-        <?php
-        // Render the first name field
-        render_text_field(
-            'first_name',           // Name
-            'first_name',           // ID
-            'Company Owner',        // Label
-            'First name',           // Placeholder
-            '',                     // Default value
-            true                    // Required
-        );
 
-        // Render the last name field
-        render_text_field(
-            'last_name',            // Name
-            'last_name',            // ID
-            '',                     // Label
-            'Last name',            // Placeholder
-            '',                     // Default value
-            true                    // Required
-        );
+        <!-- First Name -->
+        <div class="form-group">
+            <?php
+            render_text_field(
+                'first_name',           
+                'first_name',           
+                'Company Owner',        
+                'First name',           
+                '',                     
+                true // Required
+            );
+            ?>
+            <span id="firstName-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
-        // Render the phone field (Note: +43 prefix is already shown, so user enters only remaining digits)
-        render_phone_field(
-            'phone',                // Name
-            'phone',                // ID
-            'Phone Number',         // Label
-            'Enter your phone number', // Placeholder
-            '',                     // Default value
-            true,                   // Required
-            '+43'                   // Phone prefix (displayed but not typed by user)
-        );
+        <!-- Last Name -->
+        <div class="form-group">
+            <?php
+            render_text_field(
+                'last_name',            
+                'last_name',            
+                '',                     
+                'Last name',            
+                '',                     
+                true // Required
+            );
+            ?>
+            <span id="lastName-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
-        // Render the password field
-        render_password_field(
-            'password',             
-            'password',             
-            'Password (at least 6 characters)', 
-            'Create password',      
-            '',                     
-            true                    // Required
-        );
+        <!-- Phone -->
+        <div class="form-group">
+            <?php
+            render_phone_field(
+                'phone',                
+                'phone',                
+                'Phone Number',         
+                'Enter your phone number', 
+                '',                     
+                true,   // Required
+                '+43'   // Phone prefix
+            );
+            ?>
+            <span id="phone-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
-        // Subscribe checkbox - not mandatory
-        render_checkbox_field(
-            'subscribe',           
-            'subscribe',           
-            'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', 
-            false,                 // default unchecked
-            false
-        );
-        ?>
+        <!-- Password -->
+        <div class="form-group">
+            <?php
+            render_password_field(
+                'password',             
+                'password',             
+                'Password (at least 6 characters)', 
+                'Create password',      
+                '',                     
+                true // Required
+            );
+            ?>
+            <span id="password-error" class="error-msg" style="display:none; color:red;"></span>
+        </div>
 
-        <!-- Navigation buttons -->
+        <!-- Subscribe (not required) -->
+        <div class="form-group">
+            <?php
+            render_checkbox_field(
+                'subscribe',           
+                'subscribe',           
+                'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', 
+                false, // default unchecked
+                false
+            );
+            ?>
+        </div>
+
+        <!-- Navigation Buttons -->
         <button 
             type="button" 
             class="previous-button" 
@@ -265,162 +344,219 @@ function render_artisan_registration_step_2() {
         >
             Back
         </button>
-        <!-- Note: we REMOVE data-next-step="3" so it doesn't auto-jump to Step 3 -->
+
+        <!-- We REMOVE data-next-step and do validation + AJAX ourselves -->
         <button 
             type="button" 
             class="next-button purple-btn" 
             id="step2ContinueBtn"
-            disabled
         >
             Continue
         </button>
 
-        <!-- Error message container -->
+        <!-- Error container (for AJAX user creation issues) -->
         <div class="step2-error" style="display:none; color:red; margin-top:10px;"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const firstNameInput  = document.getElementById('first_name');
-            const lastNameInput   = document.getElementById('last_name');
-            const phoneInput      = document.getElementById('phone');
-            const passwordInput   = document.getElementById('password');
-            const subscribeBox    = document.getElementById('subscribe');
-            const nextButton      = document.getElementById('step2ContinueBtn');
-            const errorContainer  = document.querySelector('.step2-error');
+    document.addEventListener('DOMContentLoaded', function () {
+        const firstNameInput  = document.getElementById('first_name');
+        const lastNameInput   = document.getElementById('last_name');
+        const phoneInput      = document.getElementById('phone');
+        const passwordInput   = document.getElementById('password');
+        const subscribeBox    = document.getElementById('subscribe');
+        const nextButton      = document.getElementById('step2ContinueBtn');
+        const ajaxErrorEl     = document.querySelector('.step2-error');
 
-            // Phone must be 6..13 digits (excluding +43)
-            const phoneDigitsRegex = /^\d{6,13}$/;
+        // Inline error spans
+        const firstNameError  = document.getElementById('firstName-error');
+        const lastNameError   = document.getElementById('lastName-error');
+        const phoneError      = document.getElementById('phone-error');
+        const passwordError   = document.getElementById('password-error');
 
-            // Validate fields for Step 2
-            function validateStep2() {
-                const firstName   = firstNameInput.value.trim();
-                const lastName    = lastNameInput.value.trim();
-                const phoneDigits = phoneInput.value.trim();
-                const password    = passwordInput.value.trim();
-                let errors = [];
+        // Regex for phone must be 6..13 digits (excluding +43 prefix)
+        const phoneDigitsRegex = /^\d{6,13}$/;
 
-                // Required fields
-                if (!firstName) {
-                    errors.push('First name is required.');
-                }
-                if (!lastName) {
-                    errors.push('Last name is required.');
-                }
-                if (!phoneDigits) {
-                    errors.push('Phone number is required.');
-                } else if (!phoneDigitsRegex.test(phoneDigits)) {
-                    errors.push('Phone number must be 6 to 13 digits (excluding the +43 prefix).');
-                }
-                if (!password) {
-                    errors.push('Password is required.');
-                } else if (password.length < 6) {
-                    errors.push('Password must be at least 6 characters long.');
-                }
+        // Let’s track if user has attempted next => show inline errors
+        let hasClickedNext = false;
 
-                if (errors.length === 0) {
-                    nextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    nextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
-                }
+        // Whenever a field changes, if user hasClickedNext, re-validate => remove corrected errors
+        function onFieldChange() {
+            if (hasClickedNext) {
+                validateAndShowErrors();
+            }
+        }
+
+        firstNameInput.addEventListener('input', onFieldChange);
+        lastNameInput.addEventListener('input', onFieldChange);
+        phoneInput.addEventListener('input', onFieldChange);
+        passwordInput.addEventListener('input', onFieldChange);
+        // subscribe is optional, no inline error
+
+        // Core validation + showing inline errors
+        function validateAndShowErrors() {
+            let isValid = true;
+            clearErrors();
+
+            const firstName   = firstNameInput.value.trim();
+            const lastName    = lastNameInput.value.trim();
+            const phoneDigits = phoneInput.value.trim();
+            const password    = passwordInput.value.trim();
+
+            // First name
+            if (!firstName) {
+                isValid = false;
+                showError(firstNameInput, firstNameError, 'First name is required.');
+            }
+            // Last name
+            if (!lastName) {
+                isValid = false;
+                showError(lastNameInput, lastNameError, 'Last name is required.');
+            }
+            // Phone
+            if (!phoneDigits) {
+                isValid = false;
+                showError(phoneInput, phoneError, 'Phone number is required.');
+            } else if (!phoneDigitsRegex.test(phoneDigits)) {
+                isValid = false;
+                showError(phoneInput, phoneError, 'Phone must be 6..13 digits (excl. +43).');
+            }
+            // Password
+            if (!password) {
+                isValid = false;
+                showError(passwordInput, passwordError, 'Password is required.');
+            } else if (password.length < 6) {
+                isValid = false;
+                showError(passwordInput, passwordError, 'Password must be at least 6 characters.');
             }
 
-            // Real-time validation
-            firstNameInput.addEventListener('input', validateStep2);
-            lastNameInput.addEventListener('input', validateStep2);
-            phoneInput.addEventListener('input', validateStep2);
-            passwordInput.addEventListener('input', validateStep2);
-            if (subscribeBox) {
-                subscribeBox.addEventListener('change', validateStep2);
+            return isValid;
+        }
+
+        function showError(inputEl, errorEl, msg) {
+            errorEl.textContent   = msg;
+            errorEl.style.display = 'inline';
+            inputEl.classList.add('error-field');
+        }
+        function clearError(inputEl, errorEl) {
+            errorEl.textContent   = '';
+            errorEl.style.display = 'none';
+            inputEl.classList.remove('error-field');
+        }
+        function clearErrors() {
+            clearError(firstNameInput,  firstNameError);
+            clearError(lastNameInput,   lastNameError);
+            clearError(phoneInput,      phoneError);
+            clearError(passwordInput,   passwordError);
+            // Also clear any leftover AJAX error
+            ajaxErrorEl.style.display = 'none';
+            ajaxErrorEl.innerHTML     = '';
+        }
+
+        // On next click => if valid, do user creation AJAX
+        nextButton.addEventListener('click', function() {
+            hasClickedNext = true;
+            if (!validateAndShowErrors()) {
+                // not valid => show errors, do not proceed
+                return;
             }
 
-            // On "Continue" click, create user via AJAX before moving to Step 3
-            nextButton.addEventListener('click', function() {
-                if (nextButton.disabled) return;
+            // If fields are valid, proceed with the user creation AJAX
+            const firstName    = firstNameInput.value.trim();
+            const lastName     = lastNameInput.value.trim();
+            const phoneDigits  = phoneInput.value.trim();
+            const phoneFinal   = '+43 ' + phoneDigits;
+            const password     = passwordInput.value.trim();
+            const isSubscribed = subscribeBox && subscribeBox.checked ? true : false;
 
-                const firstName    = firstNameInput.value.trim();
-                const lastName     = lastNameInput.value.trim();
-                const phoneDigits  = phoneInput.value.trim();
-                const phoneFinal   = '+43 ' + phoneDigits;
-                const password     = passwordInput.value.trim();
-                const isSubscribed = subscribeBox && subscribeBox.checked ? true : false;
+            // Save data in the global object
+            if (!window.kazverseRegistrationData.step2) {
+                window.kazverseRegistrationData.step2 = {};
+            }
+            window.kazverseRegistrationData.step2.first_name = firstName;
+            window.kazverseRegistrationData.step2.last_name  = lastName;
+            window.kazverseRegistrationData.step2.phone      = phoneFinal;
+            window.kazverseRegistrationData.step2.password   = password;
+            window.kazverseRegistrationData.step2.subscribe  = isSubscribed;
 
-                // Save data to global object
-                if (!window.kazverseRegistrationData.step2) {
-                    window.kazverseRegistrationData.step2 = {};
-                }
-                window.kazverseRegistrationData.step2.first_name = firstName;
-                window.kazverseRegistrationData.step2.last_name  = lastName;
-                window.kazverseRegistrationData.step2.phone      = phoneFinal;
-                window.kazverseRegistrationData.step2.password   = password;
-                window.kazverseRegistrationData.step2.subscribe  = isSubscribed;
+            console.log('Step2 data ready:', window.kazverseRegistrationData.step2);
 
-                // We'll do an AJAX call to create the WP user now
-                const step1Email = window.kazverseRegistrationData.step1?.email || '';
-                if (!step1Email) {
-                    alert("No email found from Step 1!");
-                    return;
-                }
+            // We'll do an AJAX call to create the WP user now
+            const step1Email = window.kazverseRegistrationData.step1?.email || '';
+            if (!step1Email) {
+                alert("No email found from Step 1!");
+                return;
+            }
 
-                // Disable "Continue" again & hide errors
-                nextButton.disabled = true;
-                errorContainer.style.display = 'none';
-                errorContainer.innerHTML = '';
+            nextButton.disabled = true; // temporarily prevent repeat clicks
+            ajaxErrorEl.style.display = 'none';
+            ajaxErrorEl.innerHTML     = '';
 
-                fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        action: 'create_artisan_user',
-                        email: step1Email,
-                        first_name: firstName,
-                        last_name: lastName,
-                        password: password,
-                        phone: phoneFinal
-                    })
+            fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'create_artisan_user',
+                    email: step1Email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    password: password,
+                    phone: phoneFinal
                 })
-                .then(res => res.json())
-                .then(response => {
-                    if (!response) throw new Error("No response from server");
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (!response) throw new Error("No response from server");
+                if (response.success) {
+                    // User creation success
+                    console.log('User created:', response.data);
 
-                    if (response.success) {
-                        // User creation success
-                        console.log('User created:', response.data);
+                    // Make Step 2 fields read-only
+                    firstNameInput.readOnly = true;
+                    lastNameInput.readOnly  = true;
+                    phoneInput.readOnly     = true;
+                    passwordInput.readOnly  = true;
+                    if (subscribeBox) subscribeBox.disabled = true;
 
-                        // Make Step 2 fields read-only
-                        firstNameInput.readOnly = true;
-                        lastNameInput.readOnly  = true;
-                        phoneInput.readOnly     = true;
-                        passwordInput.readOnly  = true;
-                        if (subscribeBox) subscribeBox.disabled = true;
-
-                        // Move to Step 3
-                        const currentStep = document.querySelector('.form-step.active');
-                        const nextStep    = document.querySelector('.form-step-3');
-                        if (currentStep && nextStep) {
-                            currentStep.classList.remove('active');
-                            nextStep.classList.add('active');
-                        }
-                    } else {
-                        // Show error => do not proceed to Step 3
-                        const errMsg = response.data || "An unknown error occurred.";
-                        errorContainer.style.display = 'block';
-                        errorContainer.innerHTML = errMsg;
-                        nextButton.disabled = false; // let them try again
+                    // Move to Step 3
+                    const currentStep = document.querySelector('.form-step.active');
+                    const nextStep    = document.querySelector('.form-step-3');
+                    if (currentStep && nextStep) {
+                        currentStep.classList.remove('active');
+                        nextStep.classList.add('active');
                     }
-                })
-                .catch(err => {
-                    console.error('AJAX error:', err);
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = "Something went wrong. Check console.";
-                    nextButton.disabled = false;
-                });
+                } else {
+                    // Show server error => do not proceed
+                    const errMsg = response.data || "An unknown error occurred.";
+                    ajaxErrorEl.style.display = 'block';
+                    ajaxErrorEl.innerHTML = errMsg;
+                    nextButton.disabled = false; // let them try again
+                }
+            })
+            .catch(err => {
+                console.error('AJAX error:', err);
+                ajaxErrorEl.style.display = 'block';
+                ajaxErrorEl.innerHTML = "Something went wrong. Check console.";
+                nextButton.disabled = false;
             });
         });
+
+        // Inject some CSS for .error-field
+        function addErrorStyling() {
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .error-field {
+                    border: 1px solid red !important;
+                    outline: none;
+                }
+                .error-msg {
+                    margin-left: 10px;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        addErrorStyling();
+    });
     </script>
     <?php
 }
@@ -472,44 +608,57 @@ function render_artisan_registration_step_4() {
         <p>Tell us your areas of expertise so we can send you the most relevant assignments.</p>
 
         <!-- Search Trades Input -->
-        <div class="f4_form-group form-group">
+        <div class="f4_form_group form-group">
             <label for="f4_trade_search">Search trades</label>
-            <input type="text" class="form-control" id="f4_trade_search" placeholder="Search trades" />
+            <input 
+                type="text" 
+                class="form-control" 
+                id="f4_trade_search" 
+                placeholder="Search trades"
+            />
         </div>
 
         <!-- Trades Cards with Checkboxes (using render_checkbox_field) -->
         <div class="f4_form_group form-group">
-            <label for="f4_trade_select" class="f4_trade-label">Select Trade(s)</label>
-            <div class="tags_group_wrapper">
-                <div id="f4_trade_cards" class="tags_group">
-                    <?php
-                    foreach ($trades as $trade) {
+            <label for="f4_trade_select">Select Trade(s)</label>
+            <div id="f4_trade_cards" class="f4_trade-cards">
+                <?php foreach ($trades as $trade): ?>
+                    <div class="f4_trade-card">
+                        <?php
                         render_checkbox_field(
-                            'f4_trade_select[]',                // Name (array)
-                            'f4_trade_' . sanitize_title($trade), // ID
-                            esc_html($trade),                    // Label
-                            false,                               // Checked (default)
-                            false                                // Not strictly required at the HTML level
+                            'f4_trade_select[]', 
+                            'f4_trade_' . sanitize_title($trade), 
+                            esc_html($trade), 
+                            false, 
+                            false
                         );
-                    }
-                    ?>
-                </div>
+                        ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
+        <!-- Error message container -->
+        <div class="step4-error" style="display:none; color:red; margin-top:10px;"></div>
+
         <!-- Navigation Buttons -->
-        <button type="button" class="previous-button" data-previous-step="3">Back</button>
         <button 
             type="button" 
-            class="next-button purple-btn" 
-            data-next-step="5"
-            disabled
+            class="previous-button" 
+            data-previous-step="3"
+        >
+            Back
+        </button>
+        <!-- We remove data-next-step => handle validation ourselves -->
+        <button 
+            type="button" 
+            class="next-button purple-btn"
+            id="step4ContinueBtn"
         >
             Continue
         </button>
 
-        <!-- Error message container -->
-        <div class="step4-error" style="display:none; color:red; margin-top:10px;"></div>
+        
     </div>
    
     <script>
@@ -517,10 +666,13 @@ function render_artisan_registration_step_4() {
             const tradeSearchInput = document.getElementById('f4_trade_search');
             const tradeCards       = document.querySelectorAll('#f4_trade_cards .f4_trade-card');
             const checkboxes       = document.querySelectorAll('input[name="f4_trade_select[]"]');
-            const step4NextButton  = document.querySelector('.form-step-4 .next-button');
+            const step4NextButton  = document.getElementById('step4ContinueBtn');
             const errorContainer   = document.querySelector('.step4-error');
 
-            // Simple trade search functionality (for filtering the trades)
+            // Keep track if user tried "Continue" once
+            let hasClickedNext = false;
+
+            // Simple trade search functionality
             if (tradeSearchInput && tradeCards.length > 0) {
                 tradeSearchInput.addEventListener('input', function() {
                     const filterValue = tradeSearchInput.value.toLowerCase();
@@ -529,18 +681,14 @@ function render_artisan_registration_step_4() {
                         if (!labelElement) return;
 
                         const tradeText = labelElement.textContent.toLowerCase();
-                        if (tradeText.indexOf(filterValue) === -1) {
-                            card.style.display = 'none';
-                        } else {
-                            card.style.display = 'flex';
-                        }
+                        // Show/hide based on match
+                        card.style.display = tradeText.includes(filterValue) ? '' : 'none';
                     });
                 });
             }
 
-            // Validation: user must select between 1 and 5 trades
+            // Validate: user must select 1..5 trades
             function validateStep4() {
-                // Count how many checkboxes are checked
                 const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
                 let errors = [];
 
@@ -549,45 +697,51 @@ function render_artisan_registration_step_4() {
                 } else if (checkedBoxes.length > 5) {
                     errors.push('You can select a maximum of five trades.');
                 }
-
-                if (errors.length === 0) {
-                    step4NextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    step4NextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
-                }
+                return errors;
             }
 
-            // Run validation on each checkbox change
+            // Show any errors
+            function showErrors() {
+                const errors = validateStep4();
+                if (errors.length > 0) {
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                } else {
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                }
+                return (errors.length === 0);
+            }
+
+            // If user already tried once, revalidate on any change
+            function onCheckboxChange() {
+                if (hasClickedNext) {
+                    showErrors();
+                }
+            }
             checkboxes.forEach(cb => {
-                cb.addEventListener('change', validateStep4);
+                cb.addEventListener('change', onCheckboxChange);
             });
 
-            // On final button click, store data if not disabled
+            // On "Continue" click => show errors if invalid, else proceed
             step4NextButton.addEventListener('click', function() {
-                if (step4NextButton.disabled) {
-                    return; // If disabled, do nothing
+                hasClickedNext = true;
+                if (!showErrors()) {
+                    return; // If invalid, do not proceed
                 }
 
-                // Gather selected trades
-                const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                // Otherwise, gather selected trades
+                const checkedBoxes   = Array.from(checkboxes).filter(cb => cb.checked);
                 const selectedTrades = checkedBoxes.map(cb => {
-                    // Get the label text for each checked trade
-                    const labelElement = document.querySelector(`label[for="${cb.id}"]`);
-                    return labelElement ? labelElement.innerText.trim() : cb.id;
+                    const labelEl = document.querySelector(`label[for="${cb.id}"]`);
+                    return labelEl ? labelEl.innerText.trim() : cb.id;
                 });
 
-                // Initialize step4 object if not present
+                // Store in global object
                 if (!window.kazverseRegistrationData.step4) {
                     window.kazverseRegistrationData.step4 = {};
                 }
-
-                // Store selected trades
                 window.kazverseRegistrationData.step4.selected_trades = selectedTrades;
-
                 console.log('Current Registration Data:', window.kazverseRegistrationData);
 
                 // Manually move to next step
@@ -598,13 +752,11 @@ function render_artisan_registration_step_4() {
                     nextStep.classList.add('active');
                 }
             });
-
-            // Initially run validation in case user tries to proceed without any interaction
-            validateStep4();
         });
     </script>
     <?php
 }
+
 
 // Function to render Step 5
 function render_artisan_registration_step_5() {
@@ -910,7 +1062,7 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_company_name',     // Name
                 'f8_company_name',     // ID
-                'Company Name *',      // Label
+                'Company Name',      // Label
                 'Enter your company name', // Placeholder
                 '',                    // Default value
                 true                   // Required
@@ -924,7 +1076,7 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_address',          // Name
                 'f8_address',          // ID
-                'Address *',           // Label
+                'Address',           // Label
                 'Enter your address',  // Placeholder
                 '',                    // Default value
                 true                   // Required
@@ -936,7 +1088,7 @@ function render_artisan_registration_step_8() {
         <div class="f8_form_group form-group">
             <?php
             render_grouped_fields(
-                'f8_zip_code', 'f8_zip_code', 'Zip Code *',    // Zip Code Field
+                'f8_zip_code', 'f8_zip_code', 'Zip Code',    // Zip Code Field
                 'f8_city', 'f8_city', 'City *',                // City Field
                 '', '', true                                   // Default values and required
             );
