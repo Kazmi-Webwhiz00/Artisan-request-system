@@ -1,6 +1,32 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+
+function enqueue_admin_styles() {
+    // Ensure you use the correct path to your CSS file
+    wp_enqueue_style(
+        'artisan-cpt-style', // Handle for the CSS file
+        plugin_dir_url(__FILE__) . 'artisan-cpt.css', // Path to the CSS file
+        array(), // Dependencies (if any)
+        '1.0.0', // Version
+        'all' // Media type
+    );
+
+       // Enqueue JS file
+       wp_enqueue_script(
+        'artisan-cpt-script', // Handle for the JS file
+        plugin_dir_url(__FILE__) . 'artisan-cpt.js', // Path to the JS file
+        array('jquery'), // Dependencies (uses jQuery)
+        '1.0.0', // Version
+        true // Load in footer
+    );
+
+}
+add_action('admin_enqueue_scripts', 'enqueue_admin_styles');
+
+
+
+
 /**
  * Register "artisan" Custom Post Type
  */
@@ -108,98 +134,6 @@ add_action( 'add_meta_boxes', 'my_artisan_add_meta_box' );
 /**
  * 2. Render the Meta Box Fields
  */
-function my_artisan_meta_box_callback( $post ) {
-    // Use nonce for verification
-    wp_nonce_field( 'my_artisan_save_meta_box_data', 'my_artisan_meta_box_nonce' );
-
-    // Retrieve existing values
-    $trade                   = get_post_meta( $post->ID, 'trade', true );
-    $zip_code                = get_post_meta( $post->ID, 'zip_code', true );
-    $email                   = get_post_meta( $post->ID, 'email', true );
-    $first_name              = get_post_meta( $post->ID, 'first_name', true );
-    $last_name               = get_post_meta( $post->ID, 'last_name', true );
-    $phone                   = get_post_meta( $post->ID, 'phone', true );
-    $subscribe               = get_post_meta( $post->ID, 'subscribe', true );
-    $selected_trades         = maybe_unserialize( get_post_meta( $post->ID, 'selected_trades', true ) ); 
-    $distance                = get_post_meta( $post->ID, 'distance', true );
-    $work_throughout_austria = get_post_meta( $post->ID, 'work_throughout_austria', true );
-    $professional_status     = get_post_meta( $post->ID, 'professional_status', true );
-    $gisa_number             = get_post_meta( $post->ID, 'gisa_number', true );
-    $company_name            = get_post_meta( $post->ID, 'company_name', true );
-    $address                 = get_post_meta( $post->ID, 'address', true );
-    $business_zip_code       = get_post_meta( $post->ID, 'business_zip_code', true );
-    $city                    = get_post_meta( $post->ID, 'city', true );
-    $business_license        = get_post_meta( $post->ID, 'business_license', true );
-    $description             = get_post_meta( $post->ID, 'description', true );
-
-    // Display fields in a simple table (adjust markup as needed)
-    echo '<table class="form-table">';
-    
-    // Step 1 fields
-    echo '<tr><th><label>' . esc_html__('Trade', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="trade" value="' . esc_attr($trade) . '" class="regular-text" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Zip Code', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="zip_code" value="' . esc_attr($zip_code) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Email', 'textdomain') . '</label></th>';
-    echo '<td><input type="email" name="email" value="' . esc_attr($email) . '" class="regular-text" /></td></tr>';
-
-    // Step 2 fields
-    echo '<tr><th><label>' . esc_html__('First Name', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="first_name" value="' . esc_attr($first_name) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Last Name', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="last_name" value="' . esc_attr($last_name) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Phone', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="phone" value="' . esc_attr($phone) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Subscribe', 'textdomain') . '</label></th>';
-    echo '<td><input type="checkbox" name="subscribe" value="1" ' . checked($subscribe, true, false) . ' /></td></tr>';
-
-    // Step 4 selected trades (array)
-    echo '<tr><th><label>' . esc_html__('Selected Trades', 'textdomain') . '</label></th>';
-    echo '<td><textarea name="selected_trades" rows="2" cols="40">' . esc_textarea( is_array($selected_trades) ? implode(', ', $selected_trades) : $selected_trades ) . '</textarea><br/>';
-    echo '<small>' . esc_html__('Comma-separated or store as you prefer.', 'textdomain') . '</small></td></tr>';
-
-    // Step 5
-    echo '<tr><th><label>' . esc_html__('Distance (km)', 'textdomain') . '</label></th>';
-    echo '<td><input type="number" name="distance" value="' . esc_attr($distance) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Work Throughout Austria', 'textdomain') . '</label></th>';
-    echo '<td><input type="checkbox" name="work_throughout_austria" value="1" ' . checked($work_throughout_austria, true, false) . ' /></td></tr>';
-
-    // Step 6
-    echo '<tr><th><label>' . esc_html__('Professional Status', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="professional_status" value="' . esc_attr($professional_status) . '" class="widefat" /></td></tr>';
-
-    // Step 8
-    echo '<tr><th><label>' . esc_html__('GISA Number', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="gisa_number" value="' . esc_attr($gisa_number) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Company Name', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="company_name" value="' . esc_attr($company_name) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Address', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="address" value="' . esc_attr($address) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('Business Zip Code', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="business_zip_code" value="' . esc_attr($business_zip_code) . '" /></td></tr>';
-
-    echo '<tr><th><label>' . esc_html__('City', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="city" value="' . esc_attr($city) . '" /></td></tr>';
-
-    // Step 9
-    echo '<tr><th><label>' . esc_html__('Business License File', 'textdomain') . '</label></th>';
-    echo '<td><input type="text" name="business_license" value="' . esc_attr($business_license) . '" class="widefat" /></td></tr>';
-
-    // Step 11
-    echo '<tr><th><label>' . esc_html__('Description', 'textdomain') . '</label></th>';
-    echo '<td><textarea name="description" rows="4" cols="60">' . esc_textarea($description) . '</textarea></td></tr>';
-
-    echo '</table>';
-}
 
 /**
  * 3. Save the Meta Box Fields
@@ -266,3 +200,106 @@ function my_artisan_save_meta_box_data( $post_id ) {
     }
 }
 add_action( 'save_post', 'my_artisan_save_meta_box_data' );
+
+
+
+
+
+function my_artisan_meta_box_callback($post) {
+    // Use nonce for verification
+    wp_nonce_field('my_artisan_save_meta_box_data', 'my_artisan_meta_box_nonce');
+
+    // Retrieve existing values
+    $meta_fields = [
+        'trade' => get_post_meta($post->ID, 'trade', true),
+        'zip_code' => get_post_meta($post->ID, 'zip_code', true),
+        'email' => get_post_meta($post->ID, 'email', true),
+        'first_name' => get_post_meta($post->ID, 'first_name', true),
+        'last_name' => get_post_meta($post->ID, 'last_name', true),
+        'phone' => get_post_meta($post->ID, 'phone', true),
+        'subscribe' => get_post_meta($post->ID, 'subscribe', true),
+        'selected_trades' => maybe_unserialize(get_post_meta($post->ID, 'selected_trades', true)),
+        'distance' => get_post_meta($post->ID, 'distance', true),
+        'work_throughout_austria' => get_post_meta($post->ID, 'work_throughout_austria', true),
+        'professional_status' => get_post_meta($post->ID, 'professional_status', true),
+        'gisa_number' => get_post_meta($post->ID, 'gisa_number', true),
+        'company_name' => get_post_meta($post->ID, 'company_name', true),
+        'address' => get_post_meta($post->ID, 'address', true),
+        'business_zip_code' => get_post_meta($post->ID, 'business_zip_code', true),
+        'city' => get_post_meta($post->ID, 'city', true),
+        'business_license' => get_post_meta($post->ID, 'business_license', true),
+        'description' => get_post_meta($post->ID, 'description', true),
+    ];
+
+    echo '<div class="artisan-meta-box-container">';
+
+    // Step 1: Basic Details
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 1: Basic Details</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Trade</label><input type="text" name="trade" value="' . esc_attr($meta_fields['trade']) . '" class="regular-text" />';
+    echo '<label>Zip Code</label><input type="text" name="zip_code" value="' . esc_attr($meta_fields['zip_code']) . '" />';
+    echo '<label>Email</label><input type="email" name="email" value="' . esc_attr($meta_fields['email']) . '" class="regular-text" />';
+    echo '</div></div>';
+
+    // Step 2: Personal Information
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 2: Personal Information</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>First Name</label><input type="text" name="first_name" value="' . esc_attr($meta_fields['first_name']) . '" />';
+    echo '<label>Last Name</label><input type="text" name="last_name" value="' . esc_attr($meta_fields['last_name']) . '" />';
+    echo '<label>Phone</label><input type="text" name="phone" value="' . esc_attr($meta_fields['phone']) . '" />';
+    echo '<label>Subscribe</label><input type="checkbox" name="subscribe" value="1" ' . checked($meta_fields['subscribe'], true, false) . ' />';
+    echo '</div></div>';
+
+    // Step 3: Selected Trades
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 3: Selected Trades</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Selected Trades</label>';
+    echo '<textarea name="selected_trades" rows="2" cols="40">' . esc_textarea(is_array($meta_fields['selected_trades']) ? implode(', ', $meta_fields['selected_trades']) : $meta_fields['selected_trades']) . '</textarea>';
+    echo '<small>Comma-separated or store as you prefer.</small>';
+    echo '</div></div>';
+
+    // Step 4: Work Details
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 4: Work Details</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Distance (km)</label><input type="number" name="distance" value="' . esc_attr($meta_fields['distance']) . '" />';
+    echo '<label>Work Throughout Austria</label><input type="checkbox" name="work_throughout_austria" value="1" ' . checked($meta_fields['work_throughout_austria'], true, false) . ' />';
+    echo '</div></div>';
+
+    // Step 5: Professional Information
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 5: Professional Information</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Professional Status</label><input type="text" name="professional_status" value="' . esc_attr($meta_fields['professional_status']) . '" class="widefat" />';
+    echo '</div></div>';
+
+    // Step 6: Business Information
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 6: Business Information</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>GISA Number</label><input type="text" name="gisa_number" value="' . esc_attr($meta_fields['gisa_number']) . '" />';
+    echo '<label>Company Name</label><input type="text" name="company_name" value="' . esc_attr($meta_fields['company_name']) . '" />';
+    echo '<label>Address</label><input type="text" name="address" value="' . esc_attr($meta_fields['address']) . '" />';
+    echo '<label>Business Zip Code</label><input type="text" name="business_zip_code" value="' . esc_attr($meta_fields['business_zip_code']) . '" />';
+    echo '<label>City</label><input type="text" name="city" value="' . esc_attr($meta_fields['city']) . '" />';
+    echo '</div></div>';
+
+    // Step 7: Business License
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 7: Business License</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Business License File</label><input type="text" name="business_license" value="' . esc_attr($meta_fields['business_license']) . '" class="widefat" />';
+    echo '</div></div>';
+
+    // Step 8: Description
+    echo '<div class="artisan-meta-group">';
+    echo '<div class="artisan-meta-group-title">Step 8: Description</div>';
+    echo '<div class="artisan-meta-group-content">';
+    echo '<label>Description</label><textarea name="description" rows="4" cols="60">' . esc_textarea($meta_fields['description']) . '</textarea>';
+    echo '</div></div>';
+
+    echo '</div>';
+}
