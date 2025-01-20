@@ -18,6 +18,10 @@ include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-helpers.ph
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-user-registration.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/general-helpers/image-upload.php';
 
+
+include_once plugin_dir_path(__FILE__) . 'includes/taxonomies/global-services-taxonomy.php';
+
+
 // Plugin initialization function
 // function kazverse_artisan_plugin_init() {
 //     // Initialize the custom post type
