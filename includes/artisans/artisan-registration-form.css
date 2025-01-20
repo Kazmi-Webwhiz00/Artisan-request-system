@@ -1,0 +1,370 @@
+/* General Shared Styling */
+#artisan-registration-form {
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+.form-step {
+    display: none;
+}
+.form-step.active {
+    display: block;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Step 1 Styling */
+.form-step-1 {
+    /* Step 1 specific styling */
+}
+
+/* Step 2 Styling */
+.form-step-2 {
+    /* Step 2 specific styling */
+}
+
+/* Step 3 Styling */
+.form-step-3 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-3 .progress {
+    margin-bottom: 20px;
+}
+.form-step-3 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-3 h2 {
+    color: #6b52ae;
+}
+.form-step-3 p {
+    font-size: 1.1em;
+    color: #333;
+}
+.form-step-3 .next-button,
+.form-step-3 .previous-button {
+    margin-top: 20px;
+}
+
+/* Step 4 Styling */
+.form-step-4 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-4 .progress {
+    margin-bottom: 20px;
+}
+.form-step-4 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-4 h2 {
+    color: #6b52ae;
+}
+.form-step-4 .f4_form-group.form-group {
+    margin-top: 20px;
+}
+.form-step-4 .f4_trade-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+.form-step-4 .f4_trade-card {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.form-step-4 .f4_trade-card label {
+    margin-left: 10px;
+    font-size: 14px;
+}
+.form-step-4 .f4_trade-card input {
+    width: 20px;
+    height: 20px;
+}
+.form-step-4 .next-button,
+.form-step-4 .previous-button {
+    margin-top: 20px;
+}
+
+/* Step 5 Styling */
+.form-step-5 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-5 .progress {
+    margin-bottom: 20px;
+}
+.form-step-5 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-5 h2 {
+    color: #6b52ae;
+}
+.form-step-5 .f5_form-group.form-group {
+    margin-bottom: 20px;
+}
+.form-step-5 .f5_form-group.form-group input {
+    width: 100%;
+}
+.form-step-5 #f5_distance_slider {
+    width: 80%;
+    margin: 10px auto;
+}
+.form-step-5 #f5_distance_value {
+    font-size: 1.2em;
+    color: #6b52ae;
+}
+.form-step-5 .next-button,
+.form-step-5 .previous-button {
+    margin-top: 20px;
+}
+.form-step-5 #f5_work_throughout_austria {
+    margin-left: 10px;
+}
+
+/* Step 6 Styling */
+.form-step-6 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-6 .progress {
+    margin-bottom: 20px;
+}
+.form-step-6 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-6 h2 {
+    color: #6b52ae;
+}
+.form-step-6 .form-group {
+    margin-bottom: 20px;
+}
+.form-step-6 .form-check-label {
+    font-size: 1rem;
+    margin-left: 8px;
+}
+.form-step-6 .next-button,
+.form-step-6 .previous-button {
+    margin-top: 20px;
+}
+
+/* Step 8 Styling */
+.form-step-8 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-8 .progress {
+    margin-bottom: 20px;
+}
+.form-step-8 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-8 h2 {
+    color: #6b52ae;
+}
+.form-step-8 .f8_form-group.form-group {
+    margin-bottom: 20px;
+}
+.form-step-8 .f8_form-group input {
+    width: 80%;
+    margin-top: 10px;
+}
+.form-step-8 .next-button,
+.form-step-8 .previous-button {
+    margin-top: 20px;
+}
+
+/* Step 9 Styling */
+.form-step-9 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-9 .progress {
+    margin-bottom: 20px;
+}
+.form-step-9 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-9 h2 {
+    color: #6b52ae;
+    text-transform: capitalize;
+}
+.form-step-9 .f9_subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+.form-step-9 .f9_form-group {
+    margin: 20px auto;
+    max-width: 400px;
+    border: 2px dashed #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+.form-step-9 .f9_form-group .form-control {
+    display: block;
+    margin: 10px auto;
+}
+.form-step-9 .f9_file-info {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #777;
+}
+.form-step-9 .f9_submit-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #6b52ae;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+}
+.form-step-9 .f9_submit-button:hover {
+    background-color: #573d9e;
+    cursor: pointer;
+}
+
+/* Step 10 Styling */
+.form-step-10 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-10 .progress {
+    margin-bottom: 20px;
+}
+.form-step-10 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-10 h2 {
+    color: #6b52ae;
+    text-transform: capitalize;
+}
+.form-step-10 .f10_heading {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+.form-step-10 .f10_subheading {
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 20px;
+}
+.form-step-10 .f10_description {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+.form-step-10 .purple-btn {
+    background-color: #6b52ae;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 5px;
+}
+.form-step-10 .purple-btn:hover {
+    background-color: #573d9e;
+    cursor: pointer;
+}
+
+/* Step 11 Styling */
+.form-step-11 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.form-step-11 .progress {
+    margin-bottom: 20px;
+}
+.form-step-11 .progress-bar {
+    background-color: #6b52ae;
+    height: 10px;
+}
+.form-step-11 h2 {
+    color: #6b52ae;
+    text-transform: capitalize;
+}
+.form-step-11 .f11_heading {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+.form-step-11 .f11_description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+.form-step-11 .f11_tip-box {
+    background-color: #f3e8ff;
+    border-left: 5px solid #6b52ae;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 0.95rem;
+}
+.form-step-11 .f11_icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    color: #6b52ae;
+}
+.form-step-11 .f11_tip-text {
+    color: #6b52ae;
+}
+.form-step-11 .f11_tip-link {
+    color: #6b52ae;
+    font-weight: bold;
+    text-decoration: none;
+}
+.form-step-11 .f11_tip-link:hover {
+    text-decoration: underline;
+}
+.form-step-11 .f11_form-group {
+    text-align: left;
+    margin: 0 auto 20px auto;
+    max-width: 600px;
+}
+.form-step-11 .f11_textarea {
+    border: 2px solid #6b52ae;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    resize: none;
+    width: 100%;
+}
+.form-step-11 .f11_character-count {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 5px;
+}
+.form-step-11 .purple-btn {
+    background-color: #6b52ae;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 5px;
+}
+.form-step-11 .purple-btn:hover {
+    background-color: #573d9e;
+    cursor: pointer;
+}
