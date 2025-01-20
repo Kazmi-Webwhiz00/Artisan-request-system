@@ -565,5 +565,34 @@
     flex-grow: 1; /* Take up the remaining space */
     font-size: 1em;
     color: #333;
+    text-align: start;
     margin-right: 10px;
+}
+
+
+
+.f8_form_group.form-group > .mb-3 {
+    text-align:start;
+}
+
+/* Style for the file upload container */
+.kz-file-upload {
+    border: 1px dashed #ddd;
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    position: relative;
+    text-align: center;
+}
+
+/* Style for the file preview above the input */
+.file-preview {
+    margin-bottom: 15px;
+}
+
+.file-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

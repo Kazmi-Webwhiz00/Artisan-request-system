@@ -20,6 +20,15 @@ function enqueue_artisan_registration_form_styles() {
         array(), // Dependencies (if any)
         filemtime(plugin_dir_path(__FILE__) . 'artisan-registration-form.css') // Version based on file modification time
     );
+
+    wp_enqueue_script(
+        'kz-file-upload-preview', // Script handle
+        plugin_dir_url(__FILE__) . 'artisan-registration-form.js', // Path to JS file
+        array('jquery'), // Dependencies
+        '1.0.0', // Version
+        true // Load in footer
+    );
+
 }
 add_action('wp_enqueue_scripts', 'enqueue_artisan_registration_form_styles');
 
@@ -1065,7 +1074,7 @@ function render_artisan_registration_step_8() {
 // Function to render Step 9
 function render_artisan_registration_step_9() {
     ?>
-    <div class="form-step form-step-9">
+    <div class="form-step form-step-9" style="display: block;">
         <!-- Progress Bar -->
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
