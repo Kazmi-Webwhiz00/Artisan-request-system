@@ -52,3 +52,13 @@ function form_field_table_activation_hook() {
 }
 
 register_activation_hook(__FILE__, 'form_field_table_activation_hook');
+
+
+function enqueue_field_types($hook) {
+    global $post;
+
+    if ($hook === 'post.php' || $hook === 'post-new.php') {
+        wp_enqueue_script('field-types', plugin_dir_url(__FILE__) . 'includes/service-form/FieldTypes.js', ['jquery'], false, true);
+    }
+}
+add_action('admin_enqueue_scripts', 'enqueue_custom_meta_box_assets');
