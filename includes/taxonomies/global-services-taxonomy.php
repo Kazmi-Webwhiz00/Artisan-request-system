@@ -35,7 +35,7 @@ function register_global_services_taxonomy() {
     );
 
     // Register the taxonomy and allow it to be added to multiple post types
-    register_taxonomy('global_services', array('page', 'service_form'), $args);
+    register_taxonomy('global_services', array('artisan', 'service_form'), $args);
 }
 add_action('init', 'register_global_services_taxonomy');
 
