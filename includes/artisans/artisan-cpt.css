@@ -95,6 +95,63 @@
     transform: scale(1.2);
 }
 
+
+.kz-business-license-admin-preview {
+    margin-top: 10px;
+    text-align: start;
+}
+
+.kz-business-license-admin-preview img {
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.kz-view-license {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #0073aa;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.kz-view-license:hover {
+    background-color: #2b589c;
+}
+
+
+.trade-bubbles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.trade-bubble {
+    display: inline-block;
+    background-color: #f8f8f8d6;
+    color: #515151;
+    padding: 5px 10px;
+    border: 1px solid #c4c4c4;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.trade-bubble:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+
 @keyframes fadeIn {
     from {
         opacity: 0;

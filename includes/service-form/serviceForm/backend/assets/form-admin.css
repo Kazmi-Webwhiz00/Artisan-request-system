@@ -1,0 +1,292 @@
+#kz-add-new-field {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #0073aa;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.kz-field-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kz-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f7f7f7;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.kz-field-header:hover {
+    background-color: #eaeaea;
+}
+
+.kz-field-header .kz-remove-field {
+    background-color: #d33;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.kz-field-header .kz-remove-field:hover {
+    background-color: #a00;
+}
+
+.kz-field-body {
+    display: none; /* Initially collapsed */
+    padding: 15px;
+    background-color: #fff;
+}
+
+.kz-field-body label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.kz-field-body input, .kz-field-body select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.kz-field-body input:focus, .kz-field-body select:focus {
+    border-color: #0073aa;
+    outline: none;
+}
+
+.kz-radio-group {
+    margin: 10px 0;
+}
+
+.kz-radio-group label {
+    margin-right: 15px;
+    font-weight: normal;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.kz-radio-group input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Placeholder for sortable items */
+.kz-sortable-placeholder {
+    border: 2px dashed #0073aa;
+    height: 50px;
+    margin: 10px 0;
+    background: #f3f3f3;
+}
+
+.kz-drag-handle {
+    cursor: move;
+    margin-right: 10px;
+    font-size: 18px;
+    color: #0073aa;
+}
+
+
+
+/* Styles for dynamically added inputs */
+.kz-field-extra-inputs {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.kz-field-extra-inputs label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.kz-field-extra-inputs input,
+.kz-field-extra-inputs textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.kz-field-extra-inputs .kz-add-option,
+.kz-field-extra-inputs .kz-remove-option {
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px 10px;
+    color: #0073aa;
+    font-weight: bold;
+}
+
+.kz-field-extra-inputs .kz-remove-option {
+    color: #d33;
+}
+
+.kz-field-extra-inputs .kz-dynamic-options {
+    margin-top: 10px;
+}
+
+.kz-field-extra-inputs .kz-option-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.kz-field-extra-inputs .kz-option-item input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+
+.kz-add-btn {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 5px 10px;
+    background-color: #0073aa;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.kz-add-btn:hover {
+    background-color: #005f7f;
+}
+
+.kz-remove-btn {
+    margin-left: 10px;
+    color: #d33;
+    cursor: pointer;
+    font-size: 18px;
+    vertical-align: middle;
+    transition: color 0.3s ease;
+}
+
+.kz-remove-btn:hover {
+    color: #a00;
+}
+
+.editable-radio-container {
+    display: flex !important;
+    align-items: center !important;
+    font-family: Arial, sans-serif !important;
+    padding: 10px !important;
+    border: 1px solid #ccc !important; /* Add border around the main container */
+    border-radius: 8px !important; /* Optional: rounded corners */
+    width: 100% !important; /* Adjust width to fit content */
+    max-width: 500px;
+    justify-content: space-between;
+    background-color: #f9f9f9 !important; /* Optional: background color for better visibility */
+  }
+  
+  .editable-radio {
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .editable-radio input[type="radio"] {
+    margin-right: 0px !important;
+  }
+  
+  .radio-label {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  
+  .editable-input {
+    border: none !important; /* Remove border for input field */
+    outline: none !important; /* Remove focus outline for input field */
+    font-size: 14px !important;
+    width: 100% !important;
+    min-width: 450px;
+    background-color: transparent !important;
+    padding: 0px 5px !important;
+  }
+  
+  .editable-input::placeholder {
+    color: #999 !important;
+    font-style: italic !important;
+  }
+  
+  .editable-input:focus {
+    outline-color: none !important;
+  }
+  
+
+
+  .kz-checkbox-list,
+  .kz-radio-list {
+    display: flex;
+        flex-direction: column;
+        gap: 20px;
+  }
+
+
+  .editable-checkbox-container {
+    display: flex !important;
+    align-items: center !important;
+    font-family: Arial, sans-serif !important;
+    padding: 10px !important;
+    border: 1px solid #ccc !important; /* Add border around the main container */
+    border-radius: 8px !important; /* Optional: rounded corners */
+    width: fit-content !important; /* Adjust width to fit content */
+    background-color: #f9f9f9 !important; /* Optional: background color for better visibility */
+  }
+  
+  .editable-checkbox {
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .editable-checkbox input[type="checkbox"] {
+    margin-right: 8px !important;
+  }
+  
+  .checkbox-label {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  
+  .editable-input {
+    border: none !important; /* Remove border for input field */
+    outline: none !important; /* Remove focus outline for input field */
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    width: 150px !important;
+    background-color: transparent !important;
+  }
+  
+  .editable-input::placeholder {
+    color: #999 !important;
+    font-style: italic !important;
+  }
+  
+  .editable-input:focus {
+    outline: none !important;
+  }
+  

@@ -590,13 +590,19 @@ function render_artisan_registration_step_3() {
 
 // Function to render Step 4
 function render_artisan_registration_step_4() {
-    $trades = [
-        'earthmoving and excavation companies',
-        'tiler',
-        'gardeners and landscapers',
-        'electricians',
-        'plumbers'
-    ];
+    // Fetch trades dynamically from the 'global_services' taxonomy
+    $terms = get_terms([
+        'taxonomy'   => 'global_services',
+        'hide_empty' => false, // Include terms even if not assigned to posts
+    ]);
+
+    $trades = [];
+    if (!is_wp_error($terms) && !empty($terms)) {
+        foreach ($terms as $term) {
+            $trades[] = $term->name;
+        }
+    }
+    
     ?>
     <div class="form-step form-step-4">
         <!-- Progress Bar -->

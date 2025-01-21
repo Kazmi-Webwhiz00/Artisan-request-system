@@ -85,10 +85,26 @@ function kazverse_artisan_process_form() {
 
     // ========== Step 4 (array) ==========
     if ( isset($data['step4']['selected_trades']) && is_array($data['step4']['selected_trades']) ) {
-        // Could store as JSON or serialized
-        $sanitized_array = array_map( 'sanitize_text_field', $data['step4']['selected_trades'] );
-        $serialized      = maybe_serialize($sanitized_array);
+        // Sanitize the selected trades
+        $sanitized_array = array_map('sanitize_text_field', $data['step4']['selected_trades']);
+
+        // Update post meta
+        $serialized = maybe_serialize($sanitized_array);
         update_post_meta($post_id, 'selected_trades', $serialized);
+
+        // Assign selected trades to the post in the 'global_services' taxonomy
+        $term_ids = [];
+        foreach ($sanitized_array as $trade_name) {
+            $term = get_term_by('name', $trade_name, 'global_services');
+            if ($term && !is_wp_error($term)) {
+                $term_ids[] = (int) $term->term_id;
+            }
+        }
+
+        // Update the taxonomy terms for the post
+        if (!empty($term_ids)) {
+            wp_set_object_terms($post_id, $term_ids, 'global_services');
+        }
     }
 
     // ========== Step 5 ==========
