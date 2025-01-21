@@ -39,7 +39,7 @@ function render_custom_meta_box($post) {
                     $field_type = esc_attr($field->field_type);
                     $is_required = (int) $field->is_required;
                     $field_order = (int) $field->field_order;
-                    $cleaned_options = stripslashes( $field->field_options ?? '');
+                    $cleaned_options = stripslashes($field->field_options ?? '');
                     $field_options = json_decode($cleaned_options, true);
 
                     ?>
@@ -89,7 +89,27 @@ function render_custom_meta_box($post) {
                                         <input type="number" class="kz-max-value" placeholder="Enter maximum value"
                                                value="<?php echo esc_attr($field_options['max'] ?? ''); ?>">
                                     <?php endif; ?>
-                                <?php elseif ($field_type === 'radio' || $field_type === 'checkbox_simple'): ?>
+                                <?php elseif ($field_type === 'checkbox_simple'): ?>
+                                    <div class="kz-checkbox-options">
+                                        <span class="kz-add-checkbox kz-add-btn">+ Add Checkbox</span>
+                                        <div class="kz-checkbox-list">
+                                            <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
+                                                <div class="editable-checkbox-container kz-checkbox-item">
+                                                    <label class="editable-checkbox">
+                                                        <input type="checkbox" name="checkbox-group-<?php echo $field_id; ?>">
+                                                        <span class="checkbox-label">
+                                                            <input type="text" class="editable-input" 
+                                                                   placeholder="Type here..." 
+                                                                   value="<?php echo esc_attr($option['label'] ?? ''); ?>">
+                                                        </span>
+                                                    </label>
+                                                    <span class="kz-remove-checkbox kz-remove-btn">✖</span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+
+                                <?php elseif ($field_type === 'radio'): ?>
                                     <div class="kz-<?php echo $field_type; ?>-options">
                                         <span class="kz-add-<?php echo $field_type; ?> kz-add-btn">+ Add Option</span>
                                         <div class="kz-<?php echo $field_type; ?>-list">
@@ -110,6 +130,7 @@ function render_custom_meta_box($post) {
                                         </div>
                                     </div>
                                 <?php endif; ?>
+                                
                             </div>
         
                             <!-- Hidden JSON Field -->
@@ -125,6 +146,7 @@ function render_custom_meta_box($post) {
     </div>
     <?php
 }
+
 
 
 // Enqueue styles and scripts
@@ -179,27 +201,44 @@ function handle_form_fields_submission($post_id) {
         return;
     }
 
-    // Verify if the form fields are present in POST
-    if (!isset($_POST['fields']) || !is_array($_POST['fields'])) {
-        return;
-    }
-
     global $wpdb;
-
-    // Define the table name
     $table_name = $wpdb->prefix . 'form_fields';
 
-    // Loop through the submitted fields
-    foreach ($_POST['fields'] as $field_external_id => $field_data) {
-        // Sanitize and prepare the data
+    // Get all existing fields for this form
+    $existing_fields = $wpdb->get_col($wpdb->prepare(
+        "SELECT field_external_id FROM $table_name WHERE service_form_id = %d",
+        $post_id
+    ));
+
+    // Fields sent via the form
+    $submitted_fields = isset($_POST['fields']) ? array_keys($_POST['fields']) : [];
+
+    // Identify fields to delete
+    $fields_to_delete = array_diff($existing_fields, $submitted_fields);
+
+    // Delete removed fields
+    if (!empty($fields_to_delete)) {
+        foreach ($fields_to_delete as $field_external_id) {
+            $wpdb->delete($table_name, [
+                'service_form_id' => $post_id,
+                'field_external_id' => $field_external_id,
+            ], [
+                '%d',
+                '%s',
+            ]);
+        }
+    }
+
+    // Loop through submitted fields and update/insert them
+    foreach ($submitted_fields as $field_external_id) {
+        $field_data = $_POST['fields'][$field_external_id];
         $field_type = sanitize_text_field($field_data['field_type']);
         $field_label = sanitize_text_field($field_data['field_label']);
         $field_description = isset($field_data['field_description']) ? sanitize_textarea_field($field_data['field_description']) : '';
         $is_required = isset($field_data['is_required']) ? (int) $field_data['is_required'] : 0;
         $field_order = isset($field_data['field_order']) ? (int) $field_data['field_order'] : 0;
-        $field_options = isset($field_data['options']) ? ($field_data['options']) : '{}';
+        $field_options = isset($field_data['options']) ? $field_data['options'] : '{}';
 
-        // Check if the field already exists by `field_external_id`
         $existing_field = $wpdb->get_row($wpdb->prepare(
             "SELECT field_id FROM $table_name WHERE service_form_id = %d AND field_external_id = %s",
             $post_id,
@@ -220,14 +259,9 @@ function handle_form_fields_submission($post_id) {
                 ],
                 ['field_id' => $existing_field->field_id],
                 [
-                    '%s', // field_type
-                    '%s', // field_label
-                    '%s', // field_description
-                    '%d', // is_required
-                    '%d', // field_order
-                    '%s', // field_options
+                    '%s', '%s', '%s', '%d', '%d', '%s'
                 ],
-                ['%d'] // field_id
+                ['%d']
             );
         } else {
             // Insert a new field
@@ -244,14 +278,7 @@ function handle_form_fields_submission($post_id) {
                     'field_options' => $field_options,
                 ],
                 [
-                    '%s', // field_external_id
-                    '%d', // service_form_id
-                    '%s', // field_type
-                    '%s', // field_label
-                    '%s', // field_description
-                    '%d', // is_required
-                    '%d', // field_order
-                    '%s', // field_options
+                    '%s', '%d', '%s', '%s', '%s', '%d', '%d', '%s'
                 ]
             );
         }
