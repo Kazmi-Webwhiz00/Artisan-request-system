@@ -225,6 +225,9 @@ function my_artisan_meta_box_callback($post) {
         'description' => get_post_meta($post->ID, 'description', true),
     ];
 
+    // Fetch assigned trades for the current post
+    $assigned_trades = wp_get_post_terms($post->ID, 'global_services', ['fields' => 'names']);
+
     echo '<div class="artisan-meta-box-container">';
 
     // Step 1: Basic Details
@@ -251,8 +254,17 @@ function my_artisan_meta_box_callback($post) {
     echo '<div class="artisan-meta-group-title">Step 3: Selected Trades</div>';
     echo '<div class="artisan-meta-group-content">';
     echo '<label>Selected Trades</label>';
-    echo '<textarea name="selected_trades" rows="2" cols="40">' . esc_textarea(is_array($meta_fields['selected_trades']) ? implode(', ', $meta_fields['selected_trades']) : $meta_fields['selected_trades']) . '</textarea>';
-    echo '<small>Comma-separated or store as you prefer.</small>';
+
+    if (!is_wp_error($assigned_trades) && !empty($assigned_trades)) {
+        echo '<div class="trade-bubbles">';
+        foreach ($assigned_trades as $trade) {
+            echo '<span class="trade-bubble">' . esc_html($trade) . '</span>';
+        }
+        echo '</div>';
+    } else {
+        echo '<p>No trades assigned.</p>';
+    }
+
     echo '</div></div>';
 
     // Step 4: Work Details
