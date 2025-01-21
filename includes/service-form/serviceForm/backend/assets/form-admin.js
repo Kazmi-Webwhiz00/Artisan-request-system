@@ -356,11 +356,11 @@ jQuery(document).ready(function ($) {
             // Add new option
             dynamicOptions.find(".kz-add-checkbox-with-image").on("click", function () {
                 const newItem = $(`
-                    <div class="kz-checkbox-with-image-item" style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 150px;">
+                    <div class="kz-checkbox-with-image-item">
                         <div class="image-upload-preview" style="margin-bottom: 10px;">
                             <button type="button" class="upload-image-button">Upload Image</button>
                         </div>
-                        <input type="text" class="editable-input" placeholder="Type here..." style="width: 100%; margin-bottom: 10px;">
+                        <input type="text" class="editable-input" placeholder="Type here...">
                         <button type="button" class="kz-remove-checkbox-with-image kz-remove-btn">Remove</button>
                     </div>
                 `);

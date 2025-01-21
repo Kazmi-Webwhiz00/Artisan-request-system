@@ -90,9 +90,9 @@ function render_custom_meta_box($post) {
                                                         <?php else: ?>
                                                             <button type="button" class="upload-image-button">Upload Image</button>
                                                         <?php endif; ?>
+                                                        <input type="text" class="editable-input" placeholder="Type here..." 
+                                                        value="<?php echo esc_attr($option['label'] ?? ''); ?>">
                                                     </div>
-                                                    <input type="text" class="editable-input" placeholder="Type here..." 
-                                                           value="<?php echo esc_attr($option['label'] ?? ''); ?>">
                                                     <span class="kz-remove-checkbox-with-image kz-remove-btn">✖</span>
                                                 </div>
                                             <?php endforeach; ?>
