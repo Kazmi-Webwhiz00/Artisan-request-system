@@ -283,14 +283,32 @@ function my_artisan_meta_box_callback($post) {
 
     // Step 7: Business License
     echo '<div class="artisan-meta-group">';
-        echo '<div class="artisan-meta-group-title">Step 7: Business License</div>';
-        echo '<div class="artisan-meta-group-content">';
-        if ( ! empty($meta_fields['business_license_url']) ) {
-            echo '<label>Business License File</label><a href="' . esc_url($meta_fields['business_license_url']) . '" target="_blank">View License</a>';
-        } else {
-            echo '<label>Business License File</label><span>No file uploaded.</span>';
+    echo '<div class="artisan-meta-group-title">Step 7: Business License</div>';
+    echo '<div class="artisan-meta-group-content">';
+
+    if ( ! empty($meta_fields['business_license_url']) ) {
+        // Check if the file is an image
+        $file_type = wp_check_filetype($meta_fields['business_license_url']);
+        $is_image = in_array($file_type['ext'], ['jpg', 'jpeg', 'png', 'gif']);
+
+        
+        echo '<label>Business License File</label>';
+        
+        if ( $is_image ) {
+            // Display the image preview
+            echo '<div class="kz-business-license-admin-preview">
+                    <img src="' . esc_url($meta_fields['business_license_url']) . '" alt="Business License Preview">
+                  </div>';
         }
-        echo '</div></div>';
+    
+        echo '<a href="' . esc_url($meta_fields['business_license_url']) . '" target="_blank" class="kz-view-license">View License</a>';
+
+    } else {
+        echo '<label>Business License File</label><span>No file uploaded.</span>';
+    }
+
+    echo '</div></div>';
+
 
     // Step 8: Description
     echo '<div class="artisan-meta-group">';
