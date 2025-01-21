@@ -30,7 +30,13 @@ function attachEventsToExistingFields() {
 
         if (fieldType === "checkbox_simple" || fieldType === "radio") {
             attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
+            
+            dynamicOptions.find(".kz-remove-checkbox, .kz-remove-radio").on("click", function () {
+                $(this).closest(".kz-checkbox-item, .kz-radio-item").remove();
+                updateFieldOptions(fieldContainer, uniqueId);
+            });
         }
+        
     });
 }
 
