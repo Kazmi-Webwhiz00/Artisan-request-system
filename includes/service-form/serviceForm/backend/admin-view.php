@@ -39,7 +39,9 @@ function render_custom_meta_box($post) {
                     $field_type = esc_attr($field->field_type);
                     $is_required = (int) $field->is_required;
                     $field_order = (int) $field->field_order;
-                    $field_options = json_decode($field->field_options, true) ?? [];
+                    $cleaned_options = stripslashes( $field->field_options ?? '');
+                    $field_options = json_decode($cleaned_options, true);
+
                     ?>
                     <div class="kz-field-container" id="field-<?php echo $field_id; ?>">
                         <div class="kz-field-header">
@@ -195,7 +197,7 @@ function handle_form_fields_submission($post_id) {
         $field_description = isset($field_data['field_description']) ? sanitize_textarea_field($field_data['field_description']) : '';
         $is_required = isset($field_data['is_required']) ? (int) $field_data['is_required'] : 0;
         $field_order = isset($field_data['field_order']) ? (int) $field_data['field_order'] : 0;
-        $field_options = isset($field_data['options']) ? wp_json_encode($field_data['options']) : '{}';
+        $field_options = isset($field_data['options']) ? ($field_data['options']) : '{}';
 
         // Check if the field already exists by `field_external_id`
         $existing_field = $wpdb->get_row($wpdb->prepare(
