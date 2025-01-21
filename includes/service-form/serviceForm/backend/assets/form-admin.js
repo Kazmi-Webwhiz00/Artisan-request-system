@@ -4,17 +4,26 @@ jQuery(document).ready(function ($) {
 
     function init() {
         enableSortableFields();
-        initializeEventListeners(); // Centralized event listeners
+        initializeGlobalEventListeners();
+        attachEventsToExistingFields();
     }
 
     function enableSortableFields() {
         fieldsContainer.sortable({
             handle: ".kz-drag-handle",
             placeholder: "kz-sortable-placeholder",
-            stop: updateQuestionNumbers,
+            stop: function() {
+                updateQuestionNumbers();
+            }
         });
     }
 
+    function attachEventsToExistingFields() {
+        fieldsContainer.find(".kz-field-container").each(function () {
+            attachFieldEventListeners($(this));
+        });
+    }
+    
     function addNewField() {
         const uniqueId = FormMetaData.formId + "-" + new Date().getTime();
         const fieldContainer = createFieldContainer(uniqueId);
@@ -33,29 +42,87 @@ jQuery(document).ready(function ($) {
                 </div>
                 <div class="kz-field-body">
                     <label>Input Field Label:</label>
-                    <input type="text" placeholder="Enter field label here" class="kz-field-label-input">
+                    <input type="text" 
+                           placeholder="Enter field label here" 
+                           class="kz-field-label-input" 
+                           name="fields[${uniqueId}][field_label]">
                     
                     <label>Field Type:</label>
-                    <select class="kz-field-type-selector">
+                    <select class="kz-field-type-selector" name="fields[${uniqueId}][field_type]">
                         <option value="text_input">Text Input</option>
                         <option value="number_input">Number Input</option>
                         <option value="radio">Radio Button</option>
                         <option value="checkbox_simple">Simple Checkbox</option>
                         <option value="textarea">Text Area</option>
                     </select>
-
+    
                     <label>Is Required:</label>
                     <div class="kz-radio-group">
-                        <label><input type="radio" name="required-${uniqueId}" value="yes"> Yes</label>
-                        <label><input type="radio" name="required-${uniqueId}" value="no" checked> No</label>
+                        <label>
+                            <input type="radio" name="fields[${uniqueId}][is_required]" value="1"> Yes
+                        </label>
+                        <label>
+                            <input type="radio" name="fields[${uniqueId}][is_required]" value="0" checked> No
+                        </label>
                     </div>
-                    
+    
                     <div class="kz-dynamic-options"></div>
+    
+                    <!-- Hidden JSON Field -->
+                    <input type="hidden" class="kz-options-json" name="fields[${uniqueId}][options]" value="{}">
+                    
+                    <!-- Hidden Field Order -->
+                    <input type="hidden" class="kz-field-order-input" name="fields[${uniqueId}][field_order]" value="">
                 </div>
             </div>`
         );
     }
+    
 
+    function updateFieldOptions(container, uniqueId) {
+        const options = {};
+        const type = container.find(".kz-field-type-selector").val();
+    
+        // Text Input
+        if (type === "text_input") {
+            options.placeholder = container.find(".kz-dynamic-options input[placeholder]").val() || null;
+        }
+    
+        // Number Input
+        if (type === "number_input") {
+            options.placeholder = container.find(".kz-dynamic-options input[placeholder]").val() || null;
+            options.min = container.find(".kz-min-value").val() || null;
+            options.max = container.find(".kz-max-value").val() || null;
+        }
+    
+        // Textarea
+        if (type === "textarea") {
+            options.placeholder = container.find(".kz-dynamic-options textarea[placeholder]").val() || null;
+            options.min = container.find(".kz-min-length").val() || null;
+            options.max = container.find(".kz-max-length").val() || null;
+        }
+    
+        // Radio or Checkbox
+        if (type === "radio" || type === "checkbox_simple") {
+            const optionsList = [];
+            container.find(".kz-checkbox-list .kz-checkbox-item, .kz-radio-list .kz-radio-item").each(function () {
+                const label = $(this).find(".editable-input").val() || "Untitled";
+                optionsList.push({
+                    label,
+                    value: label.toLowerCase().replace(/\s+/g, "_"), // Auto-generate a value from the label
+                });
+            });
+            options.options_list = optionsList;
+        }
+    
+        // Update the hidden JSON field
+        container.find(".kz-options-json").val(JSON.stringify(options));
+    }
+    
+
+
+    
+    
     function handleFieldTypeChange(selector, container) {
         const selectedType = selector.val();
         const dynamicOptions = container.find(".kz-dynamic-options");
@@ -78,10 +145,13 @@ jQuery(document).ready(function ($) {
 
     function generateTextInputHTML() {
         return `
-            <label>Placeholder:</label>
-            <input type="text" placeholder="Enter placeholder text">
+            <div class="kz-text-input-options">
+                <label>Placeholder:</label>
+                <input type="text" class="kz-placeholder-input" placeholder="Enter placeholder text">
+            </div>
         `;
     }
+    
 
     function generateNumberInputHTML() {
         return `
@@ -126,17 +196,28 @@ jQuery(document).ready(function ($) {
     }
 
     function attachDynamicEvents(dynamicOptions, type, uniqueId) {
-        if (type === "number_input") {
-            dynamicOptions.find(".kz-min-value, .kz-max-value").on("input", function () {
-                const min = dynamicOptions.find(".kz-min-value").val() || "N/A";
-                const max = dynamicOptions.find(".kz-max-value").val() || "N/A";
-                dynamicOptions.find(".kz-range-message").text(`Selected range: ${min} to ${max}`);
+        if (type === "text_input") {
+            dynamicOptions.find(".kz-placeholder-input").on("input", function () {
+                updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
             });
         }
-
+        
+        if (type === "number_input") {
+            dynamicOptions.find(".kz-min-value, .kz-max-value, input[placeholder]").on("input", function () {
+                updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+            });
+        }
+    
+        if (type === "textarea") {
+            dynamicOptions.find(".kz-min-length, .kz-max-length, textarea[placeholder]").on("input", function () {
+                updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+            });
+        }
+    
         if (type === "checkbox_simple") {
             dynamicOptions.find(".kz-add-checkbox").on("click", function () {
-                dynamicOptions.find(".kz-checkbox-list").append(`
+                const checkboxList = dynamicOptions.find(".kz-checkbox-list");
+                const newCheckbox = $(`
                     <div class="editable-checkbox-container kz-checkbox-item">
                         <label class="editable-checkbox">
                             <input type="checkbox" name="checkbox-group-${uniqueId}">
@@ -147,13 +228,25 @@ jQuery(document).ready(function ($) {
                         <span class="kz-remove-checkbox kz-remove-btn">✖</span>
                     </div>
                 `);
-                attachEditableEvents(dynamicOptions.find(".kz-checkbox-item").last());
+                checkboxList.append(newCheckbox);
+    
+                newCheckbox.find(".editable-input").on("input", function () {
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+    
+                newCheckbox.find(".kz-remove-checkbox").on("click", function () {
+                    $(this).closest(".kz-checkbox-item").remove();
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+    
+                updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
             });
         }
-
+    
         if (type === "radio") {
             dynamicOptions.find(".kz-add-radio").on("click", function () {
-                dynamicOptions.find(".kz-radio-list").append(`
+                const radioList = dynamicOptions.find(".kz-radio-list");
+                const newRadio = $(`
                     <div class="editable-radio-container kz-radio-item">
                         <label class="editable-radio">
                             <input type="radio" name="radio-group-${uniqueId}">
@@ -164,10 +257,22 @@ jQuery(document).ready(function ($) {
                         <span class="kz-remove-radio kz-remove-btn">✖</span>
                     </div>
                 `);
-                attachEditableEvents(dynamicOptions.find(".kz-radio-item").last());
+                radioList.append(newRadio);
+    
+                newRadio.find(".editable-input").on("input", function () {
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+    
+                newRadio.find(".kz-remove-radio").on("click", function () {
+                    $(this).closest(".kz-radio-item").remove();
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+    
+                updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
             });
         }
     }
+    
 
     function attachEditableEvents(item) {
         item.find(".editable-input").on("input", function () {
@@ -204,6 +309,7 @@ jQuery(document).ready(function ($) {
             });
         });
 
+            // Update "New Question" text on label input
         fieldContainer.find(".kz-field-label-input").on("input", function () {
             const newLabel = $(this).val() || "New Question";
             fieldContainer.find(".kz-toggle-collapse").text(`Q${fieldContainer.index() + 1}: ${newLabel}`);
@@ -214,17 +320,24 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    function initializeEventListeners() {
+    function initializeGlobalEventListeners() {
         addFieldButton.on("click", addNewField);
     }
 
     function updateQuestionNumbers() {
         fieldsContainer.find(".kz-field-container").each(function (index) {
+            const order = index + 1; // Calculate the field order
             const questionLabel = $(this).find(".kz-toggle-collapse");
             const currentLabel = questionLabel.text().split(": ")[1] || "New Question";
-            questionLabel.text(`Q${index + 1}: ${currentLabel}`);
+    
+            // Update the question label
+            questionLabel.text(`Q${order}: ${currentLabel}`);
+    
+            // Update the field order hidden input
+            $(this).find(".kz-field-order-input").val(order);
         });
     }
+    
 
     init();
 });
