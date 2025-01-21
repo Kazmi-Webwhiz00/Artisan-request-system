@@ -18,11 +18,22 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    function attachEventsToExistingFields() {
-        fieldsContainer.find(".kz-field-container").each(function () {
-            attachFieldEventListeners($(this));
-        });
-    }
+function attachEventsToExistingFields() {
+    fieldsContainer.find(".kz-field-container").each(function () {
+        const fieldContainer = $(this);
+        attachFieldEventListeners(fieldContainer);
+
+        // Handle dynamic options for checkboxes and radio buttons
+        const fieldType = fieldContainer.find(".kz-field-type-selector").val();
+        const dynamicOptions = fieldContainer.find(".kz-dynamic-options");
+        const uniqueId = fieldContainer.attr("id");
+
+        if (fieldType === "checkbox_simple" || fieldType === "radio") {
+            attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
+        }
+    });
+}
+
     
     function addNewField() {
         const uniqueId = FormMetaData.formId + "-" + new Date().getTime();

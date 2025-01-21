@@ -39,7 +39,7 @@ function render_custom_meta_box($post) {
                     $field_type = esc_attr($field->field_type);
                     $is_required = (int) $field->is_required;
                     $field_order = (int) $field->field_order;
-                    $cleaned_options = stripslashes( $field->field_options ?? '');
+                    $cleaned_options = stripslashes($field->field_options ?? '');
                     $field_options = json_decode($cleaned_options, true);
 
                     ?>
@@ -89,7 +89,27 @@ function render_custom_meta_box($post) {
                                         <input type="number" class="kz-max-value" placeholder="Enter maximum value"
                                                value="<?php echo esc_attr($field_options['max'] ?? ''); ?>">
                                     <?php endif; ?>
-                                <?php elseif ($field_type === 'radio' || $field_type === 'checkbox_simple'): ?>
+                                <?php elseif ($field_type === 'checkbox_simple'): ?>
+                                    <div class="kz-checkbox-options">
+                                        <span class="kz-add-checkbox kz-add-btn">+ Add Checkbox</span>
+                                        <div class="kz-checkbox-list">
+                                            <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
+                                                <div class="editable-checkbox-container kz-checkbox-item">
+                                                    <label class="editable-checkbox">
+                                                        <input type="checkbox" name="checkbox-group-<?php echo $field_id; ?>">
+                                                        <span class="checkbox-label">
+                                                            <input type="text" class="editable-input" 
+                                                                   placeholder="Type here..." 
+                                                                   value="<?php echo esc_attr($option['label'] ?? ''); ?>">
+                                                        </span>
+                                                    </label>
+                                                    <span class="kz-remove-checkbox kz-remove-btn">✖</span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+
+                                <?php elseif ($field_type === 'radio'): ?>
                                     <div class="kz-<?php echo $field_type; ?>-options">
                                         <span class="kz-add-<?php echo $field_type; ?> kz-add-btn">+ Add Option</span>
                                         <div class="kz-<?php echo $field_type; ?>-list">
@@ -110,6 +130,7 @@ function render_custom_meta_box($post) {
                                         </div>
                                     </div>
                                 <?php endif; ?>
+                                
                             </div>
         
                             <!-- Hidden JSON Field -->
@@ -125,6 +146,7 @@ function render_custom_meta_box($post) {
     </div>
     <?php
 }
+
 
 
 // Enqueue styles and scripts
