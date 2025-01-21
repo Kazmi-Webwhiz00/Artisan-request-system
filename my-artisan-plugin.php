@@ -25,6 +25,7 @@ include_once plugin_dir_path(__FILE__) . 'includes/service-form/service-form-cpt
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/form-field-table-sql.php';
 include_once plugin_dir_path(__FILE__) .  'includes/service-form/FieldTypes.php';
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/admin-view.php';
+include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/frontend/form-renderer.php';
 
 
 
