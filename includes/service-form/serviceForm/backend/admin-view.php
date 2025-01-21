@@ -201,27 +201,44 @@ function handle_form_fields_submission($post_id) {
         return;
     }
 
-    // Verify if the form fields are present in POST
-    if (!isset($_POST['fields']) || !is_array($_POST['fields'])) {
-        return;
-    }
-
     global $wpdb;
-
-    // Define the table name
     $table_name = $wpdb->prefix . 'form_fields';
 
-    // Loop through the submitted fields
-    foreach ($_POST['fields'] as $field_external_id => $field_data) {
-        // Sanitize and prepare the data
+    // Get all existing fields for this form
+    $existing_fields = $wpdb->get_col($wpdb->prepare(
+        "SELECT field_external_id FROM $table_name WHERE service_form_id = %d",
+        $post_id
+    ));
+
+    // Fields sent via the form
+    $submitted_fields = isset($_POST['fields']) ? array_keys($_POST['fields']) : [];
+
+    // Identify fields to delete
+    $fields_to_delete = array_diff($existing_fields, $submitted_fields);
+
+    // Delete removed fields
+    if (!empty($fields_to_delete)) {
+        foreach ($fields_to_delete as $field_external_id) {
+            $wpdb->delete($table_name, [
+                'service_form_id' => $post_id,
+                'field_external_id' => $field_external_id,
+            ], [
+                '%d',
+                '%s',
+            ]);
+        }
+    }
+
+    // Loop through submitted fields and update/insert them
+    foreach ($submitted_fields as $field_external_id) {
+        $field_data = $_POST['fields'][$field_external_id];
         $field_type = sanitize_text_field($field_data['field_type']);
         $field_label = sanitize_text_field($field_data['field_label']);
         $field_description = isset($field_data['field_description']) ? sanitize_textarea_field($field_data['field_description']) : '';
         $is_required = isset($field_data['is_required']) ? (int) $field_data['is_required'] : 0;
         $field_order = isset($field_data['field_order']) ? (int) $field_data['field_order'] : 0;
-        $field_options = isset($field_data['options']) ? ($field_data['options']) : '{}';
+        $field_options = isset($field_data['options']) ? $field_data['options'] : '{}';
 
-        // Check if the field already exists by `field_external_id`
         $existing_field = $wpdb->get_row($wpdb->prepare(
             "SELECT field_id FROM $table_name WHERE service_form_id = %d AND field_external_id = %s",
             $post_id,
@@ -242,14 +259,9 @@ function handle_form_fields_submission($post_id) {
                 ],
                 ['field_id' => $existing_field->field_id],
                 [
-                    '%s', // field_type
-                    '%s', // field_label
-                    '%s', // field_description
-                    '%d', // is_required
-                    '%d', // field_order
-                    '%s', // field_options
+                    '%s', '%s', '%s', '%d', '%d', '%s'
                 ],
-                ['%d'] // field_id
+                ['%d']
             );
         } else {
             // Insert a new field
@@ -266,14 +278,7 @@ function handle_form_fields_submission($post_id) {
                     'field_options' => $field_options,
                 ],
                 [
-                    '%s', // field_external_id
-                    '%d', // service_form_id
-                    '%s', // field_type
-                    '%s', // field_label
-                    '%s', // field_description
-                    '%d', // is_required
-                    '%d', // field_order
-                    '%s', // field_options
+                    '%s', '%d', '%s', '%s', '%s', '%d', '%d', '%s'
                 ]
             );
         }
