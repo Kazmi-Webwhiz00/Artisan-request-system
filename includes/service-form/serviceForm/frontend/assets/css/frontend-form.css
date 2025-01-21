@@ -1,0 +1,103 @@
+.field-wrapper {
+    margin-bottom: 30px; /* More padding above and below each field wrapper */
+    padding: 15px 0; /* Padding inside the wrapper, excluding the background */
+}
+
+.form-group > label {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.error {
+    border: 1px solid red;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.kz-step-navigation{
+    margin-top: 20px;
+    display: flex;
+    justify-content: start;
+    gap: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.submit-button {
+    background: #28a745;
+}
+
+.submit-button:hover {
+    background: #218838;
+}
+
+
+
+.form-name {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 10px 0 20px;
+}
+
+.form-main-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+.kz-form-warpper{
+    padding-right: 200px;
+}
+
+.service-form{
+    padding-bottom: 350px;
+}
+
+.form-interaction {
+    opacity: 0.5;
+    transition: opacity 0.4s ease-in-out; /* Smooth transition */
+}
+
+
+.kz-step-navigation .next-step{
+    background-color: #FFDA79 !important;
+    border: 1px solid #FFDA79;
+    color: #002335;
+}
+
+.kz-step-navigation .prev-step{
+    border: 1px solid #FFDA79;
+    color: #002335;
+}
+
+.kz-step-navigation .prev-step:hover,
+.kz-step-navigation .next-step:hover {
+    background-color:rgba(255, 218, 121, 0.3);  /* Slight black overlay */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    color: #002335;
+}
