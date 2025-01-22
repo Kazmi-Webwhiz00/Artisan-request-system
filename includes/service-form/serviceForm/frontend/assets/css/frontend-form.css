@@ -6,6 +6,7 @@
 .form-group > label {
     font-size: 20px;
     font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .error {
@@ -39,15 +40,6 @@ button {
 button:hover {
     background: #0056b3;
 }
-
-.submit-button {
-    background: #28a745;
-}
-
-.submit-button:hover {
-    background: #218838;
-}
-
 
 
 .form-name {
@@ -83,11 +75,11 @@ button:hover {
     transition: opacity 0.4s ease-in-out; /* Smooth transition */
 }
 
-
+.submit-button,
 .kz-step-navigation .next-step{
     background-color: #FFDA79 !important;
-    border: 1px solid #FFDA79;
-    color: #002335;
+    border: 1px solid #FFDA79 !important;
+    color: #002335 !important;
 }
 
 .kz-step-navigation .prev-step{

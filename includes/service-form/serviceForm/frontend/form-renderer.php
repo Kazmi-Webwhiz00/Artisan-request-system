@@ -183,6 +183,33 @@ function render_service_form_shortcode($atts) {
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+
+                            <!-- Zip Code Field (Second Last Step) -->
+                            <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
+                                <div class="form-group mb-5">
+                                    <label for="zip_code">Zip code of your order*</label>
+                                    <?php render_text_field('zip_code', 'zip_code', '', 'Enter your zip code', '', true); ?>
+                                </div>
+                            </div>
+
+                            <!-- Email, Name, and Phone Fields (Last Step) -->
+                            <div class="form-step" data-step="<?php echo count($fields) + 2; ?>">
+                                <div class="form-group mb-5">
+                                    <label for="email">Get an answer from tradesmen in your area.</label>
+                                    <br>
+                                    <span class="mb-4">Your data will only be visible to tradesmen once you contact them.</span>
+                                    <?php render_email_field('email', 'email', '', 'Enter your email address', '', true); ?>
+                                </div>
+                                <div class="form-group mb-5">
+                                    <label for="name">Your Name*</label>
+                                    <?php render_text_field('name', 'name', '', 'Enter your name', '', true); ?>
+                                </div>
+                                <div class="form-group mb-5">
+                                    <label for="phone">Phone Number*</label>
+                                    <?php render_phone_field('phone', 'phone', '', 'Enter your phone number', '+49', true); ?>
+                                </div>
+                            </div>
+
                             <!-- Navigation Buttons -->
                             <div class="kz-step-navigation">
                                 <button type="button" class="prev-step" disabled>Back</button>
