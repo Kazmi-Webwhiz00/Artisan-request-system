@@ -767,7 +767,7 @@ function render_artisan_registration_step_4() {
 // Function to render Step 5
 function render_artisan_registration_step_5() {
     ?>
-    <div class="form-step form-step-5">
+    <div class="form-step form-step-5" >
         <!-- Progress Bar -->
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
