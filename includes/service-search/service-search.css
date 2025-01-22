@@ -10,10 +10,12 @@
 .search-box {
     display: flex;
     align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid transparent;
+    border-radius: 8px;
     padding: 5px 10px;
     background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .search-box input {
@@ -22,14 +24,54 @@
     outline: none;
     font-size: 16px;
     padding: 5px;
+    color: #333;
+}
+
+.search-box input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.search-box:focus-within {
+    border-color: #002335; /* Purple border on focus */
+    box-shadow: 0 0 8px rgba(94, 37, 122, 0.5); /* Subtle glow */
 }
 
 .search-box button {
-    background: none;
+    background:#002335; /* Purple background */
+    color: #fff;
     border: none;
     font-size: 16px;
     cursor: pointer;
-    color: #6b46c1;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+    background: #063349; /* Slightly lighter purple on hover */
+}
+
+#service-search-clear {
+    display: none; /* Hide clear button initially */
+    background-color: #dadada83;
+    border: none;
+    font-size: 12px;
+    border-radius: 50%;
+    padding: 0px;
+    cursor: pointer;
+    color: rgb(41, 41, 41);
+    margin-right: 8px;
+
+}
+
+.search-box input:not(:placeholder-shown) + #service-search-clear {
+    display: block; /* Show clear button when input has content */
 }
 
 /* Styling for the search results dropdown */
@@ -37,12 +79,14 @@
     display: none; /* Hidden by default */
     list-style: none;
     padding: 0;
-    margin: 10px 0 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    margin-top: 0px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     background-color: #fff;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 #service-search-results.visible {
@@ -52,7 +96,10 @@
 #service-search-results li {
     padding: 10px;
     border-bottom: 1px solid #eee;
+    font-size: 14px;
     cursor: pointer;
+    transition: background-color 0.3s;
+    color: #002335; /* Purple text color */
 }
 
 #service-search-results li:last-child {
@@ -60,12 +107,54 @@
 }
 
 #service-search-results li:hover {
-    background-color: #f4f4f4;
+    background-color: #062d414d; /* Light purple background on hover */
+    color: #002335; /* Text color remains purple */
 }
 
 /* Loading state for the dropdown */
 #service-search-results .loading {
     text-align: center;
     padding: 10px;
-    color: #999;
+    color: #666;
+    font-style: italic;
 }
+
+
+#service-search-input{
+    border: none;
+}
+
+.search-results > li > a {
+    text-decoration: none;
+    color: #002335;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+.loader {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    margin:15px auto;
+    position: relative;
+    color: #002335;
+    box-sizing: border-box;
+    animation: animloader 1s linear infinite alternate;
+  }
+  
+  @keyframes animloader {
+    0% {
+      box-shadow: -38px -6px, -14px 6px,  14px -6px;
+    }
+    33% {
+      box-shadow: -38px 6px, -14px -6px,  14px 6px;
+    }
+    66% {
+      box-shadow: -38px -6px, -14px 6px, 14px -6px;
+    }
+    100% {
+      box-shadow: -38px 6px, -14px -6px, 14px 6px;
+    }
+  }

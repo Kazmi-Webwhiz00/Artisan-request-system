@@ -217,7 +217,7 @@ jQuery(document).ready(function ($) {
         `;
     
         // Replace the form with the thank-you message
-        $('#dynamic-multi-step-form').parent().html(message);
+        $('.service-form').parent().html(message);
     }
     
 

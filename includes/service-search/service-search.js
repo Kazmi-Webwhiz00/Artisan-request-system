@@ -2,11 +2,12 @@ jQuery(document).ready(function ($) {
     const $input = $('#service-search-input');
     const $results = $('#service-search-results');
     const $clearButton = $('#service-search-clear');
+    const $submitButton = $('#service-search-submit');
 
     // Fetch results based on query
     function fetchResults(query = '') {
         $.ajax({
-            url: ajax_object.ajax_url,
+            url: ajax_object_search.ajax_url,
             method: 'GET',
             data: {
                 action: 'fetch_service_forms',
@@ -14,15 +15,21 @@ jQuery(document).ready(function ($) {
             },
             beforeSend: function () {
                 $results.addClass('visible'); // Show the results container
-                $results.html('<li class="loading">Loading...</li>');
+                $results.html('<li class="loading"><span class="loader"></span></li>');
             },
             success: function (response) {
                 $results.empty();
                 if (response.length) {
                     response.forEach((item) => {
                         $results.append(
-                            `<li><a href="${item.link}">${item.title}</a></li>`
+                            `<li data-link="${item.link}">${item.title}</li>`
                         );
+                    });
+
+                    // Attach click handler to each list item
+                    $results.find('li').on('click', function () {
+                        const link = $(this).data('link');
+                        window.location.href = link; // Navigate to the link
                     });
                 } else {
                     $results.html('<li>No results found.</li>');
@@ -57,5 +64,11 @@ jQuery(document).ready(function ($) {
     $clearButton.on('click', function () {
         $input.val('');
         fetchResults(''); // Fetch all results when cleared
+    });
+
+    // Submit button click event
+    $submitButton.on('click', function () {
+        const query = $input.val().trim();
+        fetchResults(query); // Perform AJAX call when submit button is clicked
     });
 });

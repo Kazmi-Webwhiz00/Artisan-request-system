@@ -24,7 +24,7 @@ add_shortcode('service_search', 'render_service_search_form');
 function enqueue_service_search_assets() {
     wp_enqueue_style('service-search-css', plugin_dir_url(__FILE__) . 'service-search.css');
     wp_enqueue_script('service-search-js', plugin_dir_url(__FILE__) . 'service-search.js', ['jquery'], false, true);
-    wp_localize_script('service-search-js', 'ajax_object', [
+    wp_localize_script('service-search-js', 'ajax_object_search', [
         'ajax_url' => admin_url('admin-ajax.php'),
     ]);
 }
