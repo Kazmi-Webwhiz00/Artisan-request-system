@@ -99,6 +99,46 @@ button:hover {
     margin-right: 300px;
 }
 
+.thank-you-message {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+}
+
+.success-gif {
+    max-width: 100px;
+    margin-bottom: 20px;
+}
+
+.thank-you-title {
+    color: #333;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.thank-you-description {
+    color: #555;
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+.user-details {
+    color: #333;
+    text-align: left;
+    display: inline-block;
+    font-size: 1em;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-details p {
+    margin: 5px 0;
+}
+
+
 @media (max-width: 1024px) {
     /* For tablets and smaller devices */
     .kz-form-wrapper {

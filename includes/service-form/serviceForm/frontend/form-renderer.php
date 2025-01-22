@@ -29,6 +29,7 @@ function enqueue_service_form_assets() {
         // Add custom AJAX script
          wp_localize_script('frontend-form-js', 'ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
+            'success_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/success.gif',
         ]);
     }
 }
@@ -196,7 +197,7 @@ function render_service_form_shortcode($atts) {
 
                             <!-- Zip Code Field (Second Last Step) -->
                             <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
-                                <div class="form-group">
+                                <div class="form-group mb-5">
                                     <label for="zip_code">Zip code of your order*</label>
                                     <?php render_text_field('zip_code', 'zip_code', '', 'Enter your zip code', '', true); ?>
                                 </div>
@@ -204,16 +205,17 @@ function render_service_form_shortcode($atts) {
 
                             <!-- Email, Name, and Phone Fields (Last Step) -->
                             <div class="form-step" data-step="<?php echo count($fields) + 2; ?>">
-                                <div class="form-group">
+                                <div class="form-group mb-5">
                                     <label for="email">Get an answer from tradesmen in your area.</label>
-                                    <span>Your data will only be visible to tradesmen once you contact them.</span>
+                                    <br>
+                                    <span class="mb-5" >Your data will only be visible to tradesmen once you contact them.</span>
                                     <?php render_email_field('email', 'email', '', 'Enter your email address', '', true); ?>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mb-5">
                                     <label for="name">Your Name*</label>
                                     <?php render_text_field('name', 'name', '', 'Enter your name', '', true); ?>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mb-5">
                                     <label for="phone">Phone Number*</label>
                                     <?php render_phone_field('phone', 'phone', '', 'Enter your phone number', '', true); ?>
                                 </div>
@@ -223,7 +225,7 @@ function render_service_form_shortcode($atts) {
                             <div class="kz-step-navigation">
                                 <button type="button" class="prev-step" disabled>Back</button>
                                 <button type="button" class="next-step">Next</button>
-                                <button type="submit" id="form-submit-button" style="display: none;">Submit</button>
+                                <button type="submit" class="submit-button" id="form-submit-button" style="display: none;">Submit</button>
                             </div>
                         <?php else: ?>
                             <p>No fields found for this form.</p>

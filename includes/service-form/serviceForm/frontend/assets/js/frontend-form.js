@@ -192,6 +192,36 @@ jQuery(document).ready(function ($) {
         };
     }
 
+    function showThankYouMessage(formData) {
+        const userName = formData.user_details.name;
+        const userEmail = formData.user_details.email;
+        const userPhone = formData.user_details.phone;
+        const formName = formData.form_name;
+    
+        // Create the thank-you message
+        const message = `
+            <div class="thank-you-message">
+                <img src="${ajax_object.success_gif_url}" alt="Success" class="success-gif">
+                <h2 class="thank-you-title">
+                    Thank you, ${userName}, for requesting ${formName} service!
+                </h2>
+                <p class="thank-you-description">
+                    Your request has been shared with all the available artisans. They will start contacting you soon using the following contact details:
+                </p>
+                <div class="user-details">
+                    <p><strong>Name:</strong> ${userName}</p>
+                    <p><strong>Email:</strong> ${userEmail}</p>
+                    <p><strong>Phone:</strong> ${userPhone}</p>
+                </div>
+            </div>
+        `;
+    
+        // Replace the form with the thank-you message
+        $('#dynamic-multi-step-form').parent().html(message);
+    }
+    
+
+    
     // AJAX form submission
     function submitForm(formData) {
         $.ajax({
@@ -206,8 +236,7 @@ jQuery(document).ready(function ($) {
             },
             success: function (response) {
                 if (response.success) {
-                    alert(response.data.message); // Success message
-                    $('#dynamic-multi-step-form')[0].reset();
+                    showThankYouMessage(formData);
                 } else {
                     alert(response.data.message); // Error message
                 }
