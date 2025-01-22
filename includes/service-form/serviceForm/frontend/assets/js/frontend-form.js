@@ -2,7 +2,7 @@ jQuery(document).ready(function ($) {
     const steps = $(".form-step");
     const nextButton = $(".next-step");
     const prevButton = $(".prev-step");
-    const submitButton = $(".submit-button");
+    const submitButton = $("#form-submit-button");
     const form = $("#dynamic-multi-step-form");
 
     let currentStep = 0;
@@ -112,4 +112,110 @@ jQuery(document).ready(function ($) {
     // Initialize the scroll detection for removing opacity
     detectScrollToTop();
 
+});
+
+
+jQuery(document).ready(function ($) {
+    // Main submit handler
+    $('#form-submit-button').on('click', function (e) {
+        e.preventDefault();
+
+        const formFields = getFormFields();
+        const userDetails = getUserDetails();
+
+        const formData = {
+            form_name: $('.form-name').text().trim(),
+            form_fields: formFields,
+            user_details: userDetails,
+        };
+
+        console.log("Form data:", JSON.stringify(formData));
+        console.table(formData.form_fields);
+        console.table([formData.user_details]);
+
+        // Submit via AJAX
+        submitForm(formData);
+    });
+
+    // Extract form fields (questions and answers)
+    function getFormFields() {
+        const fields = [];
+        $('#dynamic-multi-step-form')
+            .find('input, textarea, select')
+            .not('#zip_code, #name, #email, #phone') // Exclude user details fields
+            .each(function () {
+                const fieldType = $(this).attr('type');
+                const question = $(this)
+                    .closest('.form-group')
+                    .find('label')
+                    .text()
+                    .trim();
+                let answer = '';
+
+                if (fieldType === 'checkbox') {
+                    if ($(this).is(':checked')) {
+                        answer = $(this).val();
+                        const existingField = fields.find((item) => item.question === question);
+                        if (existingField) {
+                            existingField.answer += ', ' + answer;
+                        } else {
+                            fields.push({ question, answer });
+                        }
+                    }
+                } else if (fieldType === 'radio') {
+                    if ($(this).is(':checked')) {
+                        answer = $(this).val();
+                        fields.push({ question, answer });
+                    }
+                } else {
+                    answer = $(this).val();
+                    fields.push({ question, answer });
+                }
+            });
+        return fields;
+    }
+
+    // Extract user details (zip code, name, email, and phone)
+    function getUserDetails() {
+        const zipCode = $('#zip_code').val() || '';
+        const name = $('#name').val() || '';
+        const email = $('#email').val() || '';
+        const phone = $('#phone').val() || '';
+
+        return {
+            zip_code: zipCode,
+            name: name,
+            email: email,
+            phone: phone,
+        };
+    }
+
+    // AJAX form submission
+    function submitForm(formData) {
+        $.ajax({
+            url: ajax_object.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'submit_service_form',
+                form_data: JSON.stringify(formData),
+            },
+            beforeSend: function () {
+                $('#form-submit-button').prop('disabled', true).text('Submitting...');
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.data.message); // Success message
+                    $('#dynamic-multi-step-form')[0].reset();
+                } else {
+                    alert(response.data.message); // Error message
+                }
+            },
+            error: function () {
+                alert('An error occurred while submitting the form.');
+            },
+            complete: function () {
+                $('#form-submit-button').prop('disabled', false).text('Submit');
+            },
+        });
+    }
 });

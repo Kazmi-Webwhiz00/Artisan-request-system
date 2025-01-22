@@ -23,7 +23,7 @@ function render_checkbox_field($name, $id, $label = '', $checked = false, $requi
     }
 
     // Add checkbox input
-    $field .= '<input type="checkbox" class="kz-checkbox" name="' . esc_attr($unique_key) . '" id="' . esc_attr($unique_key) . '"';
+    $field .= '<input type="checkbox" class="kz-checkbox" name="' . esc_attr($unique_key) . '"  value="' . esc_attr($label) . '"  id="' . esc_attr($unique_key) . '"';
     if ($checked) {
         $field .= ' checked';
     }

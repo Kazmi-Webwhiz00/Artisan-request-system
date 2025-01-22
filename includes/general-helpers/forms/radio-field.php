@@ -16,7 +16,7 @@ function render_radio_button_field($name, $id, $label = '', $checked = false, $r
     $field = '<div class="kz-radio-container">'; // Add specific class for styling
     
     // Add radio button input
-    $field .= '<input type="radio" class="kz-radio" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
+    $field .= '<input type="radio" class="kz-radio" name="' . esc_attr($name) . '"  value="' . esc_attr($label) . '"  id="' . esc_attr($id) . '"';
     if ($checked) {
         $field .= ' checked';
     }

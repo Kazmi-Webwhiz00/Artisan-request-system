@@ -25,6 +25,11 @@ function enqueue_service_form_assets() {
 
         // Enqueue jQuery and JS
         wp_enqueue_script('frontend-form-js', plugin_dir_url(__FILE__) . 'assets/js/frontend-form.js', ['jquery'], false, true);
+
+        // Add custom AJAX script
+         wp_localize_script('frontend-form-js', 'ajax_object', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+        ]);
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_service_form_assets');
@@ -186,7 +191,7 @@ function render_service_form_shortcode($atts) {
 
                             <!-- Zip Code Field (Second Last Step) -->
                             <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
-                                <div class="form-group mb-5">
+                                <div class="form-group">
                                     <label for="zip_code">Zip code of your order*</label>
                                     <?php render_text_field('zip_code', 'zip_code', '', 'Enter your zip code', '', true); ?>
                                 </div>
@@ -194,19 +199,18 @@ function render_service_form_shortcode($atts) {
 
                             <!-- Email, Name, and Phone Fields (Last Step) -->
                             <div class="form-step" data-step="<?php echo count($fields) + 2; ?>">
-                                <div class="form-group mb-5">
+                                <div class="form-group">
                                     <label for="email">Get an answer from tradesmen in your area.</label>
-                                    <br>
-                                    <span class="mb-4">Your data will only be visible to tradesmen once you contact them.</span>
+                                    <span>Your data will only be visible to tradesmen once you contact them.</span>
                                     <?php render_email_field('email', 'email', '', 'Enter your email address', '', true); ?>
                                 </div>
-                                <div class="form-group mb-5">
+                                <div class="form-group">
                                     <label for="name">Your Name*</label>
                                     <?php render_text_field('name', 'name', '', 'Enter your name', '', true); ?>
                                 </div>
-                                <div class="form-group mb-5">
+                                <div class="form-group">
                                     <label for="phone">Phone Number*</label>
-                                    <?php render_phone_field('phone', 'phone', '', 'Enter your phone number', '+49', true); ?>
+                                    <?php render_phone_field('phone', 'phone', '', 'Enter your phone number', '', true); ?>
                                 </div>
                             </div>
 
@@ -214,7 +218,7 @@ function render_service_form_shortcode($atts) {
                             <div class="kz-step-navigation">
                                 <button type="button" class="prev-step" disabled>Back</button>
                                 <button type="button" class="next-step">Next</button>
-                                <button type="submit" class="submit-button" style="display: none;">Submit</button>
+                                <button type="submit" id="form-submit-button" style="display: none;">Submit</button>
                             </div>
                         <?php else: ?>
                             <p>No fields found for this form.</p>
@@ -228,3 +232,75 @@ function render_service_form_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('service_form', 'render_service_form_shortcode');
+
+// AJAX handler for form submission
+add_action('wp_ajax_submit_service_form', 'handle_service_form_submission');
+add_action('wp_ajax_nopriv_submit_service_form', 'handle_service_form_submission');
+
+function handle_service_form_submission() {
+    if (!isset($_POST['form_data']) || empty($_POST['form_data'])) {
+        wp_send_json_error(['message' => 'No data received.']);
+    }
+
+    // Decode JSON-formatted form data
+    $form_data = json_decode(stripslashes($_POST['form_data']), true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        wp_send_json_error(['message' => 'Invalid JSON data received.']);
+    }
+
+    // Extract data from form_data
+    $form_name = $form_data['form_name'] ?? 'Unknown Form';
+    $form_fields = $form_data['form_fields'] ?? [];
+    $user_details = $form_data['user_details'] ?? [];
+    $user_name = $user_details['name'] ?? 'N/A';
+    $user_email = $user_details['email'] ?? 'N/A';
+    $user_phone = $user_details['phone'] ?? 'N/A';
+    $zip_code = $user_details['zip_code'] ?? 'N/A';
+
+    // Create email body
+    ob_start();
+    ?>
+    <h2>New Job Requested in Your Area for <?php echo esc_html($form_name); ?></h2>
+    <p>A new job has been posted in the area with postal code <strong><?php echo esc_html($zip_code); ?></strong> for <strong><?php echo esc_html($form_name); ?></strong> that matches your profile.</p>
+    
+    <h3>Client Details</h3>
+    <p><strong>Name:</strong> <?php echo esc_html($user_name); ?></p>
+    <p><strong>Email:</strong> <?php echo esc_html($user_email); ?></p>
+    <p><strong>Phone:</strong> <?php echo esc_html($user_phone); ?></p>
+
+    <h3>Job Details</h3>
+    <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ccc; padding: 8px;">Question</th>
+                <th style="border: 1px solid #ccc; padding: 8px;">Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($form_fields as $field): ?>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['question']); ?></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['answer']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php
+    $email_body = ob_get_clean();
+
+    // Email settings
+    $to = 'admin@artisan.com';
+    $subject = 'New Job Request in Your Area for ' . $form_name;
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+    // Send email
+    $sent = wp_mail($to, $subject, $email_body, $headers);
+
+    if ($sent) {
+        wp_send_json_success(['message' => 'Form submitted successfully.']);
+    } else {
+        wp_send_json_error(['message' => 'Failed to send email.']);
+    }
+}
+?>

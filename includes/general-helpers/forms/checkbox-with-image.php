@@ -18,7 +18,7 @@ function render_dynamic_checkbox_field($base_id, $name, $label, $image_url, $che
     <div class="checkbox-container">
         <div class="checkbox-card">
             <!-- Use the unique key for both id and name -->
-            <input type="checkbox" name="<?php echo $unique_key; ?>" id="<?php echo $unique_key; ?>" <?php echo $checked ? 'checked' : ''; ?> />
+            <input type="checkbox" name="<?php echo $unique_key; ?>" value="<?php echo $label; ?>" id="<?php echo $unique_key; ?>" <?php echo $checked ? 'checked' : ''; ?> />
             <label for="<?php echo $unique_key; ?>">
                 <div class="checkbox-box">✓</div>
                 <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($label); ?> Image">
