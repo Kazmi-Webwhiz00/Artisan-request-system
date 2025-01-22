@@ -1,0 +1,71 @@
+/* Container for the entire search component */
+#service-search-container {
+    max-width: 400px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+/* Styling for the search box */
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: #fff;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.search-box button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #6b46c1;
+}
+
+/* Styling for the search results dropdown */
+#service-search-results {
+    display: none; /* Hidden by default */
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#service-search-results.visible {
+    display: block; /* Visible when the "visible" class is added */
+}
+
+#service-search-results li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+#service-search-results li:last-child {
+    border-bottom: none;
+}
+
+#service-search-results li:hover {
+    background-color: #f4f4f4;
+}
+
+/* Loading state for the dropdown */
+#service-search-results .loading {
+    text-align: center;
+    padding: 10px;
+    color: #999;
+}
