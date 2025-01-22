@@ -101,3 +101,22 @@ button:hover {
     transition: background-color 0.3s ease; /* Smooth transition */
     color: #002335;
 }
+
+
+.kz-form-wrapper {
+    margin-right: 300px;
+}
+
+@media (max-width: 1024px) {
+    /* For tablets and smaller devices */
+    .kz-form-wrapper {
+        margin-right: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* For mobile devices */
+    .kz-form-wrapper {
+        margin-right: 5px;
+    }
+}

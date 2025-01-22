@@ -62,3 +62,16 @@ function enqueue_field_types($hook) {
     }
 }
 add_action('admin_enqueue_scripts', 'enqueue_custom_meta_box_assets');
+
+
+// Enqueue CSS for artisan registration form
+function enqueue_helper_form_styles() {
+    wp_enqueue_style(
+        'helper-form-css', // Handle for the stylesheet
+        plugin_dir_url(__FILE__) . 'includes/general-helpers/forms/css/form-helper.css', // Path to the CSS file
+        array(), // Dependencies (if any)
+        null // Version number (optional, set to null if not versioned)
+    );
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_helper_form_styles');

@@ -15,6 +15,7 @@ require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/radio-f
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/file-upload-field.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/number-field.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/textarea-field.php';
+require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/checkbox-with-image.php';
 
 
 function enqueue_service_form_assets() {
@@ -51,7 +52,6 @@ function render_service_form_shortcode($atts) {
     $form_description = get_post_meta($post_id, '_form_description', true);
 
     $form_name = get_the_title($post_id); // Form name
-    $form_description = get_post_meta($post_id, '_form_description', true);
 
     ob_start();
     ?>
@@ -61,126 +61,140 @@ function render_service_form_shortcode($atts) {
         <p class="form-name"><?php echo esc_html($form_name); ?></p>
         <hr class="form-divider">
 
-        <div class="kz-form-warpper">
-        <!-- Main Form Title -->
-        <h1 class="form-main-title">Describe your job and contact craftsmen in your area</h1>
+        <div class="kz-form-wrapper">
+            <!-- Main Form Title -->
+            <h1 class="form-main-title">Describe your job and contact craftsmen in your area</h1>
 
-        <!-- Form Description -->
-        <p><?php echo esc_html($form_description); ?></p>
+            <!-- Form Description -->
+            <p><?php echo esc_html($form_description); ?></p>
 
-        <div class="multi-step-form">
-            <form action="" method="post" id="dynamic-multi-step-form">
-                <div class="steps-container">
-                    <?php if (!empty($fields)): ?>
-                        <?php foreach ($fields as $index => $field): ?>
-                            <?php
-                            $field_id = esc_attr($field->field_external_id);
-                            $field_label = esc_html($field->field_label);
-                            $field_description = esc_html($field->field_description);
-                            $field_type = $field->field_type;
-                            $cleaned_options = stripslashes($field->field_options ?? '');
-                            $field_options = json_decode($cleaned_options, true);
-                            $is_required = (int)$field->is_required;
-                            ?>
-                            <div class="form-step" data-step="<?php echo $index + 1; ?>">
-                                <div class="form-group">
-                                    <label for="<?php echo $field_id; ?>">
-                                        <?php echo $field_label; ?>
-                                        <?php echo $is_required ? ' *' : ' (optional)'; ?>
-                                    </label>
-                                    <?php if ($field_description): ?>
-                                        <p class="field-description"><?php echo $field_description; ?></p>
-                                    <?php endif; ?>
+            <div class="multi-step-form">
+                <form action="" method="post" id="dynamic-multi-step-form">
+                    <div class="steps-container">
+                        <?php if (!empty($fields)): ?>
+                            <?php foreach ($fields as $index => $field): ?>
+                                <?php
+                                $field_id = esc_attr($field->field_external_id);
+                                $field_label = esc_html($field->field_label);
+                                $field_description = esc_html($field->field_description);
+                                $field_type = $field->field_type;
+                                $cleaned_options = stripslashes($field->field_options ?? '');
+                                $field_options = json_decode($cleaned_options, true);
+                                $is_required = (int)$field->is_required;
+                                ?>
+                                <div class="form-step" data-step="<?php echo $index + 1; ?>">
+                                    <div class="form-group">
+                                        <label for="<?php echo $field_id; ?>">
+                                            <?php echo $field_label; ?>
+                                            <?php echo $is_required ? ' *' : ' (optional)'; ?>
+                                        </label>
+                                        <?php if ($field_description): ?>
+                                            <p class="field-description"><?php echo $field_description; ?></p>
+                                        <?php endif; ?>
 
-                                    <div class="field-wrapper field-<?php echo $field_type; ?>-wrapper">
-                                        <?php
-                                        switch ($field_type) {
-                                            case 'text_input':
-                                                render_text_field(
-                                                    $field_id,
-                                                    $field_id,
-                                                    '',
-                                                    $field_options['placeholder'] ?? '',
-                                                    '',
-                                                    $is_required
-                                                );
-                                                break;
-                                            case 'email':
-                                                render_email_field(
-                                                    $field_id,
-                                                    $field_id,
-                                                    '',
-                                                    $field_options['placeholder'] ?? '',
-                                                    '',
-                                                    $is_required
-                                                );
-                                                break;
-                                            case 'number_input':
-                                                render_number_field(
-                                                    $field_id,
-                                                    $field_id,
-                                                    '',
-                                                    $field_options['placeholder'] ?? '',
-                                                    '',
-                                                    $is_required
-                                                );
-                                                break;
-                                            case 'radio':
-                                                if (!empty($field_options['options_list'])) {
-                                                    foreach ($field_options['options_list'] as $option) {
-                                                        render_radio_button_field(
-                                                            $field_id,
-                                                            $field_id . '_' . sanitize_title($option['label']),
-                                                            $option['label'] ?? '',
-                                                            false,
-                                                            $is_required
-                                                        );
+                                        <div class="field-wrapper field-<?php echo $field_type; ?>-wrapper">
+                                            <?php
+                                            switch ($field_type) {
+                                                case 'text_input':
+                                                    render_text_field(
+                                                        $field_id,
+                                                        $field_id,
+                                                        '',
+                                                        $field_options['placeholder'] ?? '',
+                                                        '',
+                                                        $is_required
+                                                    );
+                                                    break;
+                                                case 'email':
+                                                    render_email_field(
+                                                        $field_id,
+                                                        $field_id,
+                                                        '',
+                                                        $field_options['placeholder'] ?? '',
+                                                        '',
+                                                        $is_required
+                                                    );
+                                                    break;
+                                                case 'number_input':
+                                                    render_number_field(
+                                                        $field_id,
+                                                        $field_id,
+                                                        '',
+                                                        $field_options['placeholder'] ?? '',
+                                                        '',
+                                                        $is_required
+                                                    );
+                                                    break;
+                                                case 'radio':
+                                                    if (!empty($field_options['options_list'])) {
+                                                        foreach ($field_options['options_list'] as $option) {
+                                                            render_radio_button_field(
+                                                                $field_id,
+                                                                $field_id . '_' . sanitize_title($option['label']),
+                                                                $option['label'] ?? '',
+                                                                false,
+                                                                $is_required
+                                                            );
+                                                        }
                                                     }
-                                                }
-                                                break;
-                                            case 'checkbox_simple':
-                                                if (!empty($field_options['options_list'])) {
-                                                    foreach ($field_options['options_list'] as $option) {
-                                                        render_checkbox_field(
-                                                            $field_id . '_' . sanitize_title($option['label']),
-                                                            $field_id,
-                                                            $option['label'] ?? '',
-                                                            false,
-                                                            $is_required
-                                                        );
+                                                    break;
+                                                case 'checkbox_simple':
+                                                    if (!empty($field_options['options_list'])) {
+                                                        foreach ($field_options['options_list'] as $option) {
+                                                            render_checkbox_field(
+                                                                $field_id . '_' . sanitize_title($option['label']),
+                                                                $field_id,
+                                                                $option['label'] ?? '',
+                                                                false,
+                                                                $is_required
+                                                            );
+                                                        }
                                                     }
-                                                }
-                                                break;
-                                            case 'textarea':
-                                                render_textarea_field(
-                                                    $field_id,
-                                                    $field_id,
-                                                    '',
-                                                    $field_options['placeholder'] ?? '',
-                                                    '',
-                                                    $is_required
-                                                );
-                                                break;
-                                            default:
-                                                echo '<p>Unsupported field type: ' . esc_html($field_type) . '</p>';
-                                        }
-                                        ?>
+                                                    break;
+                                                case 'checkbox_with_image':
+                                                    if (!empty($field_options['options_list'])) {
+                                                        foreach ($field_options['options_list'] as $option) {
+                                                            $image_url = wp_get_attachment_url($option['imageId']);
+                                                            render_dynamic_checkbox_field(
+                                                                $field_id . '_' . sanitize_title($option['label']),
+                                                                $field_id,
+                                                                $option['label'] ?? '',
+                                                                $image_url,
+                                                                false
+                                                            );
+                                                        }
+                                                    }
+                                                    break;
+                                                case 'textarea':
+                                                    render_textarea_field(
+                                                        $field_id,
+                                                        $field_id,
+                                                        '',
+                                                        $field_options['placeholder'] ?? '',
+                                                        '',
+                                                        $is_required
+                                                    );
+                                                    break;
+                                                default:
+                                                    echo '<p>Unsupported field type: ' . esc_html($field_type) . '</p>';
+                                            }
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
+                            <?php endforeach; ?>
+                            <!-- Navigation Buttons -->
+                            <div class="kz-step-navigation">
+                                <button type="button" class="prev-step" disabled>Back</button>
+                                <button type="button" class="next-step">Next</button>
+                                <button type="submit" class="submit-button" style="display: none;">Submit</button>
                             </div>
-                        <?php endforeach; ?>
-                        <!-- Navigation Buttons -->
-                        <div class="kz-step-navigation">
-                            <button type="button" class="prev-step" disabled>Back</button>
-                            <button type="button" class="next-step">Next</button>
-                            <button type="submit" class="submit-button" style="display: none;">Submit</button>
-                        </div>
-                    <?php else: ?>
-                        <p>No fields found for this form.</p>
-                    <?php endif; ?>
-                </div>
-            </form>
-        </div>
+                        <?php else: ?>
+                            <p>No fields found for this form.</p>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <?php

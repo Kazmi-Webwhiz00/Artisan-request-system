@@ -15,13 +15,15 @@ function render_checkbox_field($name, $id, $label = '', $checked = false, $requi
     // Start rendering
     $field = '<div class="kz-checkbox-container">'; // Prefixed container class
     
+    $unique_key = esc_attr($id) . '-' . esc_attr($name);
+
     // Add label if provided
     if ($label) {
-        $field .= '<label for="' . esc_attr($id) . '" class="kz-checkbox-label">' . esc_html($label) . '</label>';
+        $field .= '<label for="' . esc_attr($unique_key) . '" class="kz-checkbox-label">' . esc_html($label) . '</label>';
     }
 
     // Add checkbox input
-    $field .= '<input type="checkbox" class="kz-checkbox" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
+    $field .= '<input type="checkbox" class="kz-checkbox" name="' . esc_attr($unique_key) . '" id="' . esc_attr($unique_key) . '"';
     if ($checked) {
         $field .= ' checked';
     }

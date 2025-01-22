@@ -422,8 +422,8 @@
 
 /* Add a checkmark inside the checkbox */
 .kz-checkbox:checked::after {
-    content: '✔';
-    color: blue !important;
+    content: '✓';
+    color: white;
     font-size: 14px;
     position: absolute;
     top: 50%;
