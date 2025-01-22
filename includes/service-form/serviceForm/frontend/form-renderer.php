@@ -58,12 +58,17 @@ function render_service_form_shortcode($atts) {
 
     $form_name = get_the_title($post_id); // Form name
 
+    // Get global_services taxonomy terms associated with the post
+    $form_types = wp_get_post_terms($post_id, 'global_services', ['fields' => 'names']);
+    $form_type = !empty($form_types) ? esc_attr(implode(', ', $form_types)) : 'Uncategorized';
+
     ob_start();
     ?>
     <div class="service-form">
 
         <!-- Form Name in Small Text -->
-        <p class="form-name"><?php echo esc_html($form_name); ?></p>
+        <p class="form-name" id="service-form-name" form-type="<?php echo $form_type; ?>"><?php echo esc_html($form_name); ?></p>
+
         <hr class="form-divider">
 
         <div class="kz-form-wrapper">
@@ -239,6 +244,7 @@ add_action('wp_ajax_nopriv_submit_service_form', 'handle_service_form_submission
 
 function handle_service_form_submission() {
     if (!isset($_POST['form_data']) || empty($_POST['form_data'])) {
+        error_log('No data received.');
         wp_send_json_error(['message' => 'No data received.']);
     }
 
@@ -246,28 +252,107 @@ function handle_service_form_submission() {
     $form_data = json_decode(stripslashes($_POST['form_data']), true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('Invalid JSON data received.');
         wp_send_json_error(['message' => 'Invalid JSON data received.']);
     }
 
-    // Extract data from form_data
+    // Extract data
     $form_name = $form_data['form_name'] ?? 'Unknown Form';
+    $form_type = $form_data['form_type'] ?? 'Unknown Form';
     $form_fields = $form_data['form_fields'] ?? [];
     $user_details = $form_data['user_details'] ?? [];
-    $user_name = $user_details['name'] ?? 'N/A';
-    $user_email = $user_details['email'] ?? 'N/A';
-    $user_phone = $user_details['phone'] ?? 'N/A';
     $zip_code = $user_details['zip_code'] ?? 'N/A';
 
-    // Create email body
+    // Get artisans matching taxonomy and postal code
+    $artisans = get_matching_artisans($form_type, $zip_code);
+
+    if (empty($artisans)) {
+        error_log("No matching artisans found for form: $form_name and zip code: $zip_code");
+        wp_send_json_error(['message' => 'No matching artisans found.']);
+    }
+
+    // Send emails to artisans
+    $artisan_names = send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details);
+
+    // Send admin summary email
+    send_admin_summary_email($artisan_names, $form_name, $zip_code);
+
+    wp_send_json_success(['message' => 'Form submitted successfully and emails sent to artisans.']);
+}
+
+function get_matching_artisans($form_name, $zip_code) {
+    $args = [
+        'post_type' => 'artisan',
+        'meta_query' => [
+            [
+                'key' => 'zip_code',
+                'value' => $zip_code,
+                'compare' => '='
+            ]
+        ],
+        'tax_query' => [
+            [
+                'taxonomy' => 'global_services',
+                'field' => 'name',
+                'terms' => $form_name
+            ]
+        ]
+    ];
+
+    $query = new WP_Query($args);
+
+    if ($query->have_posts()) {
+        $artisans = [];
+        while ($query->have_posts()) {
+            $query->the_post();
+            $artisans[] = [
+                'name' => get_the_title(),
+                'email' => get_post_meta(get_the_ID(), 'email', true),
+            ];
+        }
+        wp_reset_postdata();
+        return $artisans;
+    }
+    return [];
+}
+
+function send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details) {
+    $artisan_names = [];
+
+    foreach ($artisans as $artisan) {
+        $artisan_name = $artisan['name'];
+        $artisan_email = $artisan['email'];
+
+        if (is_email($artisan_email)) {
+            $email_body = build_artisan_email_body($form_name, $form_fields, $user_details);
+            $subject = "New Job Request in Your Area for $form_name";
+            $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+            $sent = wp_mail($artisan_email, $subject, $email_body, $headers);
+            if ($sent) {
+                $artisan_names[] = $artisan_name;
+                error_log("Email sent to artisan: $artisan_name at $artisan_email");
+            } else {
+                error_log("Failed to send email to artisan: $artisan_name at $artisan_email");
+            }
+        } else {
+            error_log("Invalid email address for artisan: $artisan_name");
+        }
+    }
+
+    return $artisan_names;
+}
+
+function build_artisan_email_body($form_name, $form_fields, $user_details) {
     ob_start();
     ?>
     <h2>New Job Requested in Your Area for <?php echo esc_html($form_name); ?></h2>
-    <p>A new job has been posted in the area with postal code <strong><?php echo esc_html($zip_code); ?></strong> for <strong><?php echo esc_html($form_name); ?></strong> that matches your profile.</p>
+    <p>A new job has been posted in the area with postal code <strong><?php echo esc_html($user_details['zip_code']); ?></strong> for <strong><?php echo esc_html($form_name); ?></strong> that matches your profile.</p>
     
     <h3>Client Details</h3>
-    <p><strong>Name:</strong> <?php echo esc_html($user_name); ?></p>
-    <p><strong>Email:</strong> <?php echo esc_html($user_email); ?></p>
-    <p><strong>Phone:</strong> <?php echo esc_html($user_phone); ?></p>
+    <p><strong>Name:</strong> <?php echo esc_html($user_details['name']); ?></p>
+    <p><strong>Email:</strong> <?php echo esc_html($user_details['email']); ?></p>
+    <p><strong>Phone:</strong> <?php echo esc_html($user_details['phone']); ?></p>
 
     <h3>Job Details</h3>
     <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
@@ -287,20 +372,33 @@ function handle_service_form_submission() {
         </tbody>
     </table>
     <?php
-    $email_body = ob_get_clean();
+    return ob_get_clean();
+}
 
-    // Email settings
+function send_admin_summary_email($artisan_names, $form_name, $zip_code) {
     $to = 'admin@artisan.com';
-    $subject = 'New Job Request in Your Area for ' . $form_name;
+    $subject = "Summary of Job Request for $form_name";
     $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-    // Send email
-    $sent = wp_mail($to, $subject, $email_body, $headers);
+    ob_start();
+    ?>
+    <h2>Summary of Job Request for <?php echo esc_html($form_name); ?></h2>
+    <p>The job was posted in the area with postal code <strong><?php echo esc_html($zip_code); ?></strong>.</p>
+    <h3>Artisans Notified</h3>
+    <ul>
+        <?php foreach ($artisan_names as $name): ?>
+            <li><?php echo esc_html($name); ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php
+    $email_body = ob_get_clean();
 
+    $sent = wp_mail($to, $subject, $email_body, $headers);
     if ($sent) {
-        wp_send_json_success(['message' => 'Form submitted successfully.']);
+        error_log('Admin summary email sent successfully.');
     } else {
-        wp_send_json_error(['message' => 'Failed to send email.']);
+        error_log('Failed to send admin summary email.');
     }
 }
+
 ?>

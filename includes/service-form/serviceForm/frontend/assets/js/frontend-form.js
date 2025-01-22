@@ -124,10 +124,12 @@ jQuery(document).ready(function ($) {
         const userDetails = getUserDetails();
 
         const formData = {
-            form_name: $('.form-name').text().trim(),
+            form_name: $('#service-form-name').text().trim(),
+            form_type: $('#service-form-name').attr('form-type').trim(),
             form_fields: formFields,
             user_details: userDetails,
         };
+        
 
         console.log("Form data:", JSON.stringify(formData));
         console.table(formData.form_fields);
