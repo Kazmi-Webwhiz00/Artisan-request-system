@@ -290,3 +290,22 @@
     outline: none !important;
   }
   
+
+  .kz-checkbox-with-image-item{
+    border: 1px solid #ddd;
+     padding: 10px;
+      text-align: center; 
+      width: 200px;
+      max-width: 250px;
+  }
+
+  .kz-checkbox-with-image-list{
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .kz-checkbox-with-image-item > input:focus {
+    border: none !important;
+  }
+    

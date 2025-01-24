@@ -18,28 +18,63 @@ jQuery(document).ready(function ($) {
         });
     }
 
-function attachEventsToExistingFields() {
-    fieldsContainer.find(".kz-field-container").each(function () {
-        const fieldContainer = $(this);
-        attachFieldEventListeners(fieldContainer);
-
-        // Handle dynamic options for checkboxes and radio buttons
-        const fieldType = fieldContainer.find(".kz-field-type-selector").val();
-        const dynamicOptions = fieldContainer.find(".kz-dynamic-options");
-        const uniqueId = fieldContainer.attr("id");
-
-        if (fieldType === "checkbox_simple" || fieldType === "radio") {
-            attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
-            
-            dynamicOptions.find(".kz-remove-checkbox, .kz-remove-radio").on("click", function () {
-                $(this).closest(".kz-checkbox-item, .kz-radio-item").remove();
-                updateFieldOptions(fieldContainer, uniqueId);
-            });
-        }
-        
-    });
-}
-
+    function attachEventsToExistingFields() {
+        fieldsContainer.find(".kz-field-container").each(function () {
+            const fieldContainer = $(this);
+            attachFieldEventListeners(fieldContainer);
+    
+            // Handle dynamic options for checkboxes, radio buttons, and checkbox_with_image
+            const fieldType = fieldContainer.find(".kz-field-type-selector").val();
+            const dynamicOptions = fieldContainer.find(".kz-dynamic-options");
+            const uniqueId = fieldContainer.attr("id");
+    
+            if (fieldType === "checkbox_simple" || fieldType === "radio" || fieldType === "checkbox_with_image") {
+                attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
+    
+                if (fieldType === "checkbox_with_image") {
+                    dynamicOptions.find(".kz-checkbox-with-image-item").each(function () {
+                        const item = $(this);
+    
+                        // Attach image upload functionality
+                        item.find(".upload-image-button").on("click", function () {
+                            const button = $(this);
+                            const mediaUploader = wp.media({
+                                title: "Select Image",
+                                button: { text: "Use Image" },
+                                multiple: false,
+                            });
+    
+                            mediaUploader.on("select", function () {
+                                const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                button.parent().html(`<img src="${attachment.url}" alt="Preview" style="max-width: 100px;">`);
+                                item.attr("data-image-id", attachment.id);
+                                updateFieldOptions(fieldContainer, uniqueId);
+                            });
+    
+                            mediaUploader.open();
+                        });
+    
+                        // Update options on input change
+                        item.find(".editable-input").on("input", function () {
+                            updateFieldOptions(fieldContainer, uniqueId);
+                        });
+    
+                        // Attach remove functionality
+                        item.find(".kz-remove-checkbox-with-image").on("click", function () {
+                            $(this).closest(".kz-checkbox-with-image-item").remove();
+                            updateFieldOptions(fieldContainer, uniqueId);
+                        });
+                    });
+                }
+    
+                dynamicOptions.find(".kz-remove-checkbox, .kz-remove-radio").on("click", function () {
+                    $(this).closest(".kz-checkbox-item, .kz-radio-item").remove();
+                    updateFieldOptions(fieldContainer, uniqueId);
+                });
+            }
+        });
+    }
+    
     
     function addNewField() {
         const uniqueId = FormMetaData.formId + "-" + new Date().getTime();
@@ -71,6 +106,7 @@ function attachEventsToExistingFields() {
                         <option value="radio">Radio Button</option>
                         <option value="checkbox_simple">Simple Checkbox</option>
                         <option value="textarea">Text Area</option>
+                        <option value="checkbox_with_image">Checkbox with Image</option>
                     </select>
     
                     <label>Is Required:</label>
@@ -131,6 +167,20 @@ function attachEventsToExistingFields() {
             });
             options.options_list = optionsList;
         }
+
+        if (type === "checkbox_with_image") {
+            const optionsList = [];
+            container.find(".kz-checkbox-with-image-item").each(function () {
+                const item = $(this);
+                optionsList.push({
+                    label: item.find(".editable-input").val() || "Untitled",
+                    value: (item.find(".editable-input").val() || "Untitled").toLowerCase().replace(/\s+/g, "_"),
+                    imageId: item.attr("data-image-id") || null, // Get the saved image ID
+                });
+            });
+            options.options_list = optionsList;
+        }
+        
     
         // Update the hidden JSON field
         container.find(".kz-options-json").val(JSON.stringify(options));
@@ -152,6 +202,7 @@ function attachEventsToExistingFields() {
             textarea: generateTextareaHTML,
             checkbox_simple: generateCheckboxHTML,
             radio: generateRadioHTML,
+            checkbox_with_image: generateCheckboxWithImageHTML,
         };
 
         if (htmlGenerators[selectedType]) {
@@ -168,6 +219,16 @@ function attachEventsToExistingFields() {
             </div>
         `;
     }
+
+    function generateCheckboxWithImageHTML(uniqueId) {
+        return `
+            <div class="kz-checkbox-with-image-options">
+                <button type="button" class="kz-add-checkbox-with-image kz-add-btn">+ Add Option</button>
+                <div class="kz-checkbox-with-image-list" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            </div>
+        `;
+    }
+    
     
 
     function generateNumberInputHTML() {
@@ -288,6 +349,64 @@ function attachEventsToExistingFields() {
                 updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
             });
         }
+
+        if (type === "checkbox_with_image") {
+            const list = dynamicOptions.find(".kz-checkbox-with-image-list");
+            
+            // Add new option
+            dynamicOptions.find(".kz-add-checkbox-with-image").on("click", function () {
+                const newItem = $(`
+                    <div class="kz-checkbox-with-image-item">
+                        <div class="image-upload-preview" style="margin-bottom: 10px;">
+                            <button type="button" class="upload-image-button">Upload Image</button>
+                        </div>
+                        <input type="text" class="editable-input" placeholder="Type here...">
+                        <button type="button" class="kz-remove-checkbox-with-image kz-remove-btn">Remove</button>
+                    </div>
+                `);
+        
+                list.append(newItem);
+        
+                // Handle media library for image upload
+                newItem.find(".upload-image-button").on("click", function () {
+                    const button = $(this);
+                
+                    const mediaUploader = wp.media({
+                        title: "Select Image",
+                        button: { text: "Use Image" },
+                        multiple: false, // Single image selection
+                    });
+                
+                    mediaUploader.on("select", function () {
+                        const attachment = mediaUploader.state().get("selection").first().toJSON();
+                
+                        // Update the preview with the uploaded image
+                        button.parent().html(`<img src="${attachment.url}" alt="Preview" style="max-width: 100px;">`);
+                
+                        // Set the image ID as a data attribute
+                        newItem.attr("data-image-id", attachment.id);
+                
+                        // Trigger the update of the JSON
+                        updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                    });
+                
+                    mediaUploader.open();
+                });
+                
+        
+                // Remove option
+                newItem.find(".kz-remove-checkbox-with-image").on("click", function () {
+                    newItem.remove();
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+        
+                // Update options JSON on input
+                newItem.find(".editable-input").on("input", function () {
+                    updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
+                });
+            });
+        }
+        
     }
     
 

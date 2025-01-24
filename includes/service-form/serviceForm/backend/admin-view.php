@@ -41,7 +41,6 @@ function render_custom_meta_box($post) {
                     $field_order = (int) $field->field_order;
                     $cleaned_options = stripslashes($field->field_options ?? '');
                     $field_options = json_decode($cleaned_options, true);
-
                     ?>
                     <div class="kz-field-container" id="field-<?php echo $field_id; ?>">
                         <div class="kz-field-header">
@@ -63,6 +62,7 @@ function render_custom_meta_box($post) {
                                 <option value="number_input" <?php selected($field_type, 'number_input'); ?>>Number Input</option>
                                 <option value="radio" <?php selected($field_type, 'radio'); ?>>Radio Button</option>
                                 <option value="checkbox_simple" <?php selected($field_type, 'checkbox_simple'); ?>>Simple Checkbox</option>
+                                <option value="checkbox_with_image" <?php selected($field_type, 'checkbox_with_image'); ?>>Checkbox with Image</option>
                                 <option value="textarea" <?php selected($field_type, 'textarea'); ?>>Text Area</option>
                             </select>
         
@@ -77,61 +77,80 @@ function render_custom_meta_box($post) {
                             </div>
         
                             <div class="kz-dynamic-options">
-                                <?php if ($field_type === 'text_input' || $field_type === 'number_input' || $field_type === 'textarea'): ?>
-                                    <label>Placeholder:</label>
-                                    <input type="text" class="kz-placeholder-input" placeholder="Enter placeholder text"
-                                           value="<?php echo esc_attr($field_options['placeholder'] ?? ''); ?>">
-                                    <?php if ($field_type === 'number_input' || $field_type === 'textarea'): ?>
-                                        <label>Min Value:</label>
-                                        <input type="number" class="kz-min-value" placeholder="Enter minimum value"
-                                               value="<?php echo esc_attr($field_options['min'] ?? ''); ?>">
-                                        <label>Max Value:</label>
-                                        <input type="number" class="kz-max-value" placeholder="Enter maximum value"
-                                               value="<?php echo esc_attr($field_options['max'] ?? ''); ?>">
-                                    <?php endif; ?>
-                                <?php elseif ($field_type === 'checkbox_simple'): ?>
-                                    <div class="kz-checkbox-options">
-                                        <span class="kz-add-checkbox kz-add-btn">+ Add Checkbox</span>
-                                        <div class="kz-checkbox-list">
-                                            <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
-                                                <div class="editable-checkbox-container kz-checkbox-item">
-                                                    <label class="editable-checkbox">
-                                                        <input type="checkbox" name="checkbox-group-<?php echo $field_id; ?>">
-                                                        <span class="checkbox-label">
-                                                            <input type="text" class="editable-input" 
-                                                                   placeholder="Type here..." 
-                                                                   value="<?php echo esc_attr($option['label'] ?? ''); ?>">
-                                                        </span>
-                                                    </label>
-                                                    <span class="kz-remove-checkbox kz-remove-btn">✖</span>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
+    <?php if ($field_type === 'text_input' || $field_type === 'number_input' || $field_type === 'textarea'): ?>
+        <label>Placeholder:</label>
+        <input type="text" class="kz-placeholder-input" placeholder="Enter placeholder text"
+               value="<?php echo esc_attr($field_options['placeholder'] ?? ''); ?>">
+        <?php if ($field_type === 'number_input' || $field_type === 'textarea'): ?>
+            <label>Min Value:</label>
+            <input type="number" class="kz-min-value" placeholder="Enter minimum value"
+                   value="<?php echo esc_attr($field_options['min'] ?? ''); ?>">
+            <label>Max Value:</label>
+            <input type="number" class="kz-max-value" placeholder="Enter maximum value"
+                   value="<?php echo esc_attr($field_options['max'] ?? ''); ?>">
+        <?php endif; ?>
+    <?php elseif ($field_type === 'checkbox_simple'): ?>
+        <div class="kz-checkbox-options">
+            <span class="kz-add-checkbox kz-add-btn">+ Add Checkbox</span>
+            <div class="kz-checkbox-list">
+                <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
+                    <div class="editable-checkbox-container kz-checkbox-item">
+                        <label class="editable-checkbox">
+                            <input type="checkbox" name="checkbox-group-<?php echo $field_id; ?>">
+                            <span class="checkbox-label">
+                                <input type="text" class="editable-input" 
+                                       placeholder="Type here..." 
+                                       value="<?php echo esc_attr($option['label'] ?? ''); ?>">
+                            </span>
+                        </label>
+                        <span class="kz-remove-checkbox kz-remove-btn">✖</span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php elseif ($field_type === 'radio'): ?>
+        <div class="kz-radio-options">
+            <span class="kz-add-radio kz-add-btn">+ Add Option</span>
+            <div class="kz-radio-list">
+                <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
+                    <div class="editable-radio-container kz-radio-item">
+                        <label class="editable-radio">
+                            <input type="radio" name="radio-group-<?php echo $field_id; ?>">
+                            <span class="radio-label">
+                                <input type="text" class="editable-input" 
+                                       placeholder="Type here..." 
+                                       value="<?php echo esc_attr($option['label'] ?? ''); ?>">
+                            </span>
+                        </label>
+                        <span class="kz-remove-radio kz-remove-btn">✖</span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php elseif ($field_type === 'checkbox_with_image'): ?>
+        <div class="kz-checkbox-with-image-options">
+            <span class="kz-add-checkbox-with-image kz-add-btn">+ Add Option</span>
+            <div class="kz-checkbox-with-image-list">
+                <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
+                    <div class="kz-checkbox-with-image-item" data-image-id="<?php echo esc_attr($option['imageId'] ?? ''); ?>">
+                        <div class="image-upload-preview" style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                            <?php if (!empty($option['imageId'])): ?>
+                                <?php $image_url = wp_get_attachment_url($option['imageId']); ?>
+                                <img src="<?php echo esc_url($image_url); ?>" alt="Preview" style="max-width: 100px;">
+                            <?php else: ?>
+                                <button type="button" class="upload-image-button">Upload Image</button>
+                            <?php endif; ?>
+                        </div>
+                        <input type="text" class="editable-input" placeholder="Type here..." 
+                               value="<?php echo esc_attr($option['label'] ?? ''); ?>">
+                        <span class="kz-remove-checkbox-with-image kz-remove-btn">✖</span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
 
-                                <?php elseif ($field_type === 'radio'): ?>
-                                    <div class="kz-<?php echo $field_type; ?>-options">
-                                        <span class="kz-add-<?php echo $field_type; ?> kz-add-btn">+ Add Option</span>
-                                        <div class="kz-<?php echo $field_type; ?>-list">
-                                            <?php foreach ($field_options['options_list'] ?? [] as $option): ?>
-                                                <div class="editable-<?php echo $field_type; ?>-container kz-<?php echo $field_type; ?>-item">
-                                                    <label class="editable-<?php echo $field_type; ?>">
-                                                        <input type="<?php echo $field_type === 'radio' ? 'radio' : 'checkbox'; ?>"
-                                                               name="<?php echo $field_type; ?>-group-<?php echo $field_id; ?>">
-                                                        <span class="checkbox-label">
-                                                            <input type="text" class="editable-input" 
-                                                                   placeholder="Type here..." 
-                                                                   value="<?php echo esc_attr($option['label'] ?? ''); ?>">
-                                                        </span>
-                                                    </label>
-                                                    <span class="kz-remove-<?php echo $field_type; ?> kz-remove-btn">✖</span>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                                
-                            </div>
         
                             <!-- Hidden JSON Field -->
                             <input type="hidden" class="kz-options-json" name="fields[<?php echo $field_id; ?>][options]" value="<?php echo esc_attr(json_encode($field_options)); ?>">
@@ -149,11 +168,13 @@ function render_custom_meta_box($post) {
 
 
 
+
 // Enqueue styles and scripts
 function enqueue_custom_meta_box_assets($hook) {
     global $post;
 
     if ($hook === 'post.php' || $hook === 'post-new.php') {
+        wp_enqueue_media(); 
         wp_enqueue_style('custom-meta-box-style', plugin_dir_url(__FILE__) . 'assets/form-admin.css');
         wp_enqueue_script('custom-meta-box-script', plugin_dir_url(__FILE__) . 'assets/form-admin.js', ['jquery'], false, true);
         wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);

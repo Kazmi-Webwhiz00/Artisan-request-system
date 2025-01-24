@@ -767,7 +767,7 @@ function render_artisan_registration_step_4() {
 // Function to render Step 5
 function render_artisan_registration_step_5() {
     ?>
-    <div class="form-step form-step-5">
+    <div class="form-step form-step-5" >
         <!-- Progress Bar -->
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -788,10 +788,10 @@ function render_artisan_registration_step_5() {
                 id="f5_distance_slider" 
                 min="1" 
                 max="500" 
-                value="50" 
+                value="1" 
                 step="1"
             >
-            <span id="f5_distance_value">50 km</span>
+            <span id="f5_distance_value">1 km</span>
         </div>
 
         <!-- Checkbox for "I work throughout Austria" (not mandatory) -->
@@ -817,87 +817,99 @@ function render_artisan_registration_step_5() {
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // DOM references
-            const slider            = document.getElementById('f5_distance_slider');
-            const distanceValueSpan = document.getElementById('f5_distance_value');
-            const austriaCheckbox   = document.getElementById('f5_work_throughout_austria');
-            const step5NextButton   = document.querySelector('.form-step-5 .next-button');
-            const errorContainer    = document.querySelector('.step5-error');
+    document.addEventListener('DOMContentLoaded', function () {
+        // DOM references
+        const slider = document.getElementById('f5_distance_slider');
+        const distanceValueSpan = document.getElementById('f5_distance_value');
+        const austriaCheckbox = document.getElementById('f5_work_throughout_austria');
+        const step5NextButton = document.querySelector('.form-step-5 .next-button');
+        const errorContainer = document.querySelector('.step5-error');
 
-            // Initialize Leaflet map
-            const map = L.map('f5_work_area_map').setView([48.2082, 16.3738], 13); // Example: Vienna, Austria
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // Initialize Leaflet map
+        const map = L.map('f5_work_area_map').setView([48.2082, 16.3738], 13); // Example: Vienna, Austria
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            // Draw initial circle with default 50 km radius
-            let circle = L.circle([48.2082, 16.3738], {
-                color: 'purple',
-                fillColor: '#6b52ae',
-                fillOpacity: 0.3,
-                radius: slider.value * 1000 // Convert km to meters
-            }).addTo(map);
+        // Draw initial circle with default 50 km radius
+        let circle = L.circle([48.2082, 16.3738], {
+            color: 'purple',
+            fillColor: '#6b52ae',
+            fillOpacity: 0.3,
+            radius: slider.value * 1000 // Convert km to meters
+        }).addTo(map);
 
-            // Update the slider value text & circle radius on input
-            slider.addEventListener('input', function () {
-                distanceValueSpan.textContent = slider.value + ' km';
-                circle.setRadius(slider.value * 1000);
-                validateStep5();
-            });
-
-            // Validate step 5
-            function validateStep5() {
-                const distance = parseInt(slider.value, 10);
-                let errors = [];
-
-                // Basic check: distance must be between 1 and 500
-                if (isNaN(distance) || distance < 1 || distance > 500) {
-                    errors.push('Distance must be between 1 and 500 km.');
-                }
-
-                if (errors.length === 0) {
-                    step5NextButton.disabled = false;
-                    errorContainer.style.display = 'none';
-                    errorContainer.innerHTML = '';
-                } else {
-                    step5NextButton.disabled = true;
-                    errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = errors.join('<br>');
-                }
-            }
-
-            // Run initial validation to set button state
-            validateStep5();
-
-            // On final button click, store data if not disabled
-            step5NextButton.addEventListener('click', function() {
-                if (step5NextButton.disabled) {
-                    return; // If disabled, do nothing
-                }
-
-                const distance = parseInt(slider.value, 10);
-                const worksThroughoutAustria = austriaCheckbox.checked;
-
-                // Initialize step5 object if not present
-                if (!window.kazverseRegistrationData.step5) {
-                    window.kazverseRegistrationData.step5 = {};
-                }
-
-                // Store Step 5 data in the global object
-                window.kazverseRegistrationData.step5.distance = distance;
-                window.kazverseRegistrationData.step5.work_throughout_austria = worksThroughoutAustria;
-
-                // Console log the entire data object
-                console.log('Current Registration Data:', window.kazverseRegistrationData);
-
-                // Manually switch to the next step
-                const currentStep = document.querySelector('.form-step.active');
-                const nextStep    = document.querySelector('.form-step-6');
-                if (currentStep && nextStep) {
-                    currentStep.classList.remove('active');
-                    nextStep.classList.add('active');
+        // Ensure the map is properly rendered when Step 5 becomes visible
+        const step5Container = document.querySelector('.form-step-5');
+        const observer = new MutationObserver(function (mutationsList) {
+            mutationsList.forEach(function (mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (step5Container.classList.contains('active')) {
+                        setTimeout(() => {
+                            map.invalidateSize(); // Recalculate map dimensions
+                        }, 300); // Small delay to ensure visibility changes
+                    }
                 }
             });
         });
+
+        observer.observe(step5Container, { attributes: true });
+
+        // Function to adjust the zoom level only if the circle is outside the view
+        function adjustZoomIfNeeded() {
+            const circleBounds = circle.getBounds();
+            if (!map.getBounds().contains(circleBounds)) {
+                map.fitBounds(circleBounds, { padding: [20, 20] }); // Add some padding
+            }
+        }
+
+        // Update the slider value text, circle radius, and zoom level on input
+        slider.addEventListener('input', function () {
+            const distanceInKm = slider.value;
+            distanceValueSpan.textContent = distanceInKm + ' km';
+
+            const radiusInMeters = distanceInKm * 1000;
+            circle.setRadius(radiusInMeters); // Update circle radius
+            adjustZoomIfNeeded(); // Adjust zoom only if necessary
+
+            validateStep5();
+        });
+
+        // Allow users to select a location on the map
+        map.on('click', function (event) {
+            const selectedLatLng = event.latlng; // Get the latitude and longitude of the clicked point
+
+            // Update the circle's center to the clicked location
+            circle.setLatLng(selectedLatLng);
+
+            // Optionally adjust the zoom to fit the circle if needed
+            adjustZoomIfNeeded();
+
+        });
+
+        // Validate step 5
+        function validateStep5() {
+            const distance = parseInt(slider.value, 10);
+            let errors = [];
+
+            // Basic check: distance must be between 1 and 500
+            if (isNaN(distance) || distance < 1 || distance > 500) {
+                errors.push('Distance must be between 1 and 500 km.');
+            }
+
+            if (errors.length === 0) {
+                step5NextButton.disabled = false;
+                errorContainer.style.display = 'none';
+                errorContainer.innerHTML = '';
+            } else {
+                step5NextButton.disabled = true;
+                errorContainer.style.display = 'block';
+                errorContainer.innerHTML = errors.join('<br>');
+            }
+        }
+
+        // Run initial validation to set button state
+        validateStep5();
+    });
+
     </script>
     <?php
 }

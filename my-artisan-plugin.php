@@ -2,7 +2,7 @@
 /*
 Plugin Name: Kazverse Artisan Plugin
 Description: A custom WordPress plugin by Kazverse for managing artisan registration and service requests.
-Version: 1.0
+Version: 1.0.2
 Author: Kazverse
 Author URI: https://kazverse.com
 Text Domain: kazverse-artisan-plugin
@@ -25,6 +25,8 @@ include_once plugin_dir_path(__FILE__) . 'includes/service-form/service-form-cpt
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/form-field-table-sql.php';
 include_once plugin_dir_path(__FILE__) .  'includes/service-form/FieldTypes.php';
 include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/backend/admin-view.php';
+include_once plugin_dir_path(__FILE__) . 'includes/service-form/serviceForm/frontend/form-renderer.php';
+include_once plugin_dir_path(__FILE__) . 'includes/service-search/service-search.php';
 
 
 
@@ -51,3 +53,26 @@ function form_field_table_activation_hook() {
 }
 
 register_activation_hook(__FILE__, 'form_field_table_activation_hook');
+
+
+function enqueue_field_types($hook) {
+    global $post;
+
+    if ($hook === 'post.php' || $hook === 'post-new.php') {
+        wp_enqueue_script('field-types', plugin_dir_url(__FILE__) . 'includes/service-form/FieldTypes.js', ['jquery'], false, true);
+    }
+}
+add_action('admin_enqueue_scripts', 'enqueue_custom_meta_box_assets');
+
+
+// Enqueue CSS for artisan registration form
+function enqueue_helper_form_styles() {
+    wp_enqueue_style(
+        'helper-form-css', // Handle for the stylesheet
+        plugin_dir_url(__FILE__) . 'includes/general-helpers/forms/css/form-helper.css', // Path to the CSS file
+        array(), // Dependencies (if any)
+        null // Version number (optional, set to null if not versioned)
+    );
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_helper_form_styles');
