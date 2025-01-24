@@ -11,6 +11,7 @@
     display: block;
 }
 .form-group {
+    display: block !important;
     margin-bottom: 20px;
 }
 
@@ -46,6 +47,31 @@
 .form-step-3 .next-button,
 .form-step-3 .previous-button {
     margin-top: 20px;
+}
+
+.previous-button
+{
+    border: 1px solid #FFDA79 !important;
+    color: #002335 !important;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: white;
+}
+.next-button
+{
+    background-color: #FFDA79 !important;
+    border: 1px solid #FFDA79 !important;
+    color: #002335 !important;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.next-button:hover,
+.previous-button:hover
+{
+    background-color:rgba(255, 218, 121, 0.3) !important;  /* Slight black overlay */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    color: #002335 !important;
 }
 
 /* Step 4 Styling */

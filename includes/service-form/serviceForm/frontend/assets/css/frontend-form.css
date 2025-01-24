@@ -80,11 +80,16 @@ button:hover {
     background-color: #FFDA79 !important;
     border: 1px solid #FFDA79 !important;
     color: #002335 !important;
+    padding: 10px 20px;
+    border-radius: 5px;
 }
 
 .kz-step-navigation .prev-step{
-    border: 1px solid #FFDA79;
-    color: #002335;
+    border: 1px solid #FFDA79 !important;
+    color: #002335 !important;
+    background-color: white !important;
+    padding: 10px 20px;
+    border-radius: 5px;
 }
 
 .kz-step-navigation .prev-step:hover,
