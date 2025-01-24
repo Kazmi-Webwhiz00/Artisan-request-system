@@ -39,6 +39,7 @@ jQuery(document).ready(function ($) {
         // Validate regular inputs
         inputs.each(function () {
             const input = $(this);
+            const error = input.next(".error-message");
             const errorBox = input.closest(".zipcode-input-wrapper").next(".zip-error-box"); // Target the zip-error-box
     
             // Reset error box
@@ -49,11 +50,12 @@ jQuery(document).ready(function ($) {
                 isValid = false;
                 input.addClass("error");
     
-                if (errorBox.length > 0) {
-                    errorBox.text("This field is required.").show();
+                if (error.length === 0) {
+                    input.after('<span class="error-message">This field is required.</span>');
                 }
             } else {
                 input.removeClass("error");
+                error.remove();
             }
     
             // Email validation
@@ -63,8 +65,8 @@ jQuery(document).ready(function ($) {
                     isValid = false;
                     input.addClass("error");
     
-                    if (errorBox.length > 0) {
-                        errorBox.text("Please enter a valid email address.").show();
+                    if (error.length === 0) {
+                        input.after('<span class="error-message">Please enter a valid email address.</span>');
                     }
                 }
             }
@@ -97,14 +99,14 @@ jQuery(document).ready(function ($) {
         steps.eq(step).find('.field-wrapper[data-require="true"]').each(function () {
             const fieldWrapper = $(this);
             const groupInputs = fieldWrapper.find('input[type="radio"], input[type="checkbox"]');
-            const error = fieldWrapper.find(".error-message");
+            const error = fieldWrapper.siblings(".error-message");
     
             // Check if at least one is selected
             if (groupInputs.length > 0 && !groupInputs.is(":checked")) {
                 isValid = false;
     
                 if (error.length === 0) {
-                    fieldWrapper.append('<span class="error-message">Please select at least one option.</span>');
+                    fieldWrapper.after('<span class="error-message">Please select at least one option.</span>');
                 }
             } else {
                 error.remove();
