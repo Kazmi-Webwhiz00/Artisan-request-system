@@ -35,15 +35,17 @@ jQuery(document).ready(function ($) {
     function validateStep(step) {
         const inputs = steps.eq(step).find("input, textarea, select");
         let isValid = true;
-
+    
+        // Validate regular inputs
         inputs.each(function () {
             const input = $(this);
             const error = input.next(".error-message");
-
+    
+            // Required field validation for text, email, textarea, etc.
             if (input.prop("required") && !input.val().trim()) {
                 isValid = false;
                 input.addClass("error");
-
+    
                 if (error.length === 0) {
                     input.after('<span class="error-message">This field is required.</span>');
                 }
@@ -51,7 +53,8 @@ jQuery(document).ready(function ($) {
                 input.removeClass("error");
                 error.remove();
             }
-
+    
+            // Email validation
             if (input.attr("type") === "email" && input.val().trim()) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(input.val().trim())) {
@@ -61,10 +64,30 @@ jQuery(document).ready(function ($) {
                 }
             }
         });
-
+    
+        // Validate radio and checkbox groups with data-require="true"
+        steps.eq(step).find('.field-wrapper[data-require="true"]').each(function () {
+            const fieldWrapper = $(this);
+            const groupInputs = fieldWrapper.find('input[type="radio"], input[type="checkbox"]');
+            const error = fieldWrapper.find(".error-message");
+    
+            // Check if at least one is selected
+            if (groupInputs.length > 0 && !groupInputs.is(":checked")) {
+                isValid = false;
+                //fieldWrapper.addClass("error");
+    
+                if (error.length === 0) {
+                    fieldWrapper.append('<span class="error-message">Please select at least one option.</span>');
+                }
+            } else {
+                //fieldWrapper.removeClass("error");
+                error.remove();
+            }
+        });
+    
         return isValid;
     }
-
+    
     // Show the current step and scroll smoothly
     function showStep(step) {
         steps.each(function (index) {

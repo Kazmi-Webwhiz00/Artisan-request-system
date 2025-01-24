@@ -103,7 +103,11 @@ function render_service_form_shortcode($atts) {
                                             <p class="field-description"><?php echo $field_description; ?></p>
                                         <?php endif; ?>
 
-                                        <div class="field-wrapper field-<?php echo $field_type; ?>-wrapper">
+                                        <div class="field-wrapper field-<?php echo $field_type; ?>-wrapper"
+                                                    <?php if (in_array($field_type, ['radio', 'checkbox_simple', 'checkbox_with_image'])): ?>
+                                                        data-require="<?php echo $is_required ? 'true' : 'false'; ?>"
+                                                    <?php endif; ?>>
+
                                             <?php
                                             switch ($field_type) {
                                                 case 'text_input':
