@@ -51,6 +51,15 @@ jQuery(document).ready(function ($) {
                 input.removeClass("error");
                 error.remove();
             }
+
+            if (input.attr("type") === "email" && input.val().trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(input.val().trim())) {
+                    isValid = false;
+                    input.addClass("error");
+                    input.after('<span class="error-message">Please enter a valid email address.</span>');
+                }
+            }
         });
 
         return isValid;
