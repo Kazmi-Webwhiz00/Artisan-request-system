@@ -108,7 +108,6 @@ flex-wrap: wrap;
     align-items: center;
     padding: 5px 10px;
     width: 100%;
-    max-width: 400px;
     background: #ffffff;
     border: 1px solid #ced4da !important; /* Bootstrap's default light gray border */
     box-shadow: none !important;         /* Remove any custom box shadows */

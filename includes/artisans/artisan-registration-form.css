@@ -13,6 +13,7 @@
 .form-group {
     display: block !important;
     margin-bottom: 20px;
+    text-align: start;
 }
 
 /* Step 1 Styling */
@@ -34,11 +35,11 @@
     margin-bottom: 20px;
 }
 .form-step-3 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-3 h2 {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-3 p {
     font-size: 1.1em;
@@ -83,11 +84,11 @@
     margin-bottom: 20px;
 }
 .form-step-4 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-4 h2 {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-4 .f4_form-group.form-group {
     margin-top: 20px;
@@ -130,11 +131,11 @@
     margin-bottom: 20px;
 }
 .form-step-5 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-5 h2 {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-5 .f5_form-group.form-group {
     margin-bottom: 20px;
@@ -148,7 +149,7 @@
 }
 .form-step-5 #f5_distance_value {
     font-size: 1.2em;
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-5 .next-button,
 .form-step-5 .previous-button {
@@ -167,11 +168,11 @@
     margin-bottom: 20px;
 }
 .form-step-6 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-6 h2 {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-6 .form-group {
     margin-bottom: 20px;
@@ -194,11 +195,11 @@
     margin-bottom: 20px;
 }
 .form-step-8 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-8 h2 {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-8 .f8_form-group.form-group {
     margin-bottom: 20px;
@@ -221,11 +222,11 @@
     margin-bottom: 20px;
 }
 .form-step-9 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-9 h2 {
-    color: #6b52ae;
+    color: #002335;
     text-transform: capitalize;
 }
 .form-step-9 .f9_subtitle {
@@ -254,7 +255,7 @@
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1rem;
-    background-color: #6b52ae;
+    background-color: #FFDA79;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -273,11 +274,11 @@
     margin-bottom: 20px;
 }
 .form-step-10 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-10 h2 {
-    color: #6b52ae;
+    color: #002335;
     text-transform: capitalize;
 }
 .form-step-10 .f10_heading {
@@ -297,8 +298,8 @@
     margin-bottom: 30px;
 }
 .form-step-10 .purple-btn {
-    background-color: #6b52ae;
-    color: #fff;
+    background-color: #FFDA79;
+    color: #2b2b2b;
     border: none;
     border-radius: 4px;
     padding: 10px 20px;
@@ -319,11 +320,11 @@
     margin-bottom: 20px;
 }
 .form-step-11 .progress-bar {
-    background-color: #6b52ae;
-    height: 10px;
+    background-color: #FFDA79;
+    height: 15px;
 }
 .form-step-11 h2 {
-    color: #6b52ae;
+    color: #002335;
     text-transform: capitalize;
 }
 .form-step-11 .f11_heading {
@@ -338,7 +339,7 @@
 }
 .form-step-11 .f11_tip-box {
     background-color: #f3e8ff;
-    border-left: 5px solid #6b52ae;
+    border-left: 5px solid #002335;
     padding: 10px 15px;
     margin-bottom: 20px;
     display: flex;
@@ -349,13 +350,13 @@
 .form-step-11 .f11_icon {
     font-size: 1.2rem;
     margin-right: 10px;
-    color: #6b52ae;
+    color: #FFDA79;
 }
 .form-step-11 .f11_tip-text {
-    color: #6b52ae;
+    color: #002335;
 }
 .form-step-11 .f11_tip-link {
-    color: #6b52ae;
+    color: #002335;
     font-weight: bold;
     text-decoration: none;
 }
@@ -368,7 +369,7 @@
     max-width: 600px;
 }
 .form-step-11 .f11_textarea {
-    border: 2px solid #6b52ae;
+    border: 2px solid #FFDA79;
     border-radius: 5px;
     padding: 10px;
     font-size: 1rem;
@@ -382,7 +383,7 @@
     margin-top: 5px;
 }
 .form-step-11 .purple-btn {
-    background-color: #6b52ae;
+    background-color: #FFDA79;
     color: #fff;
     border: none;
     border-radius: 4px;
