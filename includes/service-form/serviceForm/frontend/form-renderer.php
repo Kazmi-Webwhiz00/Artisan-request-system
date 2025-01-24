@@ -16,6 +16,7 @@ require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/file-up
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/number-field.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/textarea-field.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/checkbox-with-image.php';
+require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/zipcode-field.php';
 
 
 function enqueue_service_form_assets() {
@@ -82,6 +83,13 @@ function render_service_form_shortcode($atts) {
             <div class="multi-step-form">
                 <form action="" method="post" id="dynamic-multi-step-form">
                     <div class="steps-container">
+                                                    <!-- Zip Code Field (Second Last Step) -->
+                                                    <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
+                                <div class="form-group mb-5">
+                                    <label for="zip_code">Zip code of your order*</label>
+                                    <?php render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5400'); ?>
+                                </div>
+                            </div>
                         <?php if (!empty($fields)): ?>
                             <?php foreach ($fields as $index => $field): ?>
                                 <?php
@@ -203,7 +211,7 @@ function render_service_form_shortcode($atts) {
                             <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
                                 <div class="form-group mb-5">
                                     <label for="zip_code">Zip code of your order*</label>
-                                    <?php render_text_field('zip_code', 'zip_code', '', 'Enter your zip code', '', true); ?>
+                                    <?php render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5400'); ?>
                                 </div>
                             </div>
 

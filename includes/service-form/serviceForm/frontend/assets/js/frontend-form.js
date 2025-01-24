@@ -39,19 +39,21 @@ jQuery(document).ready(function ($) {
         // Validate regular inputs
         inputs.each(function () {
             const input = $(this);
-            const error = input.next(".error-message");
+            const errorBox = input.closest(".zipcode-input-wrapper").next(".zip-error-box"); // Target the zip-error-box
+    
+            // Reset error box
+            errorBox.text("").hide();
     
             // Required field validation for text, email, textarea, etc.
             if (input.prop("required") && !input.val().trim()) {
                 isValid = false;
                 input.addClass("error");
     
-                if (error.length === 0) {
-                    input.after('<span class="error-message">This field is required.</span>');
+                if (errorBox.length > 0) {
+                    errorBox.text("This field is required.").show();
                 }
             } else {
                 input.removeClass("error");
-                error.remove();
             }
     
             // Email validation
@@ -60,7 +62,33 @@ jQuery(document).ready(function ($) {
                 if (!emailRegex.test(input.val().trim())) {
                     isValid = false;
                     input.addClass("error");
-                    input.after('<span class="error-message">Please enter a valid email address.</span>');
+    
+                    if (errorBox.length > 0) {
+                        errorBox.text("Please enter a valid email address.").show();
+                    }
+                }
+            }
+    
+            // Zip code validation
+            if (input.hasClass("zip-input-field")) {
+                const zipCode = input.val().trim();
+    
+                if (zipCode.length !== 4) {
+                    isValid = false;
+                    input.addClass("error");
+    
+                    if (errorBox.length > 0) {
+                        errorBox.text("ZIP code must be exactly 4 digits.").show();
+                    }
+                } else if (!ZipcodeHelper.validateZip(zipCode)) {
+                    isValid = false;
+                    input.addClass("error");
+    
+                    if (errorBox.length > 0) {
+                        errorBox.text("Invalid or unsupported ZIP code.").show();
+                    }
+                } else {
+                    input.removeClass("error");
                 }
             }
         });
@@ -74,19 +102,18 @@ jQuery(document).ready(function ($) {
             // Check if at least one is selected
             if (groupInputs.length > 0 && !groupInputs.is(":checked")) {
                 isValid = false;
-                //fieldWrapper.addClass("error");
     
                 if (error.length === 0) {
                     fieldWrapper.append('<span class="error-message">Please select at least one option.</span>');
                 }
             } else {
-                //fieldWrapper.removeClass("error");
                 error.remove();
             }
         });
     
         return isValid;
     }
+    
     
     // Show the current step and scroll smoothly
     function showStep(step) {
