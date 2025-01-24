@@ -28,52 +28,71 @@ jQuery(document).ready(function ($) {
             const dynamicOptions = fieldContainer.find(".kz-dynamic-options");
             const uniqueId = fieldContainer.attr("id");
     
-            if (fieldType === "checkbox_simple" || fieldType === "radio" || fieldType === "checkbox_with_image") {
-                attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
+            // Call attachDynamicEvents for all dynamic options
+            attachDynamicEvents(dynamicOptions, fieldType, uniqueId);
     
-                if (fieldType === "checkbox_with_image") {
-                    dynamicOptions.find(".kz-checkbox-with-image-item").each(function () {
-                        const item = $(this);
+            // Handle existing checkbox_with_image items specifically
+            if (fieldType === "checkbox_with_image") {
+                dynamicOptions.find(".kz-checkbox-with-image-item").each(function () {
+                    const item = $(this);
     
-                        // Attach image upload functionality
-                        item.find(".upload-image-button").on("click", function () {
-                            const button = $(this);
-                            const mediaUploader = wp.media({
-                                title: "Select Image",
-                                button: { text: "Use Image" },
-                                multiple: false,
-                            });
-    
-                            mediaUploader.on("select", function () {
-                                const attachment = mediaUploader.state().get("selection").first().toJSON();
-                                button.parent().html(`<img src="${attachment.url}" alt="Preview" style="max-width: 100px;">`);
-                                item.attr("data-image-id", attachment.id);
-                                updateFieldOptions(fieldContainer, uniqueId);
-                            });
-    
-                            mediaUploader.open();
+                    // Attach image upload functionality
+                    item.find(".upload-image-button").on("click", function () {
+                        const button = $(this);
+                        const mediaUploader = wp.media({
+                            title: "Select Image",
+                            button: { text: "Use Image" },
+                            multiple: false,
                         });
     
-                        // Update options on input change
-                        item.find(".editable-input").on("input", function () {
+                        mediaUploader.on("select", function () {
+                            const attachment = mediaUploader.state().get("selection").first().toJSON();
+                            button.parent().html(
+                                `<img src="${attachment.url}" alt="Preview" style="max-width: 100px;">`
+                            );
+                            item.attr("data-image-id", attachment.id);
                             updateFieldOptions(fieldContainer, uniqueId);
                         });
     
-                        // Attach remove functionality
-                        item.find(".kz-remove-checkbox-with-image").on("click", function () {
-                            $(this).closest(".kz-checkbox-with-image-item").remove();
-                            updateFieldOptions(fieldContainer, uniqueId);
-                        });
+                        mediaUploader.open();
                     });
-                }
     
+                    // Update options on input change for existing checkbox_with_image
+                    item.find(".editable-input").on("input", function () {
+                        updateFieldOptions(fieldContainer, uniqueId);
+                    });
+    
+                    // Attach remove functionality for existing checkbox_with_image
+                    item.find(".kz-remove-checkbox-with-image").on("click", function () {
+                        $(this).closest(".kz-checkbox-with-image-item").remove();
+                        updateFieldOptions(fieldContainer, uniqueId);
+                    });
+                });
+            }
+    
+            // Handle existing checkboxes and radio buttons (update and remove)
+            if (fieldType === "checkbox_simple" || fieldType === "radio") {
+                // Attach events for existing checkbox/radio labels
+                dynamicOptions.find(".kz-checkbox-item .editable-input, .kz-radio-item .editable-input").on("input", function () {
+                    updateFieldOptions(fieldContainer, uniqueId);
+                });
+    
+                // Attach remove event for existing checkbox/radio items
                 dynamicOptions.find(".kz-remove-checkbox, .kz-remove-radio").on("click", function () {
                     $(this).closest(".kz-checkbox-item, .kz-radio-item").remove();
                     updateFieldOptions(fieldContainer, uniqueId);
                 });
             }
+    
+            // Handle existing text_input, email, textarea, and number_input placeholders
+            if (fieldType === "text_input" || fieldType === "email" || fieldType === "textarea" || fieldType === "number_input") {
+                dynamicOptions.find(".kz-placeholder-input, .kz-min-value, .kz-max-value").on("input", function () {
+                    updateFieldOptions(fieldContainer, uniqueId);
+                });
+            }
         });
     }
+    
     
     
     function addNewField() {
@@ -102,13 +121,14 @@ jQuery(document).ready(function ($) {
                     <label>Field Type:</label>
                     <select class="kz-field-type-selector" name="fields[${uniqueId}][field_type]">
                         <option value="text_input">Text Input</option>
+                        <option value="email">Email</option>
                         <option value="number_input">Number Input</option>
                         <option value="radio">Radio Button</option>
                         <option value="checkbox_simple">Simple Checkbox</option>
                         <option value="textarea">Text Area</option>
                         <option value="checkbox_with_image">Checkbox with Image</option>
                     </select>
-    
+        
                     <label>Is Required:</label>
                     <div class="kz-radio-group">
                         <label>
@@ -118,9 +138,9 @@ jQuery(document).ready(function ($) {
                             <input type="radio" name="fields[${uniqueId}][is_required]" value="0" checked> No
                         </label>
                     </div>
-    
+        
                     <div class="kz-dynamic-options"></div>
-    
+        
                     <!-- Hidden JSON Field -->
                     <input type="hidden" class="kz-options-json" name="fields[${uniqueId}][options]" value="{}">
                     
@@ -136,8 +156,8 @@ jQuery(document).ready(function ($) {
         const options = {};
         const type = container.find(".kz-field-type-selector").val();
     
-        // Text Input
-        if (type === "text_input") {
+        // Handle email field type
+        if (type === "email" || type === "text_input") {
             options.placeholder = container.find(".kz-dynamic-options input[placeholder]").val() || null;
         }
     
@@ -167,7 +187,7 @@ jQuery(document).ready(function ($) {
             });
             options.options_list = optionsList;
         }
-
+    
         if (type === "checkbox_with_image") {
             const optionsList = [];
             container.find(".kz-checkbox-with-image-item").each(function () {
@@ -181,7 +201,6 @@ jQuery(document).ready(function ($) {
             options.options_list = optionsList;
         }
         
-    
         // Update the hidden JSON field
         container.find(".kz-options-json").val(JSON.stringify(options));
     }
@@ -195,21 +214,23 @@ jQuery(document).ready(function ($) {
         const dynamicOptions = container.find(".kz-dynamic-options");
         const uniqueId = container.attr("id");
         dynamicOptions.empty();
-
+    
         const htmlGenerators = {
             text_input: generateTextInputHTML,
+            email: generateTextInputHTML, // Use the same generator for email and text_input
             number_input: generateNumberInputHTML,
             textarea: generateTextareaHTML,
             checkbox_simple: generateCheckboxHTML,
             radio: generateRadioHTML,
             checkbox_with_image: generateCheckboxWithImageHTML,
         };
-
+    
         if (htmlGenerators[selectedType]) {
             dynamicOptions.append(htmlGenerators[selectedType](uniqueId));
             attachDynamicEvents(dynamicOptions, selectedType, uniqueId);
         }
     }
+    
 
     function generateTextInputHTML() {
         return `
@@ -274,7 +295,7 @@ jQuery(document).ready(function ($) {
     }
 
     function attachDynamicEvents(dynamicOptions, type, uniqueId) {
-        if (type === "text_input") {
+        if (type === "text_input" || type==="email") {
             dynamicOptions.find(".kz-placeholder-input").on("input", function () {
                 updateFieldOptions(dynamicOptions.closest(".kz-field-container"), uniqueId);
             });
