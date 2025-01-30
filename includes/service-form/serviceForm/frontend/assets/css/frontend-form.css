@@ -157,3 +157,9 @@ button:hover {
         margin-right: 5px;
     }
 }
+
+
+.swal2-confirm.swal2-styled.swal2-default-outline{
+    color: #ebebeb;
+
+}

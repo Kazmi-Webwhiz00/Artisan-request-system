@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 function render_radio_button_field($name, $id, $label = '', $checked = false, $required = false, $additional_attrs = []) {
     // Start rendering
-    $field = '<div class="kz-radio-container">'; // Add specific class for styling
+    $field = '<label class="kz-radio-container">'; // Add specific class for styling
     
     // Add radio button input
     $field .= '<input type="radio" class="kz-radio" name="' . esc_attr($name) . '"  value="' . esc_attr($label) . '"  id="' . esc_attr($id) . '"';
@@ -34,7 +34,7 @@ function render_radio_button_field($name, $id, $label = '', $checked = false, $r
     }
     
     // Close container
-    $field .= '</div>';
+    $field .= '</label>';
     
     // Echo or return the field
     echo $field;

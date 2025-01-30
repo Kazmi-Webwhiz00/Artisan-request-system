@@ -26,11 +26,14 @@ function enqueue_service_form_assets() {
 
         // Enqueue jQuery and JS
         wp_enqueue_script('frontend-form-js', plugin_dir_url(__FILE__) . 'assets/js/frontend-form.js', ['jquery'], false, true);
+        wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
+        wp_enqueue_script('lottie-player', 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js', [], null, true);
 
         // Add custom AJAX script
          wp_localize_script('frontend-form-js', 'ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'success_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/success.gif',
+            'sad_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/sad.gif',
         ]);
     }
 }

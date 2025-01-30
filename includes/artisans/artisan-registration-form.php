@@ -44,9 +44,26 @@ add_action('wp_head', function() {
 
 // Function to render Step 1
 function render_artisan_registration_step_1() {
+    if (!is_wp_error($terms) && !empty($terms)) {
+        foreach ($terms as $term) {
+            $trades[sanitize_title($term->name)] = $term->name; // Use sanitized slug as value
+        }
+    }
+
+        // Fetch trades dynamically from the 'global_services' taxonomy
+        $terms = get_terms([
+            'taxonomy'   => 'global_services',
+            'hide_empty' => false, // Include terms even if not assigned to posts
+        ]);
+
+        $trades = ['' => 'Select your trade'];
+        if (!is_wp_error($terms) && !empty($terms)) {
+            foreach ($terms as $term) {
+                $trades[sanitize_title($term->name)] = $term->name;
+            }
+        }
     ?>
     <div class="form-step form-step-1 active">
-        <h2>View orders from the region</h2>
 
         <!-- Trade Field -->
         <div class="form-group">
@@ -55,13 +72,7 @@ function render_artisan_registration_step_1() {
                 'trade',
                 'trade',
                 'Trade',
-                [
-                    '' => 'Select your trade',
-                    'well-builder' => 'Well Builder',
-                    'electrician' => 'Electrician',
-                    'plumber' => 'Plumber',
-                    // Add more trades as needed
-                ],
+                $trades,
                 '',
                 true // Required
             );
@@ -578,7 +589,6 @@ function render_artisan_registration_step_3() {
         <p>We would like to get to know you better so that we can provide you with suitable jobs – in your area and tailored to your area of expertise.</p>
         <p>In this step, we ask you about your job, your professional status, and your location.</p>
 
-        <button type="button" class="previous-button" data-previous-step="2">Back</button>
         <button type="button" class="next-button purple-btn" data-next-step="4">Continue</button>
     </div>
     
@@ -769,7 +779,7 @@ function render_artisan_registration_step_4() {
 // Function to render Step 5
 function render_artisan_registration_step_5() {
     ?>
-    <div class="form-step form-step-5" >
+    <div class="form-step form-step-5">
         <!-- Progress Bar -->
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -799,7 +809,7 @@ function render_artisan_registration_step_5() {
         <!-- Checkbox for "I work throughout Austria" (not mandatory) -->
         <div class="f5_form_group form-group">
             <label for="f5_work_throughout_austria">
-                <input type="checkbox" id="f5_work_throughout_austria"> I work throughout Austria
+                <input type="checkbox" id="f5_work_throughout_austria"> I work throughout Netherlands
             </label>
         </div>
 
@@ -819,141 +829,140 @@ function render_artisan_registration_step_5() {
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // DOM references
-        const slider = document.getElementById('f5_distance_slider');
-        const distanceValueSpan = document.getElementById('f5_distance_value');
-        const austriaCheckbox = document.getElementById('f5_work_throughout_austria');
-        const step5NextButton = document.querySelector('.form-step-5 .next-button');
-        const errorContainer = document.querySelector('.step5-error');
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM references
+            const slider = document.getElementById('f5_distance_slider');
+            const distanceValueSpan = document.getElementById('f5_distance_value');
+            const austriaCheckbox = document.getElementById('f5_work_throughout_austria');
+            const step5NextButton = document.querySelector('.form-step-5 .next-button');
+            const errorContainer = document.querySelector('.step5-error');
 
-        // Initialize Leaflet map
-        const map = L.map('f5_work_area_map').setView([48.2082, 16.3738], 13); // Example: Vienna, Austria
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            // Initialize Leaflet map (Amsterdam, Netherlands)
+            const map = L.map('f5_work_area_map').setView([52.3676, 4.9041], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Draw initial circle with default 50 km radius
-        let circle = L.circle([48.2082, 16.3738], {
-            color: '#002335',
-            fillColor: '#002335',
-            fillOpacity: 0.3,
-            radius: slider.value * 1000 // Convert km to meters
-        }).addTo(map);
+            // Draw initial circle with default 50 km radius
+            let circle = L.circle([52.3676, 4.9041], {
+                color: '#002335',
+                fillColor: '#002335',
+                fillOpacity: 0.3,
+                radius: slider.value * 1000
+            }).addTo(map);
 
-        console.log("Initial Circle Coordinates:", circle.getLatLng());
+            console.log("Initial Circle Coordinates:", circle.getLatLng());
 
-        // Ensure global object exists
-        if (!window.kazverseRegistrationData) {
-            window.kazverseRegistrationData = {};
-        }
-        if (!window.kazverseRegistrationData.step5) {
-            window.kazverseRegistrationData.step5 = {};
-        }
+            // Ensure global object exists
+            if (!window.kazverseRegistrationData) {
+                window.kazverseRegistrationData = {};
+            }
+            if (!window.kazverseRegistrationData.step5) {
+                window.kazverseRegistrationData.step5 = {};
+            }
 
-        // Store **initial** values
-        window.kazverseRegistrationData.step5 = {
-            distance: parseInt(slider.value, 10),
-            latitude: 48.2082,
-            longitude: 16.3738,
-            work_throughout_austria: austriaCheckbox.checked
-        };
+            // Store **initial** values
+            window.kazverseRegistrationData.step5 = {
+                distance: parseInt(slider.value, 10),
+                latitude: 52.3676, // Amsterdam latitude
+                longitude: 4.9041, // Amsterdam longitude
+                work_throughout_austria: austriaCheckbox.checked
+            };
 
-        // Ensure the map is properly rendered when Step 5 becomes visible
-        const step5Container = document.querySelector('.form-step-5');
-        const observer = new MutationObserver(function (mutationsList) {
-            mutationsList.forEach(function (mutation) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (step5Container.classList.contains('active')) {
-                        setTimeout(() => {
-                            map.invalidateSize(); // Recalculate map dimensions
-                        }, 300); // Small delay to ensure visibility changes
+            // Ensure the map is properly rendered when Step 5 becomes visible
+            const step5Container = document.querySelector('.form-step-5');
+            const observer = new MutationObserver(function (mutationsList) {
+                mutationsList.forEach(function (mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        if (step5Container.classList.contains('active')) {
+                            setTimeout(() => {
+                                map.invalidateSize();
+                            }, 300);
+                        }
                     }
+                });
+            });
+
+            observer.observe(step5Container, { attributes: true });
+
+            // Function to adjust zoom only if needed
+            function adjustZoomIfNeeded() {
+                const circleBounds = circle.getBounds();
+                if (!map.getBounds().contains(circleBounds)) {
+                    map.fitBounds(circleBounds, { padding: [20, 20] });
                 }
+            }
+
+            // ✅ **UPDATE DISTANCE LIVE WHEN SLIDER CHANGES**
+            slider.addEventListener('input', function () {
+                const distanceInKm = parseInt(slider.value, 10);
+                distanceValueSpan.textContent = distanceInKm + ' km';
+
+                const radiusInMeters = distanceInKm * 1000;
+                circle.setRadius(radiusInMeters);
+                adjustZoomIfNeeded();
+
+                // Update Global Data
+                window.kazverseRegistrationData.step5.distance = distanceInKm;
+                console.log("Updated Distance:", distanceInKm, "km", window.kazverseRegistrationData.step5);
+                
+                validateStep5();
+            });
+
+            // ✅ **UPDATE LATITUDE & LONGITUDE LIVE WHEN USER CLICKS ON THE MAP**
+            map.on('click', function (event) {
+                const selectedLatLng = event.latlng;
+                circle.setLatLng(selectedLatLng);
+
+                // Update Global Data
+                window.kazverseRegistrationData.step5.latitude = selectedLatLng.lat;
+                window.kazverseRegistrationData.step5.longitude = selectedLatLng.lng;
+
+                // ✅ Recenter map on new location
+                map.setView(selectedLatLng, map.getZoom());
+
+                console.log("Updated Coordinates:", selectedLatLng.lat, selectedLatLng.lng, window.kazverseRegistrationData.step5);
+            });
+
+            // ✅ **UPDATE WORK THROUGHOUT AUSTRIA CHECKBOX**
+            austriaCheckbox.addEventListener('change', function () {
+                const isChecked = austriaCheckbox.checked;
+                
+                window.kazverseRegistrationData.step5.work_throughout_austria = isChecked;
+                
+                // ✅ Disable the distance slider if checkbox is checked
+                slider.disabled = isChecked;
+                distanceValueSpan.style.opacity = isChecked ? "0.5" : "1";
+
+                console.log("Updated Work Throughout Austria:", isChecked, window.kazverseRegistrationData.step5);
+            });
+
+            // Validate step 5
+            function validateStep5() {
+                const distance = parseInt(slider.value, 10);
+                let errors = [];
+
+                // Basic check: distance must be between 1 and 500
+                if (isNaN(distance) || distance < 1 || distance > 500) {
+                    errors.push('Distance must be between 1 and 500 km.');
+                }
+
+                if (errors.length === 0) {
+                    step5NextButton.disabled = false;
+                    errorContainer.style.display = 'none';
+                    errorContainer.innerHTML = '';
+                } else {
+                    step5NextButton.disabled = true;
+                    errorContainer.style.display = 'block';
+                    errorContainer.innerHTML = errors.join('<br>');
+                }
+            }
+
+            validateStep5();
+
+            step5NextButton.addEventListener('click', function () {
+                console.log("Final Step 5 Data (Before Moving Forward):", window.kazverseRegistrationData.step5);
             });
         });
 
-        observer.observe(step5Container, { attributes: true });
-
-        // Function to adjust the zoom level only if the circle is outside the view
-        function adjustZoomIfNeeded() {
-            const circleBounds = circle.getBounds();
-            if (!map.getBounds().contains(circleBounds)) {
-                map.fitBounds(circleBounds, { padding: [20, 20] }); // Add some padding
-            }
-        }
-
-        // ✅ **UPDATE DISTANCE LIVE WHEN SLIDER CHANGES**
-        slider.addEventListener('input', function () {
-            const distanceInKm = parseInt(slider.value, 10);
-            distanceValueSpan.textContent = distanceInKm + ' km';
-
-            const radiusInMeters = distanceInKm * 1000;
-            circle.setRadius(radiusInMeters);
-            adjustZoomIfNeeded();
-
-            // **Update Global Data**
-            window.kazverseRegistrationData.step5.distance = distanceInKm;
-            console.log("Updated Distance:", distanceInKm, "km", window.kazverseRegistrationData.step5);
-            
-            validateStep5();
-        });
-
-        // ✅ **UPDATE LATITUDE & LONGITUDE LIVE WHEN USER CLICKS ON THE MAP**
-        map.on('click', function (event) {
-            const selectedLatLng = event.latlng;
-            circle.setLatLng(selectedLatLng);
-
-            // **Update Global Data**
-            window.kazverseRegistrationData.step5.latitude = selectedLatLng.lat;
-            window.kazverseRegistrationData.step5.longitude = selectedLatLng.lng;
-
-            console.log("Updated Coordinates:", selectedLatLng.lat, selectedLatLng.lng, window.kazverseRegistrationData.step5);
-
-            adjustZoomIfNeeded();
-        });
-
-        // ✅ **UPDATE WORK THROUGHOUT AUSTRIA CHECKBOX**
-        austriaCheckbox.addEventListener('change', function () {
-            window.kazverseRegistrationData.step5.work_throughout_austria = austriaCheckbox.checked;
-            console.log("Updated Work Throughout Austria:", austriaCheckbox.checked, window.kazverseRegistrationData.step5);
-        });
-
-        // Validate step 5
-        function validateStep5() {
-            const distance = parseInt(slider.value, 10);
-            let errors = [];
-
-            // Basic check: distance must be between 1 and 500
-            if (isNaN(distance) || distance < 1 || distance > 500) {
-                errors.push('Distance must be between 1 and 500 km.');
-            }
-
-            if (errors.length === 0) {
-                step5NextButton.disabled = false;
-                errorContainer.style.display = 'none';
-                errorContainer.innerHTML = '';
-            } else {
-                step5NextButton.disabled = true;
-                errorContainer.style.display = 'block';
-                errorContainer.innerHTML = errors.join('<br>');
-            }
-        }
-
-        // Run initial validation to set button state
-        validateStep5();
-
-        // ✅ **ENSURE LATEST VALUES ARE LOGGED WHEN CONTINUING TO NEXT STEP**
-        step5NextButton.addEventListener('click', function () {
-            console.log("Final Step 5 Data (Before Moving Forward):", window.kazverseRegistrationData.step5);
-
-            // Move to next step
-            const currentStep = document.querySelector('.form-step.active');
-            const nextStep = document.querySelector('.form-step-6');
-            if (currentStep && nextStep) {
-                currentStep.classList.remove('active');
-                nextStep.classList.add('active');
-            }
-        });
-    });
 
 
     </script>
