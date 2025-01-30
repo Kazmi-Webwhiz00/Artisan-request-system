@@ -111,10 +111,19 @@ function kazverse_artisan_process_form() {
     if ( isset($data['step5']['distance']) ) {
         store_artisan_meta($post_id, 'distance', $data['step5']['distance'], 'intval');
     }
+
     if ( isset($data['step5']['work_throughout_austria']) ) {
         store_artisan_meta($post_id, 'work_throughout_austria', $data['step5']['work_throughout_austria'], 'boolval');
     }
 
+    if ( isset($data['step5']['latitude']) ) {
+        store_artisan_meta($post_id, 'latitude', $data['step5']['latitude'], 'floatval');
+    }
+    
+    if ( isset($data['step5']['longitude']) ) {
+        store_artisan_meta($post_id, 'longitude', $data['step5']['longitude'], 'floatval');
+    }
+    
     // ========== Step 6 ==========
     if ( isset($data['step6']['professional_status']) ) {
         store_artisan_meta($post_id, 'professional_status', $data['step6']['professional_status']);

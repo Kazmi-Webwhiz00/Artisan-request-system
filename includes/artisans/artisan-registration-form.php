@@ -839,6 +839,24 @@ function render_artisan_registration_step_5() {
             radius: slider.value * 1000 // Convert km to meters
         }).addTo(map);
 
+        console.log("Initial Circle Coordinates:", circle.getLatLng());
+
+        // Ensure global object exists
+        if (!window.kazverseRegistrationData) {
+            window.kazverseRegistrationData = {};
+        }
+        if (!window.kazverseRegistrationData.step5) {
+            window.kazverseRegistrationData.step5 = {};
+        }
+
+        // Store **initial** values
+        window.kazverseRegistrationData.step5 = {
+            distance: parseInt(slider.value, 10),
+            latitude: 48.2082,
+            longitude: 16.3738,
+            work_throughout_austria: austriaCheckbox.checked
+        };
+
         // Ensure the map is properly rendered when Step 5 becomes visible
         const step5Container = document.querySelector('.form-step-5');
         const observer = new MutationObserver(function (mutationsList) {
@@ -863,28 +881,40 @@ function render_artisan_registration_step_5() {
             }
         }
 
-        // Update the slider value text, circle radius, and zoom level on input
+        // ✅ **UPDATE DISTANCE LIVE WHEN SLIDER CHANGES**
         slider.addEventListener('input', function () {
-            const distanceInKm = slider.value;
+            const distanceInKm = parseInt(slider.value, 10);
             distanceValueSpan.textContent = distanceInKm + ' km';
 
             const radiusInMeters = distanceInKm * 1000;
-            circle.setRadius(radiusInMeters); // Update circle radius
-            adjustZoomIfNeeded(); // Adjust zoom only if necessary
+            circle.setRadius(radiusInMeters);
+            adjustZoomIfNeeded();
 
+            // **Update Global Data**
+            window.kazverseRegistrationData.step5.distance = distanceInKm;
+            console.log("Updated Distance:", distanceInKm, "km", window.kazverseRegistrationData.step5);
+            
             validateStep5();
         });
 
-        // Allow users to select a location on the map
+        // ✅ **UPDATE LATITUDE & LONGITUDE LIVE WHEN USER CLICKS ON THE MAP**
         map.on('click', function (event) {
-            const selectedLatLng = event.latlng; // Get the latitude and longitude of the clicked point
-
-            // Update the circle's center to the clicked location
+            const selectedLatLng = event.latlng;
             circle.setLatLng(selectedLatLng);
 
-            // Optionally adjust the zoom to fit the circle if needed
-            adjustZoomIfNeeded();
+            // **Update Global Data**
+            window.kazverseRegistrationData.step5.latitude = selectedLatLng.lat;
+            window.kazverseRegistrationData.step5.longitude = selectedLatLng.lng;
 
+            console.log("Updated Coordinates:", selectedLatLng.lat, selectedLatLng.lng, window.kazverseRegistrationData.step5);
+
+            adjustZoomIfNeeded();
+        });
+
+        // ✅ **UPDATE WORK THROUGHOUT AUSTRIA CHECKBOX**
+        austriaCheckbox.addEventListener('change', function () {
+            window.kazverseRegistrationData.step5.work_throughout_austria = austriaCheckbox.checked;
+            console.log("Updated Work Throughout Austria:", austriaCheckbox.checked, window.kazverseRegistrationData.step5);
         });
 
         // Validate step 5
@@ -910,7 +940,21 @@ function render_artisan_registration_step_5() {
 
         // Run initial validation to set button state
         validateStep5();
+
+        // ✅ **ENSURE LATEST VALUES ARE LOGGED WHEN CONTINUING TO NEXT STEP**
+        step5NextButton.addEventListener('click', function () {
+            console.log("Final Step 5 Data (Before Moving Forward):", window.kazverseRegistrationData.step5);
+
+            // Move to next step
+            const currentStep = document.querySelector('.form-step.active');
+            const nextStep = document.querySelector('.form-step-6');
+            if (currentStep && nextStep) {
+                currentStep.classList.remove('active');
+                nextStep.classList.add('active');
+            }
+        });
     });
+
 
     </script>
     <?php
