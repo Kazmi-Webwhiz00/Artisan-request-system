@@ -96,3 +96,101 @@ flex-wrap: wrap;
             gap: 10px;
         }
     }
+
+
+
+
+/* zip code desing */
+
+.zipcode-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #ced4da !important; /* Bootstrap's default light gray border */
+    box-shadow: none !important;         /* Remove any custom box shadows */
+    border-radius: .375rem !important;   /* Bootstrap's default border radius */
+}
+
+.zipcode-input-wrapper:has(.zip-input-field:focus ) {
+    border-color: #86b7fe !important;    /* Bootstrap's focus border color */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; /* Bootstrap focus shadow */
+}
+
+.zip-input-field {
+    border: none !important;
+    outline: none !important;
+    flex: 1;
+    font-size: 16px;
+    background: transparent;
+    max-width: 95px;
+}
+
+
+
+.zip-place-display {
+    white-space: nowrap;
+    font-size: 16px;
+    color: #202020;
+    margin-left: 8px;
+    font-weight: 600;
+    border-left: 2px solid black;
+    padding-left: 10px;
+}
+.zip-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    z-index: 10;
+    display: none; /* Initially hidden */
+    padding: 10px; /* Space around the suggestions */
+    max-height: 500px; /* Add scroll after this height */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Light scrollbar styling */
+.zip-suggestions::-webkit-scrollbar {
+    width: 6px; /* Make the scrollbar thin */
+}
+
+.zip-suggestions::-webkit-scrollbar-thumb {
+    background: #ccc; /* Light gray scrollbar thumb */
+    border-radius: 3px; /* Rounded scrollbar thumb */
+}
+
+.zip-suggestions::-webkit-scrollbar-thumb:hover {
+    background: #aaa; /* Slightly darker on hover */
+}
+
+.zip-suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    background: #f0f0f0;
+    border-radius: 5px; /* Rounded corners for the bubble look */
+    margin-bottom: 10px; /* Space between bubbles */
+    text-align: center;
+    display: block; /* Stack suggestions vertically */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.zip-suggestions div:hover {
+    background: #e0e0e0;
+    color: #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+}
+
+
+.zip-error-box {
+    color: #ff0000; /* Red color for error message */
+    font-size: 12px;
+    margin-top: 5px;
+    display: none; /* Hidden by default */
+    text-align: left; /* Align error message to the left */
+}

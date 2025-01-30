@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @param string $prefix Phone prefix (optional, default '+1').
  * @param array $additional_attrs Additional attributes (optional).
  */
-function render_phone_field($name, $id, $label = '', $placeholder = '', $value = '', $required = false, $prefix = '+1', $additional_attrs = []) {
+function render_phone_field($name, $id, $label = '', $placeholder = '', $value = '', $required = false, $prefix = '+43', $additional_attrs = []) {
     // Start rendering
     $field = '<div class="mb-3">'; // Bootstrap's margin-bottom utility class
     

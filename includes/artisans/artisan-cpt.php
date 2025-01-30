@@ -89,6 +89,9 @@ function register_artisan_cpt_meta_fields() {
         // Step 5
         'distance'                 => array( 'type' => 'integer', 'single' => true, 'show_in_rest' => true ),
         'work_throughout_austria'  => array( 'type' => 'boolean','single' => true, 'show_in_rest' => true ),
+        'latitude'                 => array( 'type' => 'number', 'single' => true, 'show_in_rest' => true ),
+        'longitude'                => array( 'type' => 'number', 'single' => true, 'show_in_rest' => true ),
+        
 
         // Step 6
         'professional_status'      => array( 'type' => 'string',  'single' => true, 'show_in_rest' => true ),
@@ -164,6 +167,9 @@ function my_artisan_save_meta_box_data( $post_id ) {
         'address',
         'business_zip_code',
         'city',
+        'longitude',
+        'latitude',
+        'distance',
         'business_license',
         'description',
     );
@@ -215,6 +221,8 @@ function my_artisan_meta_box_callback($post) {
         'selected_trades' => maybe_unserialize(get_post_meta($post->ID, 'selected_trades', true)),
         'distance' => get_post_meta($post->ID, 'distance', true),
         'work_throughout_austria' => get_post_meta($post->ID, 'work_throughout_austria', true),
+        'latitude' => get_post_meta($post->ID, 'latitude', true),
+        'longitude' => get_post_meta($post->ID, 'longitude', true),
         'professional_status' => get_post_meta($post->ID, 'professional_status', true),
         'gisa_number' => get_post_meta($post->ID, 'gisa_number', true),
         'company_name' => get_post_meta($post->ID, 'company_name', true),
@@ -272,6 +280,8 @@ function my_artisan_meta_box_callback($post) {
     echo '<div class="artisan-meta-group-title">Step 4: Work Details</div>';
     echo '<div class="artisan-meta-group-content">';
     echo '<label>Distance (km)</label><input type="number" name="distance" value="' . esc_attr($meta_fields['distance']) . '" />';
+    echo '<label>Latitude</label><input type="text" name="latitude" value="' . esc_attr($meta_fields['latitude']) . '"  />';
+    echo '<label>Longitude</label><input type="text" name="longitude" value="' . esc_attr($meta_fields['longitude']) . '"  />';
     echo '<label>Work Throughout Austria</label><input type="checkbox" name="work_throughout_austria" value="1" ' . checked($meta_fields['work_throughout_austria'], true, false) . ' />';
     echo '</div></div>';
 

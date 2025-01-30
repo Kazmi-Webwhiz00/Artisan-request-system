@@ -35,15 +35,21 @@ jQuery(document).ready(function ($) {
     function validateStep(step) {
         const inputs = steps.eq(step).find("input, textarea, select");
         let isValid = true;
-
+    
+        // Validate regular inputs
         inputs.each(function () {
             const input = $(this);
             const error = input.next(".error-message");
-
+            const errorBox = input.closest(".zipcode-input-wrapper").next(".zip-error-box"); // Target the zip-error-box
+    
+            // Reset error box
+            errorBox.text("").hide();
+    
+            // Required field validation for text, email, textarea, etc.
             if (input.prop("required") && !input.val().trim()) {
                 isValid = false;
                 input.addClass("error");
-
+    
                 if (error.length === 0) {
                     input.after('<span class="error-message">This field is required.</span>');
                 }
@@ -51,11 +57,66 @@ jQuery(document).ready(function ($) {
                 input.removeClass("error");
                 error.remove();
             }
+    
+            // Email validation
+            if (input.attr("type") === "email" && input.val().trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(input.val().trim())) {
+                    isValid = false;
+                    input.addClass("error");
+    
+                    if (error.length === 0) {
+                        input.after('<span class="error-message">Please enter a valid email address.</span>');
+                    }
+                }
+            }
+    
+            // Zip code validation
+            if (input.hasClass("zip-input-field")) {
+                const zipCode = input.val().trim();
+    
+                if (zipCode.length !== 4) {
+                    isValid = false;
+                    input.addClass("error");
+    
+                    if (errorBox.length > 0) {
+                        errorBox.text("ZIP code must be exactly 4 digits.").show();
+                    }
+                } else if (!ZipcodeHelper.validateZip(zipCode)) {
+                    isValid = false;
+                    input.addClass("error");
+    
+                    if (errorBox.length > 0) {
+                        errorBox.text("Invalid or unsupported ZIP code.").show();
+                    }
+                } else {
+                    input.removeClass("error");
+                }
+            }
         });
-
+    
+        // Validate radio and checkbox groups with data-require="true"
+        steps.eq(step).find('.field-wrapper[data-require="true"]').each(function () {
+            const fieldWrapper = $(this);
+            const groupInputs = fieldWrapper.find('input[type="radio"], input[type="checkbox"]');
+            const error = fieldWrapper.siblings(".error-message");
+    
+            // Check if at least one is selected
+            if (groupInputs.length > 0 && !groupInputs.is(":checked")) {
+                isValid = false;
+    
+                if (error.length === 0) {
+                    fieldWrapper.after('<span class="error-message">Please select at least one option.</span>');
+                }
+            } else {
+                error.remove();
+            }
+        });
+    
         return isValid;
     }
-
+    
+    
     // Show the current step and scroll smoothly
     function showStep(step) {
         steps.each(function (index) {

@@ -10,6 +10,7 @@ require_once plugin_dir_path( __FILE__ ) . '../general-helpers/forms/checkbox-fi
 require_once plugin_dir_path( __FILE__ ) . '../general-helpers/forms/radio-field.php';
 require_once plugin_dir_path( __FILE__ ) . '../general-helpers/forms/grouped-field.php';
 require_once plugin_dir_path( __FILE__ ) . '../general-helpers/forms/file-upload-field.php';
+require_once plugin_dir_path( __FILE__ ) .  '../general-helpers/forms/zipcode-field.php';
 
 
 // Enqueue CSS for artisan registration form
@@ -72,15 +73,9 @@ function render_artisan_registration_step_1() {
         <!-- Zip Code Field -->
         <div class="form-group">
             <?php
-            render_text_field(
-                'zip_code',
-                'zip_code',
-                'Zip Code',
-                'Enter your zip code',
-                '',
-                true // Required
-            );
+            render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5400','Zip Code *');
             ?>
+            
             <!-- Inline error for zip -->
             <span id="zip-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
@@ -175,7 +170,14 @@ function render_artisan_registration_step_1() {
                 } else if (!/^[0-9]+$/.test(zipVal)) {
                     isValid = false;
                     showError(zipInput, zipError, 'Zip code must be numeric only.');
+                } else if (zipVal.length !== 4) {
+                    isValid = false;
+                    showError(zipInput, zipError, 'Zip code must be exactly 4 digits.');
+                } else if (!ZipcodeHelper.validateZip(zipVal)) { // Using the helper method
+                    isValid = false;
+                   
                 }
+
 
                 // Email
                 const emailVal = emailInput.value.trim();
@@ -239,7 +241,7 @@ function render_artisan_registration_step_1() {
                 const style = document.createElement('style');
                 style.innerHTML = `
                   .error-field {
-                      border: 1px solid red !important;
+                     
                       outline: none;
                   }
                   .error-msg {
@@ -348,7 +350,7 @@ function render_artisan_registration_step_2() {
         <!-- We REMOVE data-next-step and do validation + AJAX ourselves -->
         <button 
             type="button" 
-            class="next-button purple-btn" 
+            class="next-button next-button" 
             id="step2ContinueBtn"
         >
             Continue
@@ -546,7 +548,7 @@ function render_artisan_registration_step_2() {
             const style = document.createElement('style');
             style.innerHTML = `
                 .error-field {
-                    border: 1px solid red !important;
+                   
                     outline: none;
                 }
                 .error-msg {
@@ -831,11 +833,29 @@ function render_artisan_registration_step_5() {
 
         // Draw initial circle with default 50 km radius
         let circle = L.circle([48.2082, 16.3738], {
-            color: 'purple',
-            fillColor: '#6b52ae',
+            color: '#002335',
+            fillColor: '#002335',
             fillOpacity: 0.3,
             radius: slider.value * 1000 // Convert km to meters
         }).addTo(map);
+
+        console.log("Initial Circle Coordinates:", circle.getLatLng());
+
+        // Ensure global object exists
+        if (!window.kazverseRegistrationData) {
+            window.kazverseRegistrationData = {};
+        }
+        if (!window.kazverseRegistrationData.step5) {
+            window.kazverseRegistrationData.step5 = {};
+        }
+
+        // Store **initial** values
+        window.kazverseRegistrationData.step5 = {
+            distance: parseInt(slider.value, 10),
+            latitude: 48.2082,
+            longitude: 16.3738,
+            work_throughout_austria: austriaCheckbox.checked
+        };
 
         // Ensure the map is properly rendered when Step 5 becomes visible
         const step5Container = document.querySelector('.form-step-5');
@@ -861,28 +881,40 @@ function render_artisan_registration_step_5() {
             }
         }
 
-        // Update the slider value text, circle radius, and zoom level on input
+        // ✅ **UPDATE DISTANCE LIVE WHEN SLIDER CHANGES**
         slider.addEventListener('input', function () {
-            const distanceInKm = slider.value;
+            const distanceInKm = parseInt(slider.value, 10);
             distanceValueSpan.textContent = distanceInKm + ' km';
 
             const radiusInMeters = distanceInKm * 1000;
-            circle.setRadius(radiusInMeters); // Update circle radius
-            adjustZoomIfNeeded(); // Adjust zoom only if necessary
+            circle.setRadius(radiusInMeters);
+            adjustZoomIfNeeded();
 
+            // **Update Global Data**
+            window.kazverseRegistrationData.step5.distance = distanceInKm;
+            console.log("Updated Distance:", distanceInKm, "km", window.kazverseRegistrationData.step5);
+            
             validateStep5();
         });
 
-        // Allow users to select a location on the map
+        // ✅ **UPDATE LATITUDE & LONGITUDE LIVE WHEN USER CLICKS ON THE MAP**
         map.on('click', function (event) {
-            const selectedLatLng = event.latlng; // Get the latitude and longitude of the clicked point
-
-            // Update the circle's center to the clicked location
+            const selectedLatLng = event.latlng;
             circle.setLatLng(selectedLatLng);
 
-            // Optionally adjust the zoom to fit the circle if needed
-            adjustZoomIfNeeded();
+            // **Update Global Data**
+            window.kazverseRegistrationData.step5.latitude = selectedLatLng.lat;
+            window.kazverseRegistrationData.step5.longitude = selectedLatLng.lng;
 
+            console.log("Updated Coordinates:", selectedLatLng.lat, selectedLatLng.lng, window.kazverseRegistrationData.step5);
+
+            adjustZoomIfNeeded();
+        });
+
+        // ✅ **UPDATE WORK THROUGHOUT AUSTRIA CHECKBOX**
+        austriaCheckbox.addEventListener('change', function () {
+            window.kazverseRegistrationData.step5.work_throughout_austria = austriaCheckbox.checked;
+            console.log("Updated Work Throughout Austria:", austriaCheckbox.checked, window.kazverseRegistrationData.step5);
         });
 
         // Validate step 5
@@ -908,7 +940,21 @@ function render_artisan_registration_step_5() {
 
         // Run initial validation to set button state
         validateStep5();
+
+        // ✅ **ENSURE LATEST VALUES ARE LOGGED WHEN CONTINUING TO NEXT STEP**
+        step5NextButton.addEventListener('click', function () {
+            console.log("Final Step 5 Data (Before Moving Forward):", window.kazverseRegistrationData.step5);
+
+            // Move to next step
+            const currentStep = document.querySelector('.form-step.active');
+            const nextStep = document.querySelector('.form-step-6');
+            if (currentStep && nextStep) {
+                currentStep.classList.remove('active');
+                nextStep.classList.add('active');
+            }
+        });
     });
+
 
     </script>
     <?php
@@ -1114,11 +1160,7 @@ function render_artisan_registration_step_8() {
         <!-- Zip Code and City (Grouped) -->
         <div class="f8_form_group form-group">
             <?php
-            render_grouped_fields(
-                'f8_zip_code', 'f8_zip_code', 'Zip Code',
-                'f8_city', 'f8_city', 'City',
-                '', '', true  // Both required
-            );
+            render_zipcode_field_with_place_selector('f8_zip_code','f8_zip_code','eg. 5400','Zip Code *');
             ?>
             <span id="zipCity-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
@@ -1151,7 +1193,6 @@ function render_artisan_registration_step_8() {
         const companyNameInput= document.getElementById('f8_company_name'); 
         const addressInput    = document.getElementById('f8_address');
         const zipCodeInput    = document.getElementById('f8_zip_code');
-        const cityInput       = document.getElementById('f8_city');
         const step8NextButton = document.getElementById('step8ContinueBtn');
         const globalError     = document.getElementById('step8-inline-error');
 
@@ -1168,7 +1209,7 @@ function render_artisan_registration_step_8() {
         let attemptedNext = false;
 
         // Whenever user types, if they've tried once, re-check
-        [gisaInput, companyNameInput, addressInput, zipCodeInput, cityInput].forEach(field => {
+        [gisaInput, companyNameInput, addressInput, zipCodeInput].forEach(field => {
             field.addEventListener('input', function() {
                 if (attemptedNext) {
                     validateAndShowErrors();
@@ -1197,21 +1238,18 @@ function render_artisan_registration_step_8() {
             }
 
             const zipVal = zipCodeInput.value.trim();
-            const cityVal= cityInput.value.trim();
             if (!zipVal) {
                 isValid = false;
-                showError(zipCodeInput, zipCityError, 'Zip Code is required.');
+                showError(zipCodeInput, zipCityError, 'Zip code is required.');
             } else if (!zipRegex.test(zipVal)) {
                 isValid = false;
-                showError(zipCodeInput, zipCityError, 'Zip Code must be numeric only.');
-            }
-            if (!cityVal) {
+                showError(zipCodeInput, zipErzipCityErrorror, 'Zip code must be numeric only.');
+            } else if (zipVal.length !== 4) {
                 isValid = false;
-                // If there's already an error for zip, append or show new?
-                // We'll just reuse same span:
-                const existing = zipCityError.textContent;
-                const cityErr  = existing ? existing + ' City is required.' : 'City is required.';
-                showError(cityInput, zipCityError, cityErr);
+                showError(zipCodeInput, zipCityError, 'Zip code must be exactly 4 digits.');
+            } else if (!ZipcodeHelper.validateZip(zipVal)) { // Using the helper method
+                isValid = false;
+            
             }
 
             return isValid;
@@ -1239,7 +1277,6 @@ function render_artisan_registration_step_8() {
             clearError(companyNameInput,companyError);
             clearError(addressInput,    addressError);
             clearError(zipCodeInput,    zipCityError);
-            clearError(cityInput,       zipCityError);
             // Also hide global error if any
             globalError.style.display = 'none';
             globalError.innerHTML     = '';
@@ -1257,7 +1294,6 @@ function render_artisan_registration_step_8() {
             const companyVal    = companyNameInput.value.trim();
             const addressVal    = addressInput.value.trim();
             const zipVal        = zipCodeInput.value.trim();
-            const cityVal       = cityInput.value.trim();
 
             if (!window.kazverseRegistrationData.step8) {
                 window.kazverseRegistrationData.step8 = {};
@@ -1266,7 +1302,6 @@ function render_artisan_registration_step_8() {
             window.kazverseRegistrationData.step8.company_name  = companyVal;
             window.kazverseRegistrationData.step8.address       = addressVal;
             window.kazverseRegistrationData.step8.zip_code      = zipVal;
-            window.kazverseRegistrationData.step8.city          = cityVal;
 
             console.log('Current Registration Data:', window.kazverseRegistrationData);
 
@@ -1284,7 +1319,7 @@ function render_artisan_registration_step_8() {
             const style = document.createElement('style');
             style.innerHTML = `
                 .error-field {
-                    border: 1px solid red !important;
+                   
                     outline: none;
                 }
                 .error-msg {
@@ -1468,7 +1503,7 @@ function render_artisan_registration_step_9() {
 
     <style>
         .error-field {
-            border: 1px solid red !important;
+          
             outline: none;
         }
         .error-msg {

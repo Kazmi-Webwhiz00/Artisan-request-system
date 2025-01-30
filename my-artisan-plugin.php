@@ -2,7 +2,7 @@
 /*
 Plugin Name: Kazverse Artisan Plugin
 Description: A custom WordPress plugin by Kazverse for managing artisan registration and service requests.
-Version: 1.0.2
+Version: 1.0.4
 Author: Kazverse
 Author URI: https://kazverse.com
 Text Domain: kazverse-artisan-plugin
@@ -73,6 +73,11 @@ function enqueue_helper_form_styles() {
         array(), // Dependencies (if any)
         null // Version number (optional, set to null if not versioned)
     );
+
+    wp_enqueue_script('field-types', plugin_dir_url(__FILE__) . 'includes/general-helpers/forms/css/form-helper.js', ['jquery'], false, true);
+    wp_enqueue_script('zip-code-helper', plugin_dir_url(__FILE__) . 'includes/general-helpers/forms/css/zipcode-helper.js', ['jquery'], false, true);
+   
+
 }
 
 add_action('wp_enqueue_scripts', 'enqueue_helper_form_styles');
