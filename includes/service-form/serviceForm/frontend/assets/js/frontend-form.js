@@ -299,7 +299,16 @@ jQuery(document).ready(function ($) {
                 if (response.success) {
                     showThankYouMessage(formData);
                 } else {
-                    alert(response.data.message); // Error message
+                    Swal.fire({
+                        html: `
+                            <img src="${ajax_object.sad_gif_url}" alt="sad" class="sad-gif" style="width: 100px; height: 100px;">
+                            <p style="font-size:22px">${response.data.message}</p>
+                        `,
+                        showConfirmButton: true,
+                        confirmButtonColor: '#002335'
+                    });
+                    
+                    
                 }
             },
             error: function () {
