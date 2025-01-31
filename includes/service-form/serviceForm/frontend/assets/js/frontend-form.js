@@ -74,22 +74,18 @@ jQuery(document).ready(function ($) {
             // Zip code validation
             if (input.hasClass("zip-input-field")) {
                 const zipCode = input.val().trim();
-    
-                if (zipCode.length !== 4) {
+                // e.g. for a Dutch postcode: 4 digits + space (optional) + 2 letters
+                const nlRegex = /^\d{4}\s?[A-Za-z]{2}$/; 
+
+                if (!nlRegex.test(zipCode)) {
+                    // Mark as invalid
                     isValid = false;
                     input.addClass("error");
-    
                     if (errorBox.length > 0) {
-                        errorBox.text("ZIP code must be exactly 4 digits.").show();
-                    }
-                } else if (!ZipcodeHelper.validateZip(zipCode)) {
-                    isValid = false;
-                    input.addClass("error");
-    
-                    if (errorBox.length > 0) {
-                        errorBox.text("Invalid or unsupported ZIP code.").show();
+                        errorBox.text("Please enter a valid NL postcode (e.g., 1234AB)").show();
                     }
                 } else {
+                    // If it passes, remove error class
                     input.removeClass("error");
                 }
             }
@@ -183,7 +179,6 @@ jQuery(document).ready(function ($) {
 
         const formFields = getFormFields();
         const userDetails = getUserDetails();
-
         const formData = {
             form_name: $('#service-form-name').text().trim(),
             form_type: $('#service-form-name').attr('form-type').trim(),
@@ -244,12 +239,16 @@ jQuery(document).ready(function ($) {
         const name = $('#name').val() || '';
         const email = $('#email').val() || '';
         const phone = $('#phone').val() || '';
+        const lat = $('#zip_code-lat').val() || '';
+        const lng = $('#zip_code-lng').val()  || '';
 
         return {
             zip_code: zipCode,
             name: name,
             email: email,
             phone: phone,
+            zip_code_lat: lat,
+            zip_code_lng: lng
         };
     }
 

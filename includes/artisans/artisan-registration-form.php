@@ -44,11 +44,6 @@ add_action('wp_head', function() {
 
 // Function to render Step 1
 function render_artisan_registration_step_1() {
-    if (!is_wp_error($terms) && !empty($terms)) {
-        foreach ($terms as $term) {
-            $trades[sanitize_title($term->name)] = $term->name; // Use sanitized slug as value
-        }
-    }
 
         // Fetch trades dynamically from the 'global_services' taxonomy
         $terms = get_terms([
@@ -178,17 +173,16 @@ function render_artisan_registration_step_1() {
                 if (!zipVal) {
                     isValid = false;
                     showError(zipInput, zipError, 'Zip code is required.');
-                } else if (!/^[0-9]+$/.test(zipVal)) {
-                    isValid = false;
-                    showError(zipInput, zipError, 'Zip code must be numeric only.');
-                } else if (zipVal.length !== 4) {
-                    isValid = false;
-                    showError(zipInput, zipError, 'Zip code must be exactly 4 digits.');
-                } else if (!ZipcodeHelper.validateZip(zipVal)) { // Using the helper method
-                    isValid = false;
-                   
-                }
+                } else {
+                    let zipPlaceDisplay = document.querySelector('.zip-place-display');
 
+                    if (!zipPlaceDisplay || zipPlaceDisplay.textContent.trim() === '') {
+                        isValid = false;
+                        showError(zipInput, zipError, 'Valid zip code is required.');
+                    } else {
+                        isValid = true;
+                    }
+                }
 
                 // Email
                 const emailVal = emailInput.value.trim();
@@ -806,10 +800,10 @@ function render_artisan_registration_step_5() {
             <span id="f5_distance_value">1 km</span>
         </div>
 
-        <!-- Checkbox for "I work throughout Austria" (not mandatory) -->
+        <!-- Checkbox for "I work throughout netherlands" (not mandatory) -->
         <div class="f5_form_group form-group">
-            <label for="f5_work_throughout_austria">
-                <input type="checkbox" id="f5_work_throughout_austria"> I work throughout Netherlands
+            <label for="f5_work_throughout_netherlands">
+                <input type="checkbox" id="f5_work_throughout_netherlands"> I work throughout Netherlands
             </label>
         </div>
 
@@ -833,7 +827,7 @@ function render_artisan_registration_step_5() {
             // DOM references
             const slider = document.getElementById('f5_distance_slider');
             const distanceValueSpan = document.getElementById('f5_distance_value');
-            const austriaCheckbox = document.getElementById('f5_work_throughout_austria');
+            const netherlandsCheckbox = document.getElementById('f5_work_throughout_netherlands');
             const step5NextButton = document.querySelector('.form-step-5 .next-button');
             const errorContainer = document.querySelector('.step5-error');
 
@@ -864,7 +858,7 @@ function render_artisan_registration_step_5() {
                 distance: parseInt(slider.value, 10),
                 latitude: 52.3676, // Amsterdam latitude
                 longitude: 4.9041, // Amsterdam longitude
-                work_throughout_austria: austriaCheckbox.checked
+                work_throughout_netherlands: netherlandsCheckbox.checked
             };
 
             // Ensure the map is properly rendered when Step 5 becomes visible
@@ -922,17 +916,17 @@ function render_artisan_registration_step_5() {
                 console.log("Updated Coordinates:", selectedLatLng.lat, selectedLatLng.lng, window.kazverseRegistrationData.step5);
             });
 
-            // ✅ **UPDATE WORK THROUGHOUT AUSTRIA CHECKBOX**
-            austriaCheckbox.addEventListener('change', function () {
-                const isChecked = austriaCheckbox.checked;
+            // ✅ **UPDATE WORK THROUGHOUT netherlands CHECKBOX**
+            netherlandsCheckbox.addEventListener('change', function () {
+                const isChecked = netherlandsCheckbox.checked;
                 
-                window.kazverseRegistrationData.step5.work_throughout_austria = isChecked;
+                window.kazverseRegistrationData.step5.work_throughout_netherlands = isChecked;
                 
                 // ✅ Disable the distance slider if checkbox is checked
                 slider.disabled = isChecked;
                 distanceValueSpan.style.opacity = isChecked ? "0.5" : "1";
 
-                console.log("Updated Work Throughout Austria:", isChecked, window.kazverseRegistrationData.step5);
+                console.log("Updated Work Throughout netherlands:", isChecked, window.kazverseRegistrationData.step5);
             });
 
             // Validate step 5
@@ -1247,19 +1241,21 @@ function render_artisan_registration_step_8() {
             }
 
             const zipVal = zipCodeInput.value.trim();
-            if (!zipVal) {
+           if (!zipVal) {
                 isValid = false;
-                showError(zipCodeInput, zipCityError, 'Zip code is required.');
-            } else if (!zipRegex.test(zipVal)) {
-                isValid = false;
-                showError(zipCodeInput, zipErzipCityErrorror, 'Zip code must be numeric only.');
-            } else if (zipVal.length !== 4) {
-                isValid = false;
-                showError(zipCodeInput, zipCityError, 'Zip code must be exactly 4 digits.');
-            } else if (!ZipcodeHelper.validateZip(zipVal)) { // Using the helper method
-                isValid = false;
-            
+                showError(zipInput, zipError, 'Zip code is required.');
+            } else {
+                let zipPlaceDisplay = document.querySelector('.zip-place-display');
+
+                if (!zipPlaceDisplay || zipPlaceDisplay.textContent.trim() === '') {
+                    isValid = false;
+                    showError(zipInput, zipError, 'Valid zip code is required.');
+                } else {
+                    isValid = true;
+                }
             }
+
+
 
             return isValid;
         }

@@ -27,9 +27,7 @@ function render_select_field($name, $id, $label = '', $options = [], $selected =
     
     // Add select field
     $field .= '<select class="sf-select-input form-select" name="' . esc_attr($name) . '" id="' . esc_attr($id) . '"';
-    if ($required) {
-        $field .= ' required';
-    }
+    
     foreach ($additional_attrs as $attr_key => $attr_value) {
         $field .= ' ' . esc_attr($attr_key) . '="' . esc_attr($attr_value) . '"';
     }

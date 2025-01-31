@@ -88,7 +88,7 @@ function register_artisan_cpt_meta_fields() {
 
         // Step 5
         'distance'                 => array( 'type' => 'integer', 'single' => true, 'show_in_rest' => true ),
-        'work_throughout_austria'  => array( 'type' => 'boolean','single' => true, 'show_in_rest' => true ),
+        'work_throughout_netherlands'  => array( 'type' => 'boolean','single' => true, 'show_in_rest' => true ),
         'latitude'                 => array( 'type' => 'number', 'single' => true, 'show_in_rest' => true ),
         'longitude'                => array( 'type' => 'number', 'single' => true, 'show_in_rest' => true ),
         
@@ -174,7 +174,7 @@ function my_artisan_save_meta_box_data( $post_id ) {
         'description',
     );
     // Boolean checkboxes
-    $bool_fields = array('subscribe','work_throughout_austria');
+    $bool_fields = array('subscribe','work_throughout_netherlands');
 
     // Textarea that might be array (like 'selected_trades')
     // We'll store as a simple string. If you have a special format, parse it.
@@ -220,7 +220,7 @@ function my_artisan_meta_box_callback($post) {
         'subscribe' => get_post_meta($post->ID, 'subscribe', true),
         'selected_trades' => maybe_unserialize(get_post_meta($post->ID, 'selected_trades', true)),
         'distance' => get_post_meta($post->ID, 'distance', true),
-        'work_throughout_austria' => get_post_meta($post->ID, 'work_throughout_austria', true),
+        'work_throughout_netherlands' => get_post_meta($post->ID, 'work_throughout_netherlands', true),
         'latitude' => get_post_meta($post->ID, 'latitude', true),
         'longitude' => get_post_meta($post->ID, 'longitude', true),
         'professional_status' => get_post_meta($post->ID, 'professional_status', true),
@@ -282,7 +282,7 @@ function my_artisan_meta_box_callback($post) {
     echo '<label>Distance (km)</label><input type="number" name="distance" value="' . esc_attr($meta_fields['distance']) . '" />';
     echo '<label>Latitude</label><input type="text" name="latitude" value="' . esc_attr($meta_fields['latitude']) . '"  />';
     echo '<label>Longitude</label><input type="text" name="longitude" value="' . esc_attr($meta_fields['longitude']) . '"  />';
-    echo '<label>Work Throughout Austria</label><input type="checkbox" name="work_throughout_austria" value="1" ' . checked($meta_fields['work_throughout_austria'], true, false) . ' />';
+    echo '<label>Work Throughout netherlands</label><input type="checkbox" name="work_throughout_netherlands" value="1" ' . checked($meta_fields['work_throughout_netherlands'], true, false) . ' />';
     echo '</div></div>';
 
     // Step 5: Professional Information
