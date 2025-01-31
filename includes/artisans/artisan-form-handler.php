@@ -157,6 +157,6 @@ function kazverse_artisan_process_form() {
     }
 
     // 6. All done! Redirect to a thank-you page or show success
-    wp_redirect( home_url('/') );
+    wp_redirect( get_permalink($post_id) );
     exit;
 }

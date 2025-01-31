@@ -200,7 +200,7 @@ jQuery(document).ready(function ($) {
         const fields = [];
         $('#dynamic-multi-step-form')
             .find('input, textarea, select')
-            .not('#zip_code, #name, #email, #phone') // Exclude user details fields
+            .not('#zip_code, #name, #email, #phone, [name$="_lng"], [name$="_lat"]')
             .each(function () {
                 const fieldType = $(this).attr('type');
                 const question = $(this)
