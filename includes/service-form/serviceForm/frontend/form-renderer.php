@@ -17,7 +17,7 @@ require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/number-
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/textarea-field.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/checkbox-with-image.php';
 require_once plugin_dir_path(__FILE__) . '../../../general-helpers/forms/zipcode-field.php';
-
+require_once plugin_dir_path(__FILE__) . '../../../general-helpers/haversine_distance.php';
 
 function enqueue_service_form_assets() {
     if (is_singular('service_form')) {
@@ -29,8 +29,8 @@ function enqueue_service_form_assets() {
         wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
         wp_enqueue_script('lottie-player', 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js', [], null, true);
 
-        // Add custom AJAX script
-         wp_localize_script('frontend-form-js', 'ajax_object', [
+        // Pass AJAX info to script
+        wp_localize_script('frontend-form-js', 'ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'success_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/success.gif',
             'sad_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/sad.gif',
@@ -38,7 +38,6 @@ function enqueue_service_form_assets() {
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_service_form_assets');
-
 
 function render_service_form_shortcode($atts) {
     $atts = shortcode_atts([
@@ -60,19 +59,20 @@ function render_service_form_shortcode($atts) {
     ));
 
     $form_description = get_post_meta($post_id, '_form_description', true);
-
     $form_name = get_the_title($post_id); // Form name
 
     // Get global_services taxonomy terms associated with the post
     $form_types = wp_get_post_terms($post_id, 'global_services', ['fields' => 'names']);
-    $form_type = !empty($form_types) ? esc_attr(implode(', ', $form_types)) : 'Uncategorized';
+    $form_type  = !empty($form_types) ? esc_attr(implode(', ', $form_types)) : 'Uncategorized';
 
     ob_start();
     ?>
     <div class="service-form">
 
         <!-- Form Name in Small Text -->
-        <p class="form-name" id="service-form-name" form-type="<?php echo $form_type; ?>"><?php echo esc_html($form_name); ?></p>
+        <p class="form-name" id="service-form-name" form-type="<?php echo $form_type; ?>">
+            <?php echo esc_html($form_name); ?>
+        </p>
 
         <hr class="form-divider">
 
@@ -89,13 +89,13 @@ function render_service_form_shortcode($atts) {
                         <?php if (!empty($fields)): ?>
                             <?php foreach ($fields as $index => $field): ?>
                                 <?php
-                                $field_id = esc_attr($field->field_external_id);
-                                $field_label = esc_html($field->field_label);
+                                $field_id          = esc_attr($field->field_external_id);
+                                $field_label       = esc_html($field->field_label);
                                 $field_description = esc_html($field->field_description);
-                                $field_type = $field->field_type;
-                                $cleaned_options = stripslashes($field->field_options ?? '');
-                                $field_options = json_decode($cleaned_options, true);
-                                $is_required = (int)$field->is_required;
+                                $field_type        = $field->field_type;
+                                $cleaned_options   = stripslashes($field->field_options ?? '');
+                                $field_options     = json_decode($cleaned_options, true);
+                                $is_required       = (int)$field->is_required;
                                 ?>
                                 <div class="form-step" data-step="<?php echo $index + 1; ?>">
                                     <div class="form-group">
@@ -108,10 +108,9 @@ function render_service_form_shortcode($atts) {
                                         <?php endif; ?>
 
                                         <div class="field-wrapper field-<?php echo $field_type; ?>-wrapper"
-                                                    <?php if (in_array($field_type, ['radio', 'checkbox_simple', 'checkbox_with_image'])): ?>
-                                                        data-require="<?php echo $is_required ? 'true' : 'false'; ?>"
-                                                    <?php endif; ?>>
-
+                                             <?php if (in_array($field_type, ['radio', 'checkbox_simple', 'checkbox_with_image'])): ?>
+                                                data-require="<?php echo $is_required ? 'true' : 'false'; ?>"
+                                             <?php endif; ?>>
                                             <?php
                                             switch ($field_type) {
                                                 case 'text_input':
@@ -207,7 +206,15 @@ function render_service_form_shortcode($atts) {
                             <div class="form-step" data-step="<?php echo count($fields) + 1; ?>">
                                 <div class="form-group mb-5">
                                     <label for="zip_code">Zip code of your order*</label>
-                                    <?php render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5400', 'Zip code'); ?>
+                                    <?php
+                                    // Renders the ZIP code + hidden lat/lng fields
+                                    render_zipcode_field_with_place_selector(
+                                        'zip_code',
+                                        'zip_code',
+                                        'eg. 5400',
+                                        'Zip code'
+                                    );
+                                    ?>
                                 </div>
                             </div>
 
@@ -216,7 +223,7 @@ function render_service_form_shortcode($atts) {
                                 <div class="form-group mb-5">
                                     <label for="email">Get an answer from tradesmen in your area.</label>
                                     <br>
-                                    <span class="mb-5" >Your data will only be visible to tradesmen once you contact them.</span>
+                                    <span class="mb-5">Your data will only be visible to tradesmen once you contact them.</span>
                                     <?php render_email_field('email', 'email', '', 'Enter your email address', '', true); ?>
                                 </div>
                                 <div class="form-group mb-5">
@@ -233,7 +240,9 @@ function render_service_form_shortcode($atts) {
                             <div class="kz-step-navigation">
                                 <button type="button" class="prev-step" disabled>Back</button>
                                 <button type="button" class="next-step">Next</button>
-                                <button type="submit" class="submit-button" id="form-submit-button" style="display: none;">Submit</button>
+                                <button type="submit" class="submit-button" id="form-submit-button" style="display: none;">
+                                    Submit
+                                </button>
                             </div>
                         <?php else: ?>
                             <p>No fields found for this form.</p>
@@ -254,89 +263,147 @@ add_action('wp_ajax_nopriv_submit_service_form', 'handle_service_form_submission
 
 function handle_service_form_submission() {
     if (!isset($_POST['form_data']) || empty($_POST['form_data'])) {
-        error_log('No data received.');
+        error_log('No form_data received in AJAX request.');
         wp_send_json_error(['message' => 'No data received.']);
     }
 
-    // Decode JSON-formatted form data
-    $form_data = json_decode(stripslashes($_POST['form_data']), true);
+    $form_data_json = stripslashes($_POST['form_data']);
+    $form_data      = json_decode($form_data_json, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log('Invalid JSON data received.');
+        error_log('Invalid JSON in form_data: ' . $form_data_json);
         wp_send_json_error(['message' => 'Invalid JSON data received.']);
     }
 
+    // Debug log: full form_data
+    error_log("=== Service Form Submission ===\n" . print_r($form_data, true));
+
     // Extract data
-    $form_name = $form_data['form_name'] ?? 'Unknown Form';
-    $form_type = $form_data['form_type'] ?? 'Unknown Form';
+    $form_name   = $form_data['form_name']   ?? 'Unknown Form';
+    $form_type   = $form_data['form_type']   ?? 'Unknown Form';
     $form_fields = $form_data['form_fields'] ?? [];
     $user_details = $form_data['user_details'] ?? [];
+
+    // Lat/Lng from hidden fields
+    $user_lat = isset($user_details['zip_code_lat']) ? floatval($user_details['zip_code_lat']) : null;
+    $user_lng = isset($user_details['zip_code_lng']) ? floatval($user_details['zip_code_lng']) : null;
+
+    // User's typed ZIP (just for reference)
     $zip_code = $user_details['zip_code'] ?? 'N/A';
 
-    // Get artisans matching taxonomy and postal code
-    $artisans = get_matching_artisans($form_type, $zip_code);
+    // Additional debug logs
+    error_log("Form name: $form_name");
+    error_log("Form type (taxonomy): $form_type");
+    error_log("User ZIP Code: $zip_code");
+    error_log("User Lat: $user_lat, User Lng: $user_lng");
+
+    // Now do the matching based on lat/lng
+    $artisans = get_matching_artisans($form_type, $user_lat, $user_lng);
 
     if (empty($artisans)) {
-        error_log("No matching artisans found for form: $form_name and zip code: $zip_code");
+        error_log("No matching artisans found for form: $form_name (type: $form_type).");
         wp_send_json_error(['message' => 'No matching artisans found.']);
     }
 
-    // Send emails to artisans
+    // Send emails
     $artisan_names = send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details);
-
-    // Send admin summary email
     send_admin_summary_email($artisan_names, $form_name, $zip_code);
 
-    wp_send_json_success(['message' => 'Form submitted successfully and emails sent to artisans.']);
+    wp_send_json_success([
+        'message' => 'Form submitted successfully and emails sent to artisans.'
+    ]);
 }
 
-function get_matching_artisans($form_name, $zip_code) {
+function get_matching_artisans($form_name, $user_lat, $user_lng) {
+    error_log("=== get_matching_artisans() called ===");
+    error_log("Service/Taxonomy name: $form_name");
+    error_log("User lat/lng: $user_lat / $user_lng");
+
+    // Query only by taxonomy
     $args = [
-        'post_type' => 'artisan',
-        'meta_query' => [
-            [
-                'key' => 'zip_code',
-                'value' => $zip_code,
-                'compare' => '='
-            ]
-        ],
-        'tax_query' => [
+        'post_type'      => 'artisan',
+        'posts_per_page' => -1,
+        'tax_query'      => [
             [
                 'taxonomy' => 'global_services',
-                'field' => 'name',
-                'terms' => $form_name
-            ]
-        ]
+                'field'    => 'name',
+                'terms'    => $form_name,
+            ],
+        ],
     ];
 
     $query = new WP_Query($args);
+    error_log("WP_Query found: {$query->found_posts} artisans that match the service.");
+
+    $matching_artisans = [];
 
     if ($query->have_posts()) {
-        $artisans = [];
         while ($query->have_posts()) {
             $query->the_post();
-            $artisans[] = [
-                'name' => get_the_title(),
-                'email' => get_post_meta(get_the_ID(), 'email', true),
-            ];
+            $post_id = get_the_ID();
+            $title   = get_the_title();
+            $email   = get_post_meta($post_id, 'email', true);
+
+            // Coverage data
+            $artisan_lat = get_post_meta($post_id, 'latitude', true);
+            $artisan_lng = get_post_meta($post_id, 'longitude', true);
+            $cover_km    = get_post_meta($post_id, 'distance', true);
+            $covers_all  = get_post_meta($post_id, 'work_throughout_netherlands', true);
+
+            // Log details
+            error_log("Artisan: $title, Lat: $artisan_lat, Lng: $artisan_lng, Coverage: $cover_km km, Covers NL?: ".($covers_all ? 'Yes' : 'No'));
+
+            $is_covered = false;
+
+            if ($covers_all) {
+                // Artisan covers entire Netherlands
+                $is_covered = true;
+            } else {
+                if ($artisan_lat && $artisan_lng && $cover_km && $user_lat && $user_lng) {
+                    // Calculate distance
+                    $distance_to_user = haversine_distance(
+                        floatval($user_lat),
+                        floatval($user_lng),
+                        floatval($artisan_lat),
+                        floatval($artisan_lng)
+                    );
+                    error_log("Distance to user: $distance_to_user km (Limit: $cover_km)");
+
+                    if ($distance_to_user <= floatval($cover_km)) {
+                        $is_covered = true;
+                    }
+                }
+            }
+
+            // If covered, add to results
+            if ($is_covered) {
+                $matching_artisans[] = [
+                    'name'  => $title,
+                    'email' => $email,
+                ];
+                error_log("--> $title MATCHED the coverage requirements.");
+            } else {
+                error_log("--> $title did NOT match coverage requirements.");
+            }
         }
         wp_reset_postdata();
-        return $artisans;
     }
-    return [];
+
+    error_log("Final matched artisans: ". print_r($matching_artisans, true));
+    return $matching_artisans;
 }
 
 function send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details) {
     $artisan_names = [];
 
     foreach ($artisans as $artisan) {
-        $artisan_name = $artisan['name'];
+        $artisan_name  = $artisan['name'];
         $artisan_email = $artisan['email'];
 
         if (is_email($artisan_email)) {
             $email_body = build_artisan_email_body($form_name, $form_fields, $user_details);
-            $subject = "New Job Request in Your Area for $form_name";
-            $headers = ['Content-Type: text/html; charset=UTF-8'];
+            $subject    = "New Job Request in Your Area for $form_name";
+            $headers    = ['Content-Type: text/html; charset=UTF-8'];
 
             $sent = wp_mail($artisan_email, $subject, $email_body, $headers);
             if ($sent) {
@@ -357,7 +424,11 @@ function build_artisan_email_body($form_name, $form_fields, $user_details) {
     ob_start();
     ?>
     <h2>New Job Requested in Your Area for <?php echo esc_html($form_name); ?></h2>
-    <p>A new job has been posted in the area with postal code <strong><?php echo esc_html($user_details['zip_code']); ?></strong> for <strong><?php echo esc_html($form_name); ?></strong> that matches your profile.</p>
+    <p>
+        A new job has been posted in the area with postal code
+        <strong><?php echo esc_html($user_details['zip_code']); ?></strong>
+        for <strong><?php echo esc_html($form_name); ?></strong> that matches your profile.
+    </p>
     
     <h3>Client Details</h3>
     <p><strong>Name:</strong> <?php echo esc_html($user_details['name']); ?></p>
@@ -375,8 +446,12 @@ function build_artisan_email_body($form_name, $form_fields, $user_details) {
         <tbody>
             <?php foreach ($form_fields as $field): ?>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['question']); ?></td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['answer']); ?></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;">
+                        <?php echo esc_html($field['question']); ?>
+                    </td>
+                    <td style="border: 1px solid #ccc; padding: 8px;">
+                        <?php echo esc_html($field['answer']); ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -386,14 +461,17 @@ function build_artisan_email_body($form_name, $form_fields, $user_details) {
 }
 
 function send_admin_summary_email($artisan_names, $form_name, $zip_code) {
-    $to = 'admin@artisan.com';
+    $to      = 'admin@artisan.com';
     $subject = "Summary of Job Request for $form_name";
     $headers = ['Content-Type: text/html; charset=UTF-8'];
 
     ob_start();
     ?>
     <h2>Summary of Job Request for <?php echo esc_html($form_name); ?></h2>
-    <p>The job was posted in the area with postal code <strong><?php echo esc_html($zip_code); ?></strong>.</p>
+    <p>
+        The job was posted in the area with postal code
+        <strong><?php echo esc_html($zip_code); ?></strong>.
+    </p>
     <h3>Artisans Notified</h3>
     <ul>
         <?php foreach ($artisan_names as $name): ?>
@@ -410,5 +488,3 @@ function send_admin_summary_email($artisan_names, $form_name, $zip_code) {
         error_log('Failed to send admin summary email.');
     }
 }
-
-?>

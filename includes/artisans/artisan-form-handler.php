@@ -112,8 +112,8 @@ function kazverse_artisan_process_form() {
         store_artisan_meta($post_id, 'distance', $data['step5']['distance'], 'intval');
     }
 
-    if ( isset($data['step5']['work_throughout_austria']) ) {
-        store_artisan_meta($post_id, 'work_throughout_austria', $data['step5']['work_throughout_austria'], 'boolval');
+    if ( isset($data['step5']['work_throughout_netherlands']) ) {
+        store_artisan_meta($post_id, 'work_throughout_netherlands', $data['step5']['work_throughout_netherlands'], 'boolval');
     }
 
     if ( isset($data['step5']['latitude']) ) {
@@ -157,6 +157,6 @@ function kazverse_artisan_process_form() {
     }
 
     // 6. All done! Redirect to a thank-you page or show success
-    wp_redirect( home_url('/') );
+    wp_redirect( get_permalink($post_id) );
     exit;
 }
