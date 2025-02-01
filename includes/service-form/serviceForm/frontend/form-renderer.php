@@ -214,7 +214,7 @@ function render_service_form_shortcode($atts) {
                                     render_zipcode_field_with_place_selector(
                                         'zip_code',
                                         'zip_code',
-                                        'eg. 5400',
+                                        'eg. 5061 AA',
                                         'Zip code'
                                     );
                                     ?>

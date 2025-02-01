@@ -79,7 +79,7 @@ function render_artisan_registration_step_1() {
         <!-- Zip Code Field -->
         <div class="form-group">
             <?php
-            render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5400','Zip Code *');
+            render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5061 AA','Zip Code *');
             ?>
             
             <!-- Inline error for zip -->
@@ -1166,7 +1166,7 @@ function render_artisan_registration_step_8() {
         <!-- Zip Code and City (Grouped) -->
         <div class="f8_form_group form-group">
             <?php
-            render_zipcode_field_with_place_selector('f8_zip_code','f8_zip_code','eg. 5400','Zip Code *');
+            render_zipcode_field_with_place_selector('f8_zip_code','f8_zip_code','eg. 5061 AA','Zip Code *');
             ?>
             <span id="zipCity-error" class="error-msg" style="display:none; color:red;"></span>
         </div>

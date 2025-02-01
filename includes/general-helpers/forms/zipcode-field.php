@@ -2,7 +2,7 @@
 function render_zipcode_field_with_place_selector(
     $name = 'zip_code',
     $id = 'zipcode',
-    $placeholder = 'eg. 5400',
+    $placeholder = 'eg. 5061 AA',
     $label = 'Zip Code *',
     $required = false
 ) {
@@ -15,6 +15,7 @@ function render_zipcode_field_with_place_selector(
             name="<?php echo esc_attr($name); ?>" 
             class="zip-input-field" 
             maxlength="6" 
+            style="padding: 0.5rem 0rem;"
             placeholder="<?php echo esc_attr($placeholder); ?>"
         />
         
