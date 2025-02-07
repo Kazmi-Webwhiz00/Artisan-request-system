@@ -19,7 +19,7 @@ function render_zipcode_field_with_place_selector(
         />
         
         <!-- Place display and suggestions -->
-        <span class="zip-place-display" id="<?php echo esc_attr($id); ?>-place"></span>
+        <span class="zip-place-display" id="<?php echo esc_attr($id); ?>-place" name="zip_code_place"></span>
         <div class="zip-suggestions" id="<?php echo esc_attr($id); ?>-suggestions"></div>
         
         <!-- Hidden fields for lat/lng -->

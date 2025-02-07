@@ -241,6 +241,7 @@ jQuery(document).ready(function ($) {
         const phone = $('#phone').val() || '';
         const lat = $('#zip_code-lat').val() || '';
         const lng = $('#zip_code-lng').val()  || '';
+        const zipPlace = $('span[name="zip_code_place"]').text().trim() || '';
 
         return {
             zip_code: zipCode,
@@ -248,7 +249,8 @@ jQuery(document).ready(function ($) {
             email: email,
             phone: phone,
             zip_code_lat: lat,
-            zip_code_lng: lng
+            zip_code_lng: lng,
+            zipPlace: zipPlace
         };
     }
 

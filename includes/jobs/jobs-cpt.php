@@ -49,10 +49,11 @@ add_action('init', 'register_service_job_cpt');
 function register_service_job_meta_fields() {
     $fields = array(
         // Job Details
-        'job_description'    => array('type' => 'string', 'single' => true, 'show_in_rest' => true),
-        'job_location'       => array('type' => 'string', 'single' => true, 'show_in_rest' => true),
         'job_zip_code'       => array('type' => 'string', 'single' => true, 'show_in_rest' => true),
         'job_details_json'   => array('type' => 'string', 'single' => true, 'show_in_rest' => true), // JSON Data
+        'latitude'           => array('type' => 'number', 'single' => true, 'show_in_rest' => true), // New field
+        'longitude'          => array('type' => 'number', 'single' => true, 'show_in_rest' => true), // New field
+        'city'               => array('type' => 'string', 'single' => true, 'show_in_rest' => true), // New field
 
         // Client Details
         'client_name'        => array('type' => 'string', 'single' => true, 'show_in_rest' => true),
