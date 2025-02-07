@@ -214,7 +214,7 @@ function render_service_form_shortcode($atts) {
                                     render_zipcode_field_with_place_selector(
                                         'zip_code',
                                         'zip_code',
-                                        'eg. 5400',
+                                        'eg. 5061 AA',
                                         'Zip code'
                                     );
                                     ?>
@@ -307,7 +307,7 @@ function handle_service_form_submission() {
 
     if (empty($artisans)) {
         error_log("No matching artisans found for form: $form_name (type: $form_type).");
-        wp_send_json_error(['message' => 'No matching artisans found.']);
+        wp_send_json_error(['message' => 'No matching artisans found in your area.']);
     }
 
     // Send emails
