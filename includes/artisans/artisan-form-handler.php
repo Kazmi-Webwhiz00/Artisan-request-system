@@ -49,10 +49,17 @@ function kazverse_artisan_process_form() {
         }
     }
 
+    $user_id = isset($data['step2']['userId']) && is_numeric($data['step2']['userId']) ? intval($data['step2']['userId']) : null;
+
+    if (empty($user_id) || $user_id <= 0) {
+        wp_send_json_error(['message' => 'Invalid or missing user ID.']);
+    }
+    
     // 5. Insert a new Artisan post (status: "publish" or "pending" as you wish)
     $post_id = wp_insert_post(array(
         'post_type'   => 'artisan',
         'post_title'  => $post_title,
+        'post_author'  => $user_id,
         'post_status' => 'publish',  // or 'pending'
     ));
     if ( is_wp_error($post_id) ) {
@@ -156,7 +163,9 @@ function kazverse_artisan_process_form() {
         store_artisan_meta($post_id, 'description', $data['step11']['description'], 'sanitize_textarea_field');
     }
 
+
+    kz_login_user($user_id);
     // 6. All done! Redirect to a thank-you page or show success
-    wp_redirect( get_permalink($post_id) );
+    wp_redirect( home_url('/job-lisitng-page/') );
     exit;
 }

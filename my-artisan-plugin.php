@@ -2,7 +2,7 @@
 /*
 Plugin Name: Kazverse Artisan Plugin
 Description: A custom WordPress plugin by Kazverse for managing artisan registration and service requests.
-Version: 1.0.5
+Version: 1.0.6
 Author: Kazverse
 Author URI: https://kazverse.com
 Text Domain: kazverse-artisan-plugin
@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // Include artisan-related files
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-cpt.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/jobs/jobs-cpt.php';
+include_once plugin_dir_path(__FILE__) .  'includes/jobs/jobs-listing.php';
+
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-registration-form.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-form-handler.php';
 include_once plugin_dir_path( __FILE__ ) . 'includes/artisans/artisan-helpers.php';

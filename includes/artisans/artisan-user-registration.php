@@ -36,8 +36,10 @@ function ajax_create_artisan_user() {
     // Send email to the user
     send_user_email($email, $first_name, $last_name, $password);
 
-
-    wp_send_json_success('User created successfully, and email sent.');
+    wp_send_json_success([
+        'message' => 'User created successfully, and email sent.',
+        'user_id' => $user_id
+    ]);
 }
 
 /**

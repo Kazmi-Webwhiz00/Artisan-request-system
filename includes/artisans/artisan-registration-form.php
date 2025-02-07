@@ -516,7 +516,10 @@ function render_artisan_registration_step_2() {
                 if (!response) throw new Error("No response from server");
                 if (response.success) {
                     // User creation success
-                    console.log('User created:', response.data);
+                    console.log('User created:', response.data.message);;
+
+                    window.kazverseRegistrationData.step2.userId  = response.data.user_id;
+
 
                     // Make Step 2 fields read-only
                     firstNameInput.readOnly = true;
@@ -773,7 +776,7 @@ function render_artisan_registration_step_4() {
 // Function to render Step 5
 function render_artisan_registration_step_5() {
     ?>
-    <div class="form-step form-step-5">
+    <div class="form-step form-step-5" >
         <!-- Progress Bar -->
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
