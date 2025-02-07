@@ -164,8 +164,11 @@ function kazverse_artisan_process_form() {
     }
 
 
-    kz_login_user($user_id);
+    wp_set_current_user($user_id);
+    wp_set_auth_cookie($user_id);
+    do_action('wp_login', get_userdata($user_id)->user_login, get_userdata($user_id));
+
     // 6. All done! Redirect to a thank-you page or show success
-    wp_redirect( home_url('/job-lisitng-page/') );
+    wp_redirect( home_url('/job-listing-page/') );
     exit;
 }

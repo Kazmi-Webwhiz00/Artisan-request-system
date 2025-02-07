@@ -1,109 +1,170 @@
 /**************************************************************
- * LISTING CARDS (UNCHANGED / SLIGHT REFINEMENT)
+ * GENERAL STYLES & RESPONSIVE
  **************************************************************/
- .artisan-job-listings {
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+#job-filter-form{
+  width: 300px;
+}
+
+/**************************************************************
+ * LISTING CARDS
+ **************************************************************/
+.artisan-job-listings {
     max-width: 800px;
-    margin: 0 auto;
-    padding: 20px 0;
-  }
-  
-  .artisan-job-listings h2 {
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.filter-header h2 {
     font-size: 24px;
-    margin-bottom: 1.5rem;
-  }
-  
-  .artisan-job-listings .job-list {
+    margin: 0 0 10px;
+}
+
+.job-filter-select {
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* Divider */
+.divider {
+    border: none;
+    border-bottom: 1px solid #e2e2e2;
+    margin: 15px 0;
+}
+
+.jobs-section {
+    padding: 10px 0;
+}
+
+.job-list {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-  
-  .artisan-job-listings .job-list .job-item {
+}
+
+.job-item {
     margin-bottom: 20px;
     cursor: pointer;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card {
+}
+
+.job-card {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     background: #fff;
     border: 1px solid #e2e2e2;
     border-radius: 8px;
     padding: 20px;
-    transition: background 0.3s;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card:hover {
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.job-card:hover {
     background: #fafafa;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .job-info {
-    flex: 1;
-    margin-right: 20px;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .job-info h3 {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.job-info {
+    margin-bottom: 15px;
+}
+
+.job-info .meta {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.job-info .job-title {
     margin: 4px 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: #333;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .job-info .meta {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .job-info .excerpt {
-    font-size: 14px;
+}
+
+.job-info .excerpt {
+    font-size: 15px;
     color: #555;
-    margin: 6px 0;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .client-name {
+    margin: 10px 0;
+}
+
+.job-info .details span {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.client-name {
     font-weight: 400;
     color: #333;
-    margin-top: 6px;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .view-job-button {
-    padding: 10px 14px;
-    background: #333;
+}
+
+.view-job-button {
+    align-self: flex-end;
+    padding: 10px 16px;
+    background: #0073aa;
     color: #fff;
     border: none;
     font-size: 14px;
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s;
-  }
-  
-  .artisan-job-listings .job-list .job-item .job-card .view-job-button:hover {
-    background: #000;
-  }
-  /**************************************************************
- * BASIC OVERLAY / BACKDROP LAYOUT
+}
+
+.view-job-button:hover {
+    background: #005177;
+}
+
+/**************************************************************
+ * OVERLAY / MODAL STYLES
  **************************************************************/
 .overlay-backdrop {
     position: fixed;
-    inset: 0; /* same as top:0; right:0; bottom:0; left:0 */
+    inset: 0;
     background: rgba(0,0,0,0.5);
     z-index: 900;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease;
-  }
-  
-  .overlay-backdrop.visible {
+}
+
+.overlay-backdrop.visible {
     opacity: 1;
     visibility: visible;
-  }
-  
-  .overlay {
+}
+
+.overlay {
     position: fixed;
     top: 0;
     right: 0;
-    width: 450px; /* or 480px, 500px—whatever you need */
+    width: 100%;
+    max-width: 450px;
     height: 100%;
     background: #fff;
     box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
@@ -112,49 +173,42 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-  }
-  
-  .overlay.visible {
+}
+
+.overlay.visible {
     transform: translateX(0);
-    z-index: 9999999;
-  }
-  
-  /**************************************************************
-   * OVERLAY HEADER (TITLE & CLOSE BUTTON)
-   **************************************************************/
-  .overlay__header {
+}
+
+.overlay__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
     background: #f9f9f9;
     border-bottom: 1px solid #e2e2e2;
-  }
-  
-  .overlay__header h2 {
+}
+
+.overlay__header h2 {
     margin: 0;
     font-size: 20px;
     font-weight: 500;
-  }
-  
-  .close-overlay {
+}
+
+.close-overlay {
     font-size: 24px;
     cursor: pointer;
     background: none;
     border: none;
     line-height: 1;
-  }
-  
-  /**************************************************************
-   * TABS (BRIEF / CLIENT INFO)
-   **************************************************************/
-  .overlay__tabs {
+}
+
+.overlay__tabs {
     display: flex;
     border-bottom: 1px solid #e2e2e2;
     background: #f9f9f9;
-  }
-  
-  .overlay-tab {
+}
+
+.overlay-tab {
     flex: 1;
     padding: 12px 0;
     border: none;
@@ -165,143 +219,153 @@
     transition: background 0.2s;
     color: #666;
     position: relative;
-  }
-  
-  .overlay-tab:hover {
+}
+
+.overlay-tab:hover {
     background: #efefef;
-  }
-  
-  .overlay-tab.active {
+}
+
+.overlay-tab.active {
     font-weight: 600;
     color: #000;
     background: #fff;
     border-bottom: 2px solid #000;
-  }
-  
-  /**************************************************************
-   * MAIN SCROLLABLE BODY
-   **************************************************************/
-  .overlay__body {
+}
+
+.overlay__body {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     font-size: 15px; 
     line-height: 1.5;
-  }
-  
-  .tab-content {
-    display: none; /* Toggled via JS */
-  }
-  
-  .tab-content.active {
+}
+
+/* Show active tab content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
     display: block;
-  }
-  
-  /**************************************************************
-   * BRIEF TAB STYLES
-   **************************************************************/
-  /* “Brief” heading, subhead, paragraphs, etc. */
-  #brief-tab h2 {
+}
+
+/**************************************************************
+ * BRIEF TAB STYLES
+ **************************************************************/
+#brief-tab h2 {
     font-size: 22px;
     margin-bottom: 8px;
-  }
-  
-  #brief-tab .posted-info {
+}
+
+#brief-tab .meta {
     color: #666;
     margin-bottom: 16px;
-  }
-  
-  /* Example table or pair-based styling for details (budget, timeline, etc.) */
-  .brief-details {
+}
+
+.brief-details {
     display: grid;
-    grid-template-columns: max-content 1fr; /* label & value */
+    grid-template-columns: max-content 1fr;
     gap: 4px 16px;
     margin-bottom: 18px;
-  }
-  .brief-details .label {
+}
+
+.brief-details .label {
     font-weight: 600;
     color: #444;
-    white-space: nowrap;
-  }
-  .brief-details .value {
+}
+
+.brief-details .value {
     color: #333;
-  }
-  
-  #brief-tab .description-section {
+}
+
+#brief-tab .description-section {
     margin-bottom: 20px;
-  }
-  #brief-tab .description-section h3 {
+}
+
+#brief-tab .description-section h3 {
     margin: 14px 0 6px;
     font-size: 16px;
     font-weight: 600;
-  }
-  
-  /**************************************************************
-   * CLIENT INFO TAB STYLES
-   **************************************************************/
-  #client-info-tab h3 {
+}
+
+/**************************************************************
+ * CLIENT INFO TAB STYLES
+ **************************************************************/
+#client-info-tab h3 {
     margin-top: 0;
     margin-bottom: 12px;
-  }
-  
-  .client-profile {
+}
+
+.client-profile {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-  }
-  .client-profile img.avatar {
+}
+
+.client-profile img.avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
     object-fit: cover;
-  }
-  .client-profile .client-name {
+}
+
+.client-profile .client-name {
     font-weight: 600;
     font-size: 16px;
     margin: 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .client-meta {
+}
+
+.client-meta {
     display: flex;
     align-items: center;
     font-size: 14px;
     color: #666;
     margin-top: 5px;
-  }
-  .client-meta i {
-    margin-right: 4px; /* for an icon if you have Font Awesome, etc. */
-  }
-  
-  /* You can also do label-value style for location, etc. */
-  .client-info-list {
+}
+
+.client-meta i {
+    margin-right: 4px;
+}
+
+.client-info-list {
     margin-top: 15px;
     font-size: 14px;
-  }
-  .client-info-list .info-item {
+}
+
+.client-info-list .info-item {
     margin-bottom: 8px;
-  }
-  .client-info-list .info-item strong {
+}
+
+.client-info-list .info-item strong {
     font-weight: 600;
     margin-right: 6px;
-  }
-  
-  /**************************************************************
-   * EXAMPLE FOR Q&A TABLE (IF ANY)
-   **************************************************************/
-  #overlay-job-details {
+}
+
+#overlay-job-details {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-  }
-  
-  #overlay-job-details th,
-  #overlay-job-details td {
+}
+
+#overlay-job-details th,
+#overlay-job-details td {
     border: 1px solid #ccc;
     padding: 6px;
     text-align: left;
     font-size: 14px;
-  }
-  
+}
+
+/**************************************************************
+ * MEDIA QUERIES
+ **************************************************************/
+@media (min-width: 600px) {
+    .job-card {
+        flex-direction: row;
+        align-items: center;
+    }
+    .job-info {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}

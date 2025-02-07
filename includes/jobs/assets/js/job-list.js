@@ -8,11 +8,11 @@ jQuery(document).ready(function ($) {
             return;
         }
 
-        // Populate "Brief" tab
+        // Populate "Brief" tab using the new keys
         $('#overlay-job-title').text(jobData.title || 'No Title');
-        $('#overlay-posted-time').text(jobData.time_ago || 'N/A');
+        $('#overlay-posted-time').text(jobData.posted || 'N/A'); // changed from jobData.time_ago
         $('#overlay-location').text(jobData.city || 'Unknown');
-        $('#overlay-distance').text(jobData.distance || 'Unknown');
+        $('#overlay-distance').text(jobData.distance || 'Unknown'); // uses the new "distance" key
         
         // If service_type is an array, join it
         var serviceType = jobData.service_type;
@@ -33,7 +33,7 @@ jQuery(document).ready(function ($) {
             });
         }
 
-        // "Client Info" tab
+        // Populate "Client Info" tab
         $('#overlay-client-name').text(jobData.client_name || 'N/A');
         $('#overlay-client-email').text(jobData.client_email || 'N/A');
         $('#overlay-client-phone').text(jobData.client_phone || 'N/A');
@@ -49,17 +49,16 @@ jQuery(document).ready(function ($) {
         $('#client-info-tab').hide();
     });
 
-    // Closing
+    // Closing overlay
     $('.close-overlay, #overlay-backdrop').on('click', function () {
         $('#job-detail-overlay').removeClass('visible').addClass('hidden');
         $('#overlay-backdrop').removeClass('visible').addClass('hidden');
     });
 
-    // Tabs
+    // Tab switching
     $('.overlay-tab').on('click', function () {
         $('.overlay-tab').removeClass('active');
         $(this).addClass('active');
-
         var tab = $(this).data('tab');
         $('.tab-content').hide();
         $('#' + tab).show();
