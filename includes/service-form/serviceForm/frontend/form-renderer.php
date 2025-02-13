@@ -321,6 +321,9 @@ function handle_service_form_submission() {
         wp_send_json_error(['message' => 'No matching artisans found in your area.']);
     }
 
+    // *** New: Send email to client with the matched artisan details ***
+    send_client_email($user_details, $artisans, $form_name, $form_fields);
+    
     // Send emails
     $artisan_names = send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details);
     send_admin_summary_email($artisan_names, $form_name, $zip_code);
@@ -329,6 +332,76 @@ function handle_service_form_submission() {
         'message' => 'Form submitted successfully and emails sent to artisans.'
     ]);
 }
+
+
+/**
+ * Build the email body for the client, listing the matched artisans and the job details.
+ */
+function build_client_email_body($user_details, $artisans, $form_name, $form_fields) {
+    ob_start();
+    ?>
+    <h2>Thank you, <?php echo esc_html($user_details['name']); ?>!</h2>
+    <p>
+        Your job request for <strong><?php echo esc_html($form_name); ?></strong> has been received.
+        We have found the following local artisans who might be a great fit for your project:
+    </p>
+    <ul>
+        <?php foreach ($artisans as $artisan): ?>
+            <li style="margin-bottom: 15px;">
+                <strong><?php echo esc_html($artisan['name']); ?></strong><br>
+                Email: <?php echo esc_html($artisan['email']); ?><br>
+                Phone: <?php echo esc_html($artisan['phone'] ?? 'N/A'); ?><br>
+                Trades: <?php echo esc_html($artisan['categories'] ?? 'N/A'); ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    <h3>Your Job Details:</h3>
+    <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ccc; padding: 8px;">Question</th>
+                <th style="border: 1px solid #ccc; padding: 8px;">Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($form_fields as $field): ?>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['question']); ?></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><?php echo esc_html($field['answer']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <p>
+        We will be in touch shortly with further details.
+    </p>
+    <?php
+    return ob_get_clean();
+}
+
+
+/**
+ * Send an email to the client with details of the matched artisans.
+ */
+function send_client_email($user_details, $artisans, $form_name, $form_fields) {
+    $client_email = $user_details['email'] ?? '';
+    if (!is_email($client_email)) {
+        error_log("Invalid client email: " . $client_email);
+        return;
+    }
+
+    $email_body = build_client_email_body($user_details, $artisans, $form_name, $form_fields);
+    $subject    = "Your '$form_name' Request – Matched Artisans in Your Area";
+    $headers    = ['Content-Type: text/html; charset=UTF-8'];
+
+    $sent = wp_mail($client_email, $subject, $email_body, $headers);
+    if ($sent) {
+        error_log("Client email sent successfully to $client_email");
+    } else {
+        error_log("Failed to send client email to $client_email");
+    }
+}
+
 
 function get_matching_artisans($form_name, $user_lat, $user_lng) {
     error_log("=== get_matching_artisans() called ===");
@@ -359,6 +432,14 @@ function get_matching_artisans($form_name, $user_lat, $user_lng) {
             $post_id = get_the_ID();
             $title   = get_the_title();
             $email   = get_post_meta($post_id, 'email', true);
+            $phone   = get_post_meta($post_id, 'phone', true);
+
+            // 'selected_trades' holds the artisan's categories (if stored as a string or comma-separated list)
+            $selected_trades = get_post_meta($post_id, 'selected_trades', true);
+            $selected_trades = maybe_unserialize($selected_trades);
+            if ( is_array($selected_trades) ) {
+                $selected_trades = implode(', ', $selected_trades);
+            }
 
             // Coverage data
             $artisan_lat = get_post_meta($post_id, 'latitude', true);
@@ -367,7 +448,7 @@ function get_matching_artisans($form_name, $user_lat, $user_lng) {
             $covers_all  = get_post_meta($post_id, 'work_throughout_netherlands', true);
 
             // Log details
-            error_log("Artisan: $title, Lat: $artisan_lat, Lng: $artisan_lng, Coverage: $cover_km km, Covers NL?: ".($covers_all ? 'Yes' : 'No'));
+            error_log("Artisan: $title, Lat: $artisan_lat, Lng: $artisan_lng, Coverage: $cover_km km, Covers NL?: " . ($covers_all ? 'Yes' : 'No'));
 
             $is_covered = false;
 
@@ -391,11 +472,13 @@ function get_matching_artisans($form_name, $user_lat, $user_lng) {
                 }
             }
 
-            // If covered, add to results
+            // If covered, add to results with additional details
             if ($is_covered) {
                 $matching_artisans[] = [
-                    'name'  => $title,
-                    'email' => $email,
+                    'name'       => $title,
+                    'email'      => $email,
+                    'phone'      => $phone,
+                    'categories' => $selected_trades,
                 ];
                 error_log("--> $title MATCHED the coverage requirements.");
             } else {
@@ -405,9 +488,10 @@ function get_matching_artisans($form_name, $user_lat, $user_lng) {
         wp_reset_postdata();
     }
 
-    error_log("Final matched artisans: ". print_r($matching_artisans, true));
+    error_log("Final matched artisans: " . print_r($matching_artisans, true));
     return $matching_artisans;
 }
+
 
 function send_emails_to_artisans($artisans, $form_name, $form_fields, $user_details) {
     $artisan_names = [];
