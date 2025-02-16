@@ -27,7 +27,7 @@ add_action( 'wp_enqueue_scripts', 'enqueue_job_list_assets' );
  */
 function artisan_job_listings_shortcode() {
     if ( ! is_user_logged_in() ) {
-        return '<p>You must be logged in to view available jobs.</p>';
+        return '<p>' . esc_html__( 'You must be logged in to view available jobs.', 'kazverse-artisan-plugin' ) . '</p>';
     }
     $user_id = get_current_user_id();
     $artisan_post = get_posts( array(
@@ -37,12 +37,12 @@ function artisan_job_listings_shortcode() {
         'author'      => $user_id,
     ) );
     if ( empty( $artisan_post ) ) {
-        return '<p>No artisan profile found for your account.</p>';
+        return '<p>' . esc_html__( 'No artisan profile found for your account.', 'kazverse-artisan-plugin' ) . '</p>';
     }
     $artisan_post_id = $artisan_post[0]->ID;
     $artisan_trades = wp_get_post_terms( $artisan_post_id, 'global_services', array( 'fields' => 'names' ) );
     if ( empty( $artisan_trades ) ) {
-        return '<p>No trade type found for your artisan profile.</p>';
+        return '<p>' . esc_html__( 'No trade type found for your artisan profile.', 'kazverse-artisan-plugin' ) . '</p>';
     }
     $artisan_lat      = get_post_meta( $artisan_post_id, 'latitude', true );
     $artisan_lng      = get_post_meta( $artisan_post_id, 'longitude', true );
@@ -67,7 +67,7 @@ function artisan_job_listings_shortcode() {
     );
     $jobs_query = new WP_Query( $args );
     if ( ! $jobs_query->have_posts() ) {
-        return '<p>No jobs available matching your trade.</p>';
+        return '<p>' . esc_html__( 'No jobs available matching your trade.', 'kazverse-artisan-plugin' ) . '</p>';
     }
 
     $all_jobs     = array();
@@ -83,7 +83,7 @@ function artisan_job_listings_shortcode() {
         $client_name   = get_post_meta( $job_id, 'client_name', true );
         $client_email  = get_post_meta( $job_id, 'client_email', true );
         $client_phone  = get_post_meta( $job_id, 'client_phone', true );
-        $published_ago = human_time_diff( get_post_time( 'U', true, $job_id ), current_time( 'timestamp' ) ) . ' ago';
+        $published_ago = human_time_diff( get_post_time( 'U', true, $job_id ), current_time( 'timestamp' ) ) . ' ' . esc_html__( 'ago', 'kazverse-artisan-plugin' );
         
         $job_details       = get_post_meta( $job_id, 'job_details_json', true );
         $job_details_array = json_decode( $job_details, true );
@@ -97,16 +97,16 @@ function artisan_job_listings_shortcode() {
         $distance_info = '';
         if ( ! empty( $artisan_lat ) && ! empty( $artisan_lng ) && ! empty( $job_lat ) && ! empty( $job_lng ) ) {
             $distance      = haversine_distance( floatval( $artisan_lat ), floatval( $artisan_lng ), floatval( $job_lat ), floatval( $job_lng ) );
-            $distance_info = round( $distance, 2 ) . ' km';
+            $distance_info = round( $distance, 2 ) . ' ' . esc_html__( 'km', 'kazverse-artisan-plugin' );
         }
         // Build job data with new keys 'posted' and 'distance'
         $job_data = array(
             'id'               => $job_id,
             'title'            => $job_title,
-            'posted'           => $published_ago,   // new key for overlay
+            'posted'           => $published_ago,
             'excerpt'          => $job_excerpt,
             'city'             => $job_city,
-            'distance'         => $distance_info,   // new key for overlay
+            'distance'         => $distance_info,
             'numeric_distance' => $distance,
             'client_name'      => $client_name,
             'client_email'     => $client_email,
@@ -130,7 +130,7 @@ function artisan_job_listings_shortcode() {
     <main class="artisan-job-listings" role="main">
         <!-- Header Row with Title and Dropdown Filter -->
         <div class="filter-header">
-            <h2>Your Matches</h2>
+            <h2><?php echo esc_html__( 'Your Matches', 'kazverse-artisan-plugin' ); ?></h2>
             <form method="get" id="job-filter-form">
                 <?php 
                     // Preserve other GET parameters
@@ -140,10 +140,10 @@ function artisan_job_listings_shortcode() {
                         }
                     }
                     $filter_options = array(
-                        'all'     => 'Show All Jobs',
-                        'covered' => 'My Covered Areas',
+                        'all'     => esc_html__( 'Show All Jobs', 'kazverse-artisan-plugin' ),
+                        'covered' => esc_html__( 'My Covered Areas', 'kazverse-artisan-plugin' ),
                     );
-                    echo '<label for="job_filter" class="visually-hidden">Filter Jobs</label>';
+                    echo '<label for="job_filter" class="visually-hidden">' . esc_html__( 'Filter Jobs', 'kazverse-artisan-plugin' ) . '</label>';
                     render_select_field(
                         'job_filter',
                         'job_filter',
@@ -151,7 +151,10 @@ function artisan_job_listings_shortcode() {
                         $filter_options,
                         $filter,
                         false,
-                        array( 'onchange' => "document.getElementById('job-filter-form').submit();", 'class' => 'job-filter-select' )
+                        array(
+                            'onchange' => "document.getElementById('job-filter-form').submit();", 
+                            'class'    => 'job-filter-select'
+                        )
                     );
                 ?>
             </form>
@@ -173,10 +176,10 @@ function artisan_job_listings_shortcode() {
                                     <?php if ( $job['city'] || $job['distance'] ) : ?>
                                         <p class="meta details">
                                             <?php if ( $job['city'] ) : ?>
-                                                <span class="location"><strong>Location:</strong> <?php echo esc_html( $job['city'] ); ?></span>
+                                                <span class="location"><strong><?php echo esc_html__( 'Location:', 'kazverse-artisan-plugin' ); ?></strong> <?php echo esc_html( $job['city'] ); ?></span>
                                             <?php endif; ?>
                                             <?php if ( $job['distance'] ) : ?>
-                                                <span class="distance"><strong>Distance:</strong> <?php echo esc_html( $job['distance'] ); ?></span>
+                                                <span class="distance"><strong><?php echo esc_html__( 'Distance:', 'kazverse-artisan-plugin' ); ?></strong> <?php echo esc_html( $job['distance'] ); ?></span>
                                             <?php endif; ?>
                                         </p>
                                     <?php endif; ?>
@@ -184,13 +187,15 @@ function artisan_job_listings_shortcode() {
                                         <p class="client-name"><?php echo esc_html( $job['client_name'] ); ?></p>
                                     <?php endif; ?>
                                 </div>
-                                <button class="view-job-button" aria-label="View brief for <?php echo esc_attr( $job['title'] ); ?>">View brief</button>
+                                <button class="view-job-button" aria-label="<?php echo esc_attr__( 'View brief for ', 'kazverse-artisan-plugin' ) . esc_attr( $job['title'] ); ?>">
+                                    <?php echo esc_html__( 'View brief', 'kazverse-artisan-plugin' ); ?>
+                                </button>
                             </div>
                         </li>
                     <?php endforeach; ?>
                 </ul>
             <?php else: ?>
-                <p class="no-results">No jobs to display.</p>
+                <p class="no-results"><?php echo esc_html__( 'No jobs to display.', 'kazverse-artisan-plugin' ); ?></p>
             <?php endif; ?>
         </section>
     </main>
@@ -198,28 +203,28 @@ function artisan_job_listings_shortcode() {
     <div id="overlay-backdrop" class="overlay-backdrop hidden" tabindex="-1"></div>
     <div id="job-detail-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <div class="overlay__header">
-            <h2 id="overlay-title">Job Preview</h2>
-            <button class="close-overlay" aria-label="Close">&times;</button>
+            <h2 id="overlay-title"><?php echo esc_html__( 'Job Preview', 'kazverse-artisan-plugin' ); ?></h2>
+            <button class="close-overlay" aria-label="<?php echo esc_attr__( 'Close', 'kazverse-artisan-plugin' ); ?>">&times;</button>
         </div>
         <div class="overlay__tabs" role="tablist">
-            <button class="overlay-tab active" data-tab="brief-tab" role="tab" aria-selected="true">Brief</button>
-            <button class="overlay-tab" data-tab="client-info-tab" role="tab" aria-selected="false">Client Info</button>
+            <button class="overlay-tab active" data-tab="brief-tab" role="tab" aria-selected="true"><?php echo esc_html__( 'Brief', 'kazverse-artisan-plugin' ); ?></button>
+            <button class="overlay-tab" data-tab="client-info-tab" role="tab" aria-selected="false"><?php echo esc_html__( 'Client Info', 'kazverse-artisan-plugin' ); ?></button>
         </div>
         <div class="overlay__body">
             <div class="tab-content active" id="brief-tab" role="tabpanel">
                 <h2 id="overlay-job-title"></h2>
-                <p class="meta"><strong>Posted:</strong> <span id="overlay-posted-time"></span></p>
-                <p class="meta"><strong>Location:</strong> <span id="overlay-location"></span><br/><strong>Distance:</strong> <span id="overlay-distance"></span></p>
-                <strong>Service Type:</strong> <p id="overlay-service-type"></p>
+                <p class="meta"><strong><?php echo esc_html__( 'Posted:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-posted-time"></span></p>
+                <p class="meta"><strong><?php echo esc_html__( 'Location:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-location"></span><br/><strong><?php echo esc_html__( 'Distance:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-distance"></span></p>
+                <strong><?php echo esc_html__( 'Service Type:', 'kazverse-artisan-plugin' ); ?></strong> <p id="overlay-service-type"></p>
                 <p id="overlay-excerpt"></p>
-                <h3>Details</h3>
+                <h3><?php echo esc_html__( 'Details', 'kazverse-artisan-plugin' ); ?></h3>
                 <table id="overlay-job-details"></table>
             </div>
             <div class="tab-content" id="client-info-tab" role="tabpanel">
-                <h3>Client Info</h3>
-                <p><strong>Name:</strong> <span id="overlay-client-name"></span></p>
-                <p><strong>Email:</strong> <span id="overlay-client-email"></span></p>
-                <p><strong>Phone:</strong> <span id="overlay-client-phone"></span></p>
+                <h3><?php echo esc_html__( 'Client Info', 'kazverse-artisan-plugin' ); ?></h3>
+                <p><strong><?php echo esc_html__( 'Name:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-client-name"></span></p>
+                <p><strong><?php echo esc_html__( 'Email:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-client-email"></span></p>
+                <p><strong><?php echo esc_html__( 'Phone:', 'kazverse-artisan-plugin' ); ?></strong> <span id="overlay-client-phone"></span></p>
             </div>
         </div>
     </div>

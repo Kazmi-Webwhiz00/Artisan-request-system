@@ -51,10 +51,10 @@ function render_artisan_registration_step_1() {
             'hide_empty' => false, // Include terms even if not assigned to posts
         ]);
 
-        $trades = ['' => 'Select your trade'];
-        if (!is_wp_error($terms) && !empty($terms)) {
-            foreach ($terms as $term) {
-                $trades[sanitize_title($term->name)] = $term->name;
+        $trades = ['' => __( 'Select your trade', 'kazverse-artisan-plugin' )];
+        if ( !is_wp_error( $terms ) && !empty( $terms ) ) {
+            foreach ( $terms as $term ) {
+                $trades[sanitize_title( $term->name )] = $term->name;
             }
         }
     ?>
@@ -66,7 +66,7 @@ function render_artisan_registration_step_1() {
             render_select_field(
                 'trade',
                 'trade',
-                'Trade',
+                __( 'Trade', 'kazverse-artisan-plugin' ),
                 $trades,
                 '',
                 true // Required
@@ -79,7 +79,12 @@ function render_artisan_registration_step_1() {
         <!-- Zip Code Field -->
         <div class="form-group">
             <?php
-            render_zipcode_field_with_place_selector('zip_code','zip_code','eg. 5061 AA','Zip Code *');
+            render_zipcode_field_with_place_selector(
+                'zip_code',
+                'zip_code',
+                __( 'eg. 5061 AA', 'kazverse-artisan-plugin' ),
+                __( 'Zip Code *', 'kazverse-artisan-plugin' )
+            );
             ?>
             
             <!-- Inline error for zip -->
@@ -92,8 +97,8 @@ function render_artisan_registration_step_1() {
             render_email_field(
                 'email',
                 'email',
-                'Email Address',
-                'Enter your email address',
+                __( 'Email Address', 'kazverse-artisan-plugin' ),
+                __( 'Enter your email address', 'kazverse-artisan-plugin' ),
                 '',
                 true // Required
             );
@@ -104,9 +109,14 @@ function render_artisan_registration_step_1() {
 
         <div class="form-group terms">
             <p>
-                By clicking on “Register for free” you agree to Kazverse’s 
-                <a href="#">terms and conditions</a>. Information about how we process your data can be found in our 
-                <a href="#">privacy policy</a>.
+                <?php
+                /* translators: %s and %s are links */
+                echo sprintf(
+                    __( 'By clicking on “Register for free” you agree to Kazverse’s %1$s. Information about how we process your data can be found in our %2$s.', 'kazverse-artisan-plugin' ),
+                    '<a href="#">' . __( 'terms and conditions', 'kazverse-artisan-plugin' ) . '</a>',
+                    '<a href="#">' . __( 'privacy policy', 'kazverse-artisan-plugin' ) . '</a>'
+                );
+                ?>
             </p>
         </div>
 
@@ -116,7 +126,7 @@ function render_artisan_registration_step_1() {
             class="next-button" 
             id="step1ContinueBtn"
         >
-            Register for free
+            <?php echo esc_html__( 'Register for free', 'kazverse-artisan-plugin' ); ?>
         </button>
     </div>
 
@@ -165,20 +175,20 @@ function render_artisan_registration_step_1() {
                 const tradeVal = tradeSelect.value.trim();
                 if (!tradeVal) {
                     isValid = false;
-                    showError(tradeSelect, tradeError, 'Please select a trade.');
+                    showError(tradeSelect, tradeError, '<?php echo esc_js( __( 'Please select a trade.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
 
                 // Zip
                 const zipVal = zipInput.value.trim();
                 if (!zipVal) {
                     isValid = false;
-                    showError(zipInput, zipError, 'Zip code is required.');
+                    showError(zipInput, zipError, '<?php echo esc_js( __( 'Zip code is required.', 'kazverse-artisan-plugin' ) ); ?>');
                 } else {
                     let zipPlaceDisplay = document.querySelector('.zip-place-display');
 
                     if (!zipPlaceDisplay || zipPlaceDisplay.textContent.trim() === '') {
                         isValid = false;
-                        showError(zipInput, zipError, 'Valid zip code is required.');
+                        showError(zipInput, zipError, '<?php echo esc_js( __( 'Valid zip code is required.', 'kazverse-artisan-plugin' ) ); ?>');
                     } else {
                         isValid = true;
                     }
@@ -188,10 +198,10 @@ function render_artisan_registration_step_1() {
                 const emailVal = emailInput.value.trim();
                 if (!emailVal) {
                     isValid = false;
-                    showError(emailInput, emailError, 'Email is required.');
+                    showError(emailInput, emailError, '<?php echo esc_js( __( 'Email is required.', 'kazverse-artisan-plugin' ) ); ?>');
                 } else if (!emailRegex.test(emailVal)) {
                     isValid = false;
-                    showError(emailInput, emailError, 'Please enter a valid email address.');
+                    showError(emailInput, emailError, '<?php echo esc_js( __( 'Please enter a valid email address.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
 
                 return isValid;
@@ -266,8 +276,8 @@ function render_artisan_registration_step_1() {
 function render_artisan_registration_step_2() {
     ?>
     <div class="form-step form-step-2">
-        <h2>Create an Account</h2>
-        <p>Enter your name exactly as it appears on your company documents.</p>
+        <h2><?php echo esc_html__( 'Create an Account', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><?php echo esc_html__( 'Enter your name exactly as it appears on your company documents.', 'kazverse-artisan-plugin' ); ?></p>
 
         <!-- First Name -->
         <div class="form-group">
@@ -275,8 +285,8 @@ function render_artisan_registration_step_2() {
             render_text_field(
                 'first_name',           
                 'first_name',           
-                'Company Owner',        
-                'First name',           
+                __( 'Company Owner', 'kazverse-artisan-plugin' ),        
+                __( 'First name', 'kazverse-artisan-plugin' ),           
                 '',                     
                 true // Required
             );
@@ -291,7 +301,7 @@ function render_artisan_registration_step_2() {
                 'last_name',            
                 'last_name',            
                 '',                     
-                'Last name',            
+                __( 'Last name', 'kazverse-artisan-plugin' ),            
                 '',                     
                 true // Required
             );
@@ -305,8 +315,8 @@ function render_artisan_registration_step_2() {
             render_phone_field(
                 'phone',                
                 'phone',                
-                'Phone Number',         
-                'Enter your phone number', 
+                __( 'Phone Number', 'kazverse-artisan-plugin' ),         
+                __( 'Enter your phone number', 'kazverse-artisan-plugin' ), 
                 '',                     
                 true,   // Required
                 '+43'   // Phone prefix
@@ -321,8 +331,8 @@ function render_artisan_registration_step_2() {
             render_password_field(
                 'password',             
                 'password',             
-                'Password (at least 6 characters)', 
-                'Create password',      
+                __( 'Password (at least 6 characters)', 'kazverse-artisan-plugin' ), 
+                __( 'Create password', 'kazverse-artisan-plugin' ),      
                 '',                     
                 true // Required
             );
@@ -336,7 +346,7 @@ function render_artisan_registration_step_2() {
             render_checkbox_field(
                 'subscribe',           
                 'subscribe',           
-                'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', 
+                __( 'I would like to receive advertising about Kazverse services and offers by email, SMS, and/or telephone.', 'kazverse-artisan-plugin' ), 
                 false, // default unchecked
                 false
             );
@@ -349,7 +359,7 @@ function render_artisan_registration_step_2() {
             class="previous-button" 
             data-previous-step="1"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- We REMOVE data-next-step and do validation + AJAX ourselves -->
@@ -358,7 +368,7 @@ function render_artisan_registration_step_2() {
             class="next-button next-button" 
             id="step2ContinueBtn"
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- Error container (for AJAX user creation issues) -->
@@ -413,28 +423,28 @@ function render_artisan_registration_step_2() {
             // First name
             if (!firstName) {
                 isValid = false;
-                showError(firstNameInput, firstNameError, 'First name is required.');
+                showError(firstNameInput, firstNameError, '<?php echo esc_js( __( 'First name is required.', 'kazverse-artisan-plugin' ) ); ?>');
             }
             // Last name
             if (!lastName) {
                 isValid = false;
-                showError(lastNameInput, lastNameError, 'Last name is required.');
+                showError(lastNameInput, lastNameError, '<?php echo esc_js( __( 'Last name is required.', 'kazverse-artisan-plugin' ) ); ?>');
             }
             // Phone
             if (!phoneDigits) {
                 isValid = false;
-                showError(phoneInput, phoneError, 'Phone number is required.');
+                showError(phoneInput, phoneError, '<?php echo esc_js( __( 'Phone number is required.', 'kazverse-artisan-plugin' ) ); ?>');
             } else if (!phoneDigitsRegex.test(phoneDigits)) {
                 isValid = false;
-                showError(phoneInput, phoneError, 'Phone must be 6..13 digits (excl. +43).');
+                showError(phoneInput, phoneError, '<?php echo esc_js( __( 'Phone must be 6..13 digits (excl. +43).', 'kazverse-artisan-plugin' ) ); ?>');
             }
             // Password
             if (!password) {
                 isValid = false;
-                showError(passwordInput, passwordError, 'Password is required.');
+                showError(passwordInput, passwordError, '<?php echo esc_js( __( 'Password is required.', 'kazverse-artisan-plugin' ) ); ?>');
             } else if (password.length < 6) {
                 isValid = false;
-                showError(passwordInput, passwordError, 'Password must be at least 6 characters.');
+                showError(passwordInput, passwordError, '<?php echo esc_js( __( 'Password must be at least 6 characters.', 'kazverse-artisan-plugin' ) ); ?>');
             }
 
             return isValid;
@@ -491,7 +501,7 @@ function render_artisan_registration_step_2() {
             // We'll do an AJAX call to create the WP user now
             const step1Email = window.kazverseRegistrationData.step1?.email || '';
             if (!step1Email) {
-                alert("No email found from Step 1!");
+                alert("<?php echo esc_js( __( 'No email found from Step 1!', 'kazverse-artisan-plugin' ) ); ?>");
                 return;
             }
 
@@ -513,7 +523,7 @@ function render_artisan_registration_step_2() {
             })
             .then(res => res.json())
             .then(response => {
-                if (!response) throw new Error("No response from server");
+                if (!response) throw new Error("<?php echo esc_js( __( 'No response from server', 'kazverse-artisan-plugin' ) ); ?>");
                 if (response.success) {
                     // User creation success
                     console.log('User created:', response.data.message);;
@@ -537,7 +547,7 @@ function render_artisan_registration_step_2() {
                     }
                 } else {
                     // Show server error => do not proceed
-                    const errMsg = response.data || "An unknown error occurred.";
+                    const errMsg = response.data || "<?php echo esc_js( __( 'An unknown error occurred.', 'kazverse-artisan-plugin' ) ); ?>";
                     ajaxErrorEl.style.display = 'block';
                     ajaxErrorEl.innerHTML = errMsg;
                     nextButton.disabled = false; // let them try again
@@ -546,7 +556,7 @@ function render_artisan_registration_step_2() {
             .catch(err => {
                 console.error('AJAX error:', err);
                 ajaxErrorEl.style.display = 'block';
-                ajaxErrorEl.innerHTML = "Something went wrong. Check console.";
+                ajaxErrorEl.innerHTML = "<?php echo esc_js( __( 'Something went wrong. Check console.', 'kazverse-artisan-plugin' ) ); ?>";
                 nextButton.disabled = false;
             });
         });
@@ -580,13 +590,14 @@ function render_artisan_registration_step_3() {
             <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>About You</h2>
-        <p><strong>~ 2 min</strong></p>
-        <p>Welcome! Let's go!</p>
-        <p>We would like to get to know you better so that we can provide you with suitable jobs – in your area and tailored to your area of expertise.</p>
-        <p>In this step, we ask you about your job, your professional status, and your location.</p>
+        <h2><?php echo esc_html__( 'About You', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><strong><?php echo esc_html__( '~ 2 min', 'kazverse-artisan-plugin' ); ?></strong></p>
+        <p><?php echo esc_html__( 'Welcome! Let\'s go!', 'kazverse-artisan-plugin' ); ?></p>
+        <p><?php echo esc_html__( 'We would like to get to know you better so that we can provide you with suitable jobs – in your area and tailored to your area of expertise.', 'kazverse-artisan-plugin' ); ?></p>
 
-        <button type="button" class="next-button purple-btn" data-next-step="4">Continue</button>
+        <button type="button" class="next-button purple-btn" data-next-step="4">
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
+        </button>
     </div>
     
     <script>
@@ -619,23 +630,23 @@ function render_artisan_registration_step_4() {
             <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>Select up to five trades</h2>
-        <p>Tell us your areas of expertise so we can send you the most relevant assignments.</p>
+        <h2><?php echo esc_html__( 'Select up to five trades', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><?php echo esc_html__( 'Tell us your areas of expertise so we can send you the most relevant assignments.', 'kazverse-artisan-plugin' ); ?></p>
 
         <!-- Search Trades Input -->
         <div class="f4_form_group form-group">
-            <label for="f4_trade_search">Search trades</label>
+            <label for="f4_trade_search"><?php echo esc_html__( 'Search trades', 'kazverse-artisan-plugin' ); ?></label>
             <input 
                 type="text" 
                 class="form-control" 
                 id="f4_trade_search" 
-                placeholder="Search trades"
+                placeholder="<?php echo esc_attr__( 'Search trades', 'kazverse-artisan-plugin' ); ?>"
             />
         </div>
 
         <!-- Trades Cards with Checkboxes (using render_checkbox_field) -->
         <div class="f4_form_group form-group">
-            <label for="f4_trade_select">Select Trade(s)</label>
+            <label for="f4_trade_select"><?php echo esc_html__( 'Select Trade(s)', 'kazverse-artisan-plugin' ); ?></label>
             <div id="f4_trade_cards" class="f4_trade-cards">
                 <?php foreach ($trades as $trade): ?>
                     <div class="f4_trade-card">
@@ -643,7 +654,7 @@ function render_artisan_registration_step_4() {
                         render_checkbox_field(
                             'f4_trade_select[]', 
                             'f4_trade_' . sanitize_title($trade), 
-                            esc_html($trade), 
+                            esc_html($trade),
                             false, 
                             false
                         );
@@ -662,7 +673,7 @@ function render_artisan_registration_step_4() {
             class="previous-button" 
             data-previous-step="3"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
         <!-- We remove data-next-step => handle validation ourselves -->
         <button 
@@ -670,7 +681,7 @@ function render_artisan_registration_step_4() {
             class="next-button purple-btn"
             id="step4ContinueBtn"
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         
@@ -708,9 +719,9 @@ function render_artisan_registration_step_4() {
                 let errors = [];
 
                 if (checkedBoxes.length === 0) {
-                    errors.push('You must select at least one trade.');
+                    errors.push('<?php echo esc_js( __( 'You must select at least one trade.', 'kazverse-artisan-plugin' ) ); ?>');
                 } else if (checkedBoxes.length > 5) {
-                    errors.push('You can select a maximum of five trades.');
+                    errors.push('<?php echo esc_js( __( 'You can select a maximum of five trades.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
                 return errors;
             }
@@ -782,15 +793,15 @@ function render_artisan_registration_step_5() {
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>In which area do you work?</h2>
-        <p>Set maximum distance by gear.</p>
+        <h2><?php echo esc_html__( 'In which area do you work?', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><?php echo esc_html__( 'Set maximum distance by gear.', 'kazverse-artisan-plugin' ); ?></p>
 
         <!-- Map displaying work area (using Leaflet) -->
         <div id="f5_work_area_map" style="height: 300px; width: 100%;"></div>
 
         <!-- Slider for maximum distance -->
         <div class="f5_form-group form-group">
-            <label for="f5_distance_slider">Maximum Distance</label>
+            <label for="f5_distance_slider"><?php echo esc_html__( 'Maximum Distance', 'kazverse-artisan-plugin' ); ?></label>
             <input 
                 type="range" 
                 class="form-range" 
@@ -806,19 +817,19 @@ function render_artisan_registration_step_5() {
         <!-- Checkbox for "I work throughout netherlands" (not mandatory) -->
         <div class="f5_form_group form-group">
             <label for="f5_work_throughout_netherlands">
-                <input type="checkbox" id="f5_work_throughout_netherlands"> I work throughout Netherlands
+                <input type="checkbox" id="f5_work_throughout_netherlands"> <?php echo esc_html__( 'I work throughout Netherlands', 'kazverse-artisan-plugin' ); ?>
             </label>
         </div>
 
         <!-- Navigation buttons -->
-        <button type="button" class="previous-button" data-previous-step="4">Back</button>
+        <button type="button" class="previous-button" data-previous-step="4"><?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?></button>
         <button 
             type="button" 
             class="next-button purple-btn" 
             data-next-step="6"
             disabled
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- Error message container -->
@@ -939,7 +950,7 @@ function render_artisan_registration_step_5() {
 
                 // Basic check: distance must be between 1 and 500
                 if (isNaN(distance) || distance < 1 || distance > 500) {
-                    errors.push('Distance must be between 1 and 500 km.');
+                    errors.push('<?php echo esc_js( __( 'Distance must be between 1 and 500 km.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
 
                 if (errors.length === 0) {
@@ -975,18 +986,18 @@ function render_artisan_registration_step_6() {
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>What is your current professional status?</h2>
+        <h2><?php echo esc_html__( 'What is your current professional status?', 'kazverse-artisan-plugin' ); ?></h2>
         
         <!-- Radio buttons for professional status -->
         <div class="form-group" id="professional-status-group">
             <?php
             // Array of professional status options
             $status_options = [
-                'I have just registered my company and am still waiting for my business license',
-                'My company has existed for less than 3 months',
-                'My company exists between 3 months and one year',
-                'My company has existed for over a year',
-                'I don\'t have a company'
+                __( 'I have just registered my company and am still waiting for my business license', 'kazverse-artisan-plugin' ),
+                __( 'My company has existed for less than 3 months', 'kazverse-artisan-plugin' ),
+                __( 'My company exists between 3 months and one year', 'kazverse-artisan-plugin' ),
+                __( 'My company has existed for over a year', 'kazverse-artisan-plugin' ),
+                __( 'I don\'t have a company', 'kazverse-artisan-plugin' )
             ];
 
             // Loop through options and render each as a radio button
@@ -1008,7 +1019,7 @@ function render_artisan_registration_step_6() {
             class="previous-button" 
             data-previous-step="5"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- We remove data-next-step to handle validation ourselves -->
@@ -1017,7 +1028,7 @@ function render_artisan_registration_step_6() {
             class="next-button purple-btn" 
             id="step6ContinueBtn"
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- Inline error container -->
@@ -1054,7 +1065,7 @@ function render_artisan_registration_step_6() {
                 const selectedRadio = Array.from(radioButtons).find(rb => rb.checked);
                 if (!selectedRadio) {
                     isValid = false;
-                    showError('Please select your current professional status.');
+                    showError('<?php echo esc_js( __( 'Please select your current professional status.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
 
                 return isValid;
@@ -1115,8 +1126,8 @@ function render_artisan_registration_step_8() {
             <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>What is your company name?</h2>
-        <p>Only qualified tradesmen and service providers can use MyHammer.</p>
+        <h2><?php echo esc_html__( 'What is your company name?', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><?php echo esc_html__( 'Only qualified tradesmen and service providers can use MyHammer.', 'kazverse-artisan-plugin' ); ?></p>
 
         <!-- GISA Number (Optional) -->
         <div class="f8_form_group form-group">
@@ -1124,8 +1135,8 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_gisa_number',      // Name
                 'f8_gisa_number',      // ID
-                'GISA (optional)',     // Label
-                'Enter your GISA number',  // Placeholder
+                __( 'GISA (optional)', 'kazverse-artisan-plugin' ),     // Label
+                __( 'Enter your GISA number', 'kazverse-artisan-plugin' ),  // Placeholder
                 '',                    // Default value
                 false                  // Not required
             );
@@ -1139,8 +1150,8 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_company_name',     // Name
                 'f8_company_name',     // ID
-                'Company Name',        // Label
-                'Enter your company name', 
+                __( 'Company Name', 'kazverse-artisan-plugin' ),        // Label
+                __( 'Enter your company name', 'kazverse-artisan-plugin' ), 
                 '',                    // Default value
                 true                   // Required
             );
@@ -1154,8 +1165,8 @@ function render_artisan_registration_step_8() {
             render_text_field(
                 'f8_address',          // Name
                 'f8_address',          // ID
-                'Address',             // Label
-                'Enter your address',
+                __( 'Address', 'kazverse-artisan-plugin' ),             // Label
+                __( 'Enter your address', 'kazverse-artisan-plugin' ),
                 '',                    
                 true // Required
             );
@@ -1166,7 +1177,12 @@ function render_artisan_registration_step_8() {
         <!-- Zip Code and City (Grouped) -->
         <div class="f8_form_group form-group">
             <?php
-            render_zipcode_field_with_place_selector('f8_zip_code','f8_zip_code','eg. 5061 AA','Zip Code *');
+            render_zipcode_field_with_place_selector(
+                'f8_zip_code',
+                'f8_zip_code',
+                __( 'eg. 5061 AA', 'kazverse-artisan-plugin' ),
+                __( 'Zip Code *', 'kazverse-artisan-plugin' )
+            );
             ?>
             <span id="zipCity-error" class="error-msg" style="display:none; color:red;"></span>
         </div>
@@ -1177,7 +1193,7 @@ function render_artisan_registration_step_8() {
             class="previous-button" 
             data-previous-step="6"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
         <!-- Remove data-next-step so we can handle it ourselves -->
         <button 
@@ -1185,7 +1201,7 @@ function render_artisan_registration_step_8() {
             class="next-button purple-btn" 
             id="step8ContinueBtn"
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- Error container if needed for combined messages -->
@@ -1234,31 +1250,29 @@ function render_artisan_registration_step_8() {
             const companyVal = companyNameInput.value.trim();
             if (!companyVal) {
                 isValid = false;
-                showError(companyNameInput, companyError, 'Company Name is required.');
+                showError(companyNameInput, companyError, '<?php echo esc_js( __( 'Company Name is required.', 'kazverse-artisan-plugin' ) ); ?>');
             }
 
             const addressVal = addressInput.value.trim();
             if (!addressVal) {
                 isValid = false;
-                showError(addressInput, addressError, 'Address is required.');
+                showError(addressInput, addressError, '<?php echo esc_js( __( 'Address is required.', 'kazverse-artisan-plugin' ) ); ?>');
             }
 
             const zipVal = zipCodeInput.value.trim();
            if (!zipVal) {
                 isValid = false;
-                showError(zipInput, zipError, 'Zip code is required.');
+                showError(zipCodeInput, zipCityError, '<?php echo esc_js( __( 'Zip code is required.', 'kazverse-artisan-plugin' ) ); ?>');
             } else {
                 let zipPlaceDisplay = document.querySelector('.zip-place-display');
 
                 if (!zipPlaceDisplay || zipPlaceDisplay.textContent.trim() === '') {
                     isValid = false;
-                    showError(zipInput, zipError, 'Valid zip code is required.');
+                    showError(zipCodeInput, zipCityError, '<?php echo esc_js( __( 'Valid zip code is required.', 'kazverse-artisan-plugin' ) ); ?>');
                 } else {
                     isValid = true;
                 }
             }
-
-
 
             return isValid;
         }
@@ -1351,10 +1365,10 @@ function render_artisan_registration_step_9() {
             <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>Qualifications</h2>
-        <p>Please upload your business license</p>
+        <h2><?php echo esc_html__( 'Qualifications', 'kazverse-artisan-plugin' ); ?></h2>
+        <p><?php echo esc_html__( 'Please upload your business license', 'kazverse-artisan-plugin' ); ?></p>
         <p class="f9_subtitle">
-            You can upload either each page individually or a file with multiple pages.
+            <?php echo esc_html__( 'You can upload either each page individually or a file with multiple pages.', 'kazverse-artisan-plugin' ); ?>
         </p>
 
         <!-- File Upload Field -->
@@ -1368,12 +1382,12 @@ function render_artisan_registration_step_9() {
                 ['accept' => 'image/png, image/jpeg, application/pdf'] // Accept specific types
             );
             ?>
-            <p class="f9_file-info">File: PNG, JPG, PDF, max. 15 MB</p>
+            <p class="f9_file-info"><?php echo esc_html__( 'File: PNG, JPG, PDF, max. 15 MB', 'kazverse-artisan-plugin' ); ?></p>
         </div>
 
         <!-- Loading Indicator -->
         <div id="upload-loading" style="display:none; margin-top:10px;">
-            <span>Uploading...</span>
+            <span><?php echo esc_html__( 'Uploading...', 'kazverse-artisan-plugin' ); ?></span>
         </div>
 
         <!-- Error message container -->
@@ -1385,7 +1399,7 @@ function render_artisan_registration_step_9() {
             class="previous-button" 
             data-previous-step="8"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         <!-- Remove data-next-step to handle manually -->
@@ -1394,7 +1408,7 @@ function render_artisan_registration_step_9() {
             class="next-button purple-btn" 
             id="step9ContinueBtn"
         >
-            Continue
+            <?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?>
         </button>
     </div>
 
@@ -1418,7 +1432,7 @@ function render_artisan_registration_step_9() {
             const files = businessLicenseInput.files;
 
             if (!files || files.length === 0) {
-                errors.push('Please select a file to upload.');
+                errors.push('<?php echo esc_js( __( 'Please select a file to upload.', 'kazverse-artisan-plugin' ) ); ?>');
             } else {
                 const file = files[0];
                 const fileName = file.name;
@@ -1426,10 +1440,10 @@ function render_artisan_registration_step_9() {
                 const ext = fileName.split('.').pop().toLowerCase();
 
                 if (!allowedExtensions.includes(ext)) {
-                    errors.push('File must be PNG, JPG, or PDF.');
+                    errors.push('<?php echo esc_js( __( 'File must be PNG, JPG, or PDF.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
                 if (fileSize > maxFileSize) {
-                    errors.push('File must not exceed 15 MB.');
+                    errors.push('<?php echo esc_js( __( 'File must not exceed 15 MB.', 'kazverse-artisan-plugin' ) ); ?>');
                 }
             }
 
@@ -1492,7 +1506,7 @@ function render_artisan_registration_step_9() {
                 } else {
                     // Show error
                     errorContainer.style.display = 'block';
-                    errorContainer.innerHTML = data.data || 'Upload failed.';
+                    errorContainer.innerHTML = data.data || '<?php echo esc_js( __( 'Upload failed.', 'kazverse-artisan-plugin' ) ); ?>';
                 }
             })
             .catch(error => {
@@ -1500,7 +1514,7 @@ function render_artisan_registration_step_9() {
                 step9NextButton.disabled = false;
                 console.error('Upload error:', error);
                 errorContainer.style.display = 'block';
-                errorContainer.innerHTML = 'Something went wrong. Please try again.';
+                errorContainer.innerHTML = '<?php echo esc_js( __( 'Something went wrong. Please try again.', 'kazverse-artisan-plugin' ) ); ?>';
             });
         });
 
@@ -1531,19 +1545,17 @@ function render_artisan_registration_step_10() {
             <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>Create profile</h2>
+        <h2><?php echo esc_html__( 'Create profile', 'kazverse-artisan-plugin' ); ?></h2>
         
-        <h3 class="f10_heading">Prepared for success</h3>
-        <p class="f10_subheading">~ 5 mins</p>
+        <h3 class="f10_heading"><?php echo esc_html__( 'Prepared for success', 'kazverse-artisan-plugin' ); ?></h3>
+        <p class="f10_subheading"><?php echo esc_html__( '~ 5 mins', 'kazverse-artisan-plugin' ); ?></p>
         <p class="f10_description">
-            You've almost made it!<br>
-            We help you achieve your goals and get the orders you want.<br><br>
-            In this step, we will set up your public profile and guide you through important steps to consider when using MyHammer.
+            <?php echo esc_html__( "You've almost made it!\nWe help you achieve your goals and get the orders you want.\n\nIn this step, we will set up your public profile and guide you through important steps to consider when using MyHammer.", 'kazverse-artisan-plugin' ); ?>
         </p>
 
         <!-- Navigation Buttons -->
-        <button type="button" class="previous-button purple-btn" data-previous-step="9">Back</button>
-        <button type="button" class="next-button purple-btn" data-next-step="11">Continue</button>
+        <button type="button" class="previous-button purple-btn" data-previous-step="9"><?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?></button>
+        <button type="button" class="next-button purple-btn" data-next-step="11"><?php echo esc_html__( 'Continue', 'kazverse-artisan-plugin' ); ?></button>
     </div>
 
     <script>
@@ -1563,19 +1575,24 @@ function render_artisan_registration_step_11() {
             <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
 
-        <h2>Create profile</h2>
+        <h2><?php echo esc_html__( 'Create profile', 'kazverse-artisan-plugin' ); ?></h2>
         
-        <h3 class="f11_heading">Introduce yourself to future customers</h3>
+        <h3 class="f11_heading"><?php echo esc_html__( 'Introduce yourself to future customers', 'kazverse-artisan-plugin' ); ?></h3>
         <p class="f11_description">
-            This is your opportunity to make a good first impression. You can make changes to your profile at any time.
+            <?php echo esc_html__( 'This is your opportunity to make a good first impression. You can make changes to your profile at any time.', 'kazverse-artisan-plugin' ); ?>
         </p>
 
         <!-- Tip Box -->
         <div class="f11_tip-box">
             <i class="f11_icon">ℹ️</i>
             <span class="f11_tip-text">
-                A good description can increase your chances of getting orders.
-                <a href="#" class="f11_tip-link">Helpful Writing Tips</a>
+                <?php
+                /* translators: %s is a link */
+                echo sprintf(
+                    __( 'A good description can increase your chances of getting orders. <a href="#" class="f11_tip-link">%s</a>', 'kazverse-artisan-plugin' ),
+                    __( 'Helpful Writing Tips', 'kazverse-artisan-plugin' )
+                );
+                ?>
             </span>
         </div>
 
@@ -1585,7 +1602,7 @@ function render_artisan_registration_step_11() {
                 id="f11_professional_description" 
                 name="professional_description" 
                 class="f11_textarea form-control" 
-                placeholder="Describe your professional experience and expertise..." 
+                placeholder="<?php echo esc_attr__( 'Describe your professional experience and expertise...', 'kazverse-artisan-plugin' ); ?>" 
                 maxlength="1250" 
                 rows="5"
             ></textarea>
@@ -1603,14 +1620,14 @@ function render_artisan_registration_step_11() {
             class="previous-button purple-btn" 
             data-previous-step="10"
         >
-            Back
+            <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
         <button 
             type="submit" 
             class="submit-button purple-btn"
             disabled
         >
-            Submit
+            <?php echo esc_html__( 'Submit', 'kazverse-artisan-plugin' ); ?>
         </button>
 
         
@@ -1634,10 +1651,10 @@ function render_artisan_registration_step_11() {
                 const length = descriptionValue.length;
 
                 if (length < minDescriptionLength) {
-                    errors.push(`Description must be at least ${minDescriptionLength} characters long.`);
+                    errors.push("<?php echo esc_js( sprintf( __( 'Description must be at least %d characters long.', 'kazverse-artisan-plugin' ), 10 ) ); ?>");
                 }
                 if (length > maxDescriptionLength) {
-                    errors.push(`Description cannot exceed ${maxDescriptionLength} characters.`);
+                    errors.push("<?php echo esc_js( sprintf( __( 'Description cannot exceed %d characters.', 'kazverse-artisan-plugin' ), 1250 ) ); ?>");
                 }
 
                 if (errors.length === 0) {
