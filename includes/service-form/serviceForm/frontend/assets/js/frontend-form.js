@@ -173,6 +173,48 @@ jQuery(document).ready(function ($) {
 
 
 jQuery(document).ready(function ($) {
+    $(document).on('change', 'input[type="file"].kz-file-input', function() {
+        var fileInput = $(this);
+        var fileData = fileInput.prop('files')[0];
+
+        // Create a FormData object and add required parameters
+        var formData = new FormData();
+        formData.append('action', 'upload_business_license');
+        formData.append('nonce', ajax_object.upload_nonce);
+        formData.append('business_license', fileData);
+
+        $.ajax({
+            url: ajax_object.ajax_url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    // Store the returned URL as a data attribute
+                    fileInput.data('uploaded-url', response.data.url);
+                    // Optionally, you could show a preview
+                    fileInput.closest('.field-wrapper').append(
+                        `<div class="file-upload-preview">
+                            <img src="${response.data.url}" alt="Uploaded file" style="max-width: 100px;">
+                        </div>`
+                    );
+                } else {
+                    Swal.fire({
+                        html: `<p>${response.data.message || response.data}</p>`,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    html: `<p>An error occurred while uploading the file.</p>`,
+                    icon: 'error'
+                });
+            }
+        });
+    });
+
     // Main submit handler
     $('#form-submit-button').on('click', function (e) {
         e.preventDefault();
@@ -202,17 +244,19 @@ jQuery(document).ready(function ($) {
             .find('input, textarea, select')
             .not('#zip_code, #name, #email, #phone, [name$="_lng"], [name$="_lat"]')
             .each(function () {
-                const fieldType = $(this).attr('type');
-                const question = $(this)
-                    .closest('.form-group')
-                    .find('label')
-                    .text()
-                    .trim();
+                const input = $(this);
+                const fieldType = input.attr('type');
+                const question = input.closest('.form-group').find('label').text().trim();
                 let answer = '';
 
-                if (fieldType === 'checkbox') {
-                    if ($(this).is(':checked')) {
-                        answer = $(this).val();
+                if (fieldType === 'file') {
+                    // For file inputs, check for the uploaded URL stored in data attribute
+                    answer = input.data('uploaded-url') || '';
+                    fields.push({ question, answer });
+                }
+                else if (fieldType === 'checkbox') {
+                    if (input.is(':checked')) {
+                        answer = input.val();
                         const existingField = fields.find((item) => item.question === question);
                         if (existingField) {
                             existingField.answer += ', ' + answer;
@@ -221,17 +265,18 @@ jQuery(document).ready(function ($) {
                         }
                     }
                 } else if (fieldType === 'radio') {
-                    if ($(this).is(':checked')) {
-                        answer = $(this).val();
+                    if (input.is(':checked')) {
+                        answer = input.val();
                         fields.push({ question, answer });
                     }
                 } else {
-                    answer = $(this).val();
+                    answer = input.val();
                     fields.push({ question, answer });
                 }
             });
         return fields;
     }
+
 
     // Extract user details (zip code, name, email, and phone)
     function getUserDetails() {

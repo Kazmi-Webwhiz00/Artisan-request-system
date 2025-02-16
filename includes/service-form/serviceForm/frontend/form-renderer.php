@@ -32,11 +32,12 @@ function enqueue_service_form_assets() {
         wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', [], null, true);
         wp_enqueue_script('lottie-player', 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js', [], null, true);
 
-        // Pass AJAX info to script
+        // Pass AJAX info to script, including nonce for file uploads
         wp_localize_script('frontend-form-js', 'ajax_object', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'success_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/success.gif',
-            'sad_gif_url' => plugin_dir_url(__FILE__) . 'assets/images/sad.gif',
+            'ajax_url'       => admin_url('admin-ajax.php'),
+            'success_gif_url'=> plugin_dir_url(__FILE__) . 'assets/images/success.gif',
+            'sad_gif_url'    => plugin_dir_url(__FILE__) . 'assets/images/sad.gif',
+            'upload_nonce'   => wp_create_nonce('kazverse_upload_nonce'),
         ]);
     }
 }
@@ -195,6 +196,16 @@ function render_service_form_shortcode($atts) {
                                                         '',
                                                         $is_required
                                                     );
+                                                    break;
+                                                // New case for file_input
+                                                case 'file_input':
+                                                    render_file_upload_field(
+                                                        $field_id,            // Field name
+                                                        $field_id,            // Field ID
+                                                        $field_label,         // Use the actual field label as the question
+                                                        $is_required          // Required flag
+                                                    );
+
                                                     break;
                                                 default:
                                                     echo '<p>Unsupported field type: ' . esc_html($field_type) . '</p>';
