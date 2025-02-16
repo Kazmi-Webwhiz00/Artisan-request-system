@@ -176,6 +176,11 @@ jQuery(document).ready(function ($) {
     $(document).on('change', 'input[type="file"].kz-file-input', function() {
         var fileInput = $(this);
         var fileData = fileInput.prop('files')[0];
+        // Get the next button element
+        var nextButton = $(".next-step");
+        
+        // Disable next button and change text
+        nextButton.prop('disabled', true).text('Uploading...');
 
         // Create a FormData object and add required parameters
         var formData = new FormData();
@@ -193,24 +198,25 @@ jQuery(document).ready(function ($) {
                 if (response.success) {
                     // Store the returned URL as a data attribute
                     fileInput.data('uploaded-url', response.data.url);
-                    // Optionally, you could show a preview
-                    fileInput.closest('.field-wrapper').append(
-                        `<div class="file-upload-preview">
-                            <img src="${response.data.url}" alt="Uploaded file" style="max-width: 100px;">
-                        </div>`
-                    );
+                    // Optionally, display a preview image
+                    fileInput.closest('.kz-file-upload').find('.file-preview img').attr('src', response.data.url).show();
+                    fileInput.closest('.kz-file-upload').find('.file-preview').show();
                 } else {
                     Swal.fire({
                         html: `<p>${response.data.message || response.data}</p>`,
                         icon: 'error'
                     });
                 }
+                // Re-enable next button and restore text
+                nextButton.prop('disabled', false).text('Next');
             },
             error: function() {
                 Swal.fire({
                     html: `<p>An error occurred while uploading the file.</p>`,
                     icon: 'error'
                 });
+                // Re-enable next button and restore text in case of error
+                nextButton.prop('disabled', false).text('Next');
             }
         });
     });
