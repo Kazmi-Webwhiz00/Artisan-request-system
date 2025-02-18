@@ -80,7 +80,15 @@ function render_service_job_meta_box($post) {
                     <?php foreach ($job_questions as $question) : ?>
                         <tr>
                             <td style="border: 1px solid #ddd; padding: 8px;"><?php echo esc_html($question['question']); ?></td>
-                            <td style="border: 1px solid #ddd; padding: 8px;"><?php echo esc_html($question['answer']); ?></td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">
+                                <?php
+                                    if (filter_var($question['answer'], FILTER_VALIDATE_URL)) {
+                                        echo '<a href="' . esc_url($question['answer']) . '" target="_blank" class="button">View File</a>';
+                                    } else {
+                                        echo esc_html($question['answer']);
+                                    }
+                                ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

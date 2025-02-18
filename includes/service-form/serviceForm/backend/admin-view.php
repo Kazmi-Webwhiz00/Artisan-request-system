@@ -65,6 +65,7 @@ function render_custom_meta_box($post) {
                                 <option value="checkbox_simple" <?php selected($field_type, 'checkbox_simple'); ?>>Simple Checkbox</option>
                                 <option value="checkbox_with_image" <?php selected($field_type, 'checkbox_with_image'); ?>>Checkbox with Image</option>
                                 <option value="textarea" <?php selected($field_type, 'textarea'); ?>>Text Area</option>
+                                <option value="file_input" <?php selected($field_type, 'file_input'); ?>>File Input</option>
                             </select>
         
                             <label>Is Required:</label>

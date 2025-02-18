@@ -104,77 +104,79 @@ jQuery(document).ready(function ($) {
     }
 
     function createFieldContainer(uniqueId) {
-        return $(
-            `<div class="kz-field-container" id="field-${uniqueId}">
-                <div class="kz-field-header">
-                    <span class="kz-drag-handle">☰</span>
-                    <span class="kz-toggle-collapse">Q${$(".kz-field-container").length + 1}: New Question</span>
-                    <span class="kz-remove-field">✖</span>
+    return $(
+        `<div class="kz-field-container" id="field-${uniqueId}">
+            <div class="kz-field-header">
+                <span class="kz-drag-handle">☰</span>
+                <span class="kz-toggle-collapse">Q${$(".kz-field-container").length + 1}: New Question</span>
+                <span class="kz-remove-field">✖</span>
+            </div>
+            <div class="kz-field-body">
+                <label>Input Field Label:</label>
+                <input type="text" 
+                       placeholder="Enter field label here" 
+                       class="kz-field-label-input" 
+                       name="fields[${uniqueId}][field_label]">
+                
+                <label>Field Type:</label>
+                <select class="kz-field-type-selector" name="fields[${uniqueId}][field_type]">
+                    <option value="text_input">Text Input</option>
+                    <option value="email">Email</option>
+                    <option value="number_input">Number Input</option>
+                    <option value="radio">Radio Button</option>
+                    <option value="checkbox_simple">Simple Checkbox</option>
+                    <option value="textarea">Text Area</option>
+                    <option value="checkbox_with_image">Checkbox with Image</option>
+                    <!-- New File Input Option -->
+                    <option value="file_input">File Input</option>
+                </select>
+    
+                <label>Is Required:</label>
+                <div class="kz-radio-group">
+                    <label>
+                        <input type="radio" name="fields[${uniqueId}][is_required]" value="1"> Yes
+                    </label>
+                    <label>
+                        <input type="radio" name="fields[${uniqueId}][is_required]" value="0" checked> No
+                    </label>
                 </div>
-                <div class="kz-field-body">
-                    <label>Input Field Label:</label>
-                    <input type="text" 
-                           placeholder="Enter field label here" 
-                           class="kz-field-label-input" 
-                           name="fields[${uniqueId}][field_label]">
-                    
-                    <label>Field Type:</label>
-                    <select class="kz-field-type-selector" name="fields[${uniqueId}][field_type]">
-                        <option value="text_input">Text Input</option>
-                        <option value="email">Email</option>
-                        <option value="number_input">Number Input</option>
-                        <option value="radio">Radio Button</option>
-                        <option value="checkbox_simple">Simple Checkbox</option>
-                        <option value="textarea">Text Area</option>
-                        <option value="checkbox_with_image">Checkbox with Image</option>
-                    </select>
-        
-                    <label>Is Required:</label>
-                    <div class="kz-radio-group">
-                        <label>
-                            <input type="radio" name="fields[${uniqueId}][is_required]" value="1"> Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="fields[${uniqueId}][is_required]" value="0" checked> No
-                        </label>
-                    </div>
-        
-                    <div class="kz-dynamic-options"></div>
-        
-                    <!-- Hidden JSON Field -->
-                    <input type="hidden" class="kz-options-json" name="fields[${uniqueId}][options]" value="{}">
-                    
-                    <!-- Hidden Field Order -->
-                    <input type="hidden" class="kz-field-order-input" name="fields[${uniqueId}][field_order]" value="">
-                </div>
-            </div>`
-        );
+    
+                <div class="kz-dynamic-options"></div>
+    
+                <!-- Hidden JSON Field -->
+                <input type="hidden" class="kz-options-json" name="fields[${uniqueId}][options]" value="{}">
+                
+                <!-- Hidden Field Order -->
+                <input type="hidden" class="kz-field-order-input" name="fields[${uniqueId}][field_order]" value="">
+            </div>
+        </div>`
+    );
     }
     
 
     function updateFieldOptions(container, uniqueId) {
         const options = {};
         const type = container.find(".kz-field-type-selector").val();
-    
+
         // Handle email field type
         if (type === "email" || type === "text_input") {
             options.placeholder = container.find(".kz-dynamic-options input[placeholder]").val() || null;
         }
-    
+
         // Number Input
         if (type === "number_input") {
             options.placeholder = container.find(".kz-dynamic-options input[placeholder]").val() || null;
             options.min = container.find(".kz-min-value").val() || null;
             options.max = container.find(".kz-max-value").val() || null;
         }
-    
+
         // Textarea
         if (type === "textarea") {
             options.placeholder = container.find(".kz-dynamic-options textarea[placeholder]").val() || null;
             options.min = container.find(".kz-min-length").val() || null;
             options.max = container.find(".kz-max-length").val() || null;
         }
-    
+
         // Radio or Checkbox
         if (type === "radio" || type === "checkbox_simple") {
             const optionsList = [];
@@ -187,7 +189,7 @@ jQuery(document).ready(function ($) {
             });
             options.options_list = optionsList;
         }
-    
+
         if (type === "checkbox_with_image") {
             const optionsList = [];
             container.find(".kz-checkbox-with-image-item").each(function () {
@@ -200,21 +202,21 @@ jQuery(document).ready(function ($) {
             });
             options.options_list = optionsList;
         }
-        
+
         // Update the hidden JSON field
         container.find(".kz-options-json").val(JSON.stringify(options));
     }
-    
 
 
-    
+
+
     
     function handleFieldTypeChange(selector, container) {
         const selectedType = selector.val();
         const dynamicOptions = container.find(".kz-dynamic-options");
         const uniqueId = container.attr("id");
         dynamicOptions.empty();
-    
+
         const htmlGenerators = {
             text_input: generateTextInputHTML,
             email: generateTextInputHTML, // Use the same generator for email and text_input
@@ -224,7 +226,7 @@ jQuery(document).ready(function ($) {
             radio: generateRadioHTML,
             checkbox_with_image: generateCheckboxWithImageHTML,
         };
-    
+
         if (htmlGenerators[selectedType]) {
             dynamicOptions.append(htmlGenerators[selectedType](uniqueId));
             attachDynamicEvents(dynamicOptions, selectedType, uniqueId);
