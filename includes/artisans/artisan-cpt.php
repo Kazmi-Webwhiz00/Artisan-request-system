@@ -112,6 +112,10 @@ function register_artisan_cpt_meta_fields() {
 
         // Step 11
         'description'              => array( 'type' => 'string',  'single' => true, 'show_in_rest' => true ),
+        
+
+        'artisan_status'            => array( 'type' => 'string', 'single' => true, 'show_in_rest' => true ),
+
     );
 
     foreach ( $fields as $meta_key => $args ) {
@@ -341,3 +345,55 @@ function my_artisan_meta_box_callback($post) {
 
     echo '</div>';
 }
+
+
+
+function add_artisan_status_meta_box() {
+    add_meta_box(
+        'artisan_status_meta_box',
+        __( 'Artisan Status', 'textdomain' ),
+        'render_artisan_status_meta_box',
+        'artisan',      // Post type
+        'side',         // Position (Right sidebar under Publish box)
+        'high'          // Priority
+    );
+}
+add_action( 'add_meta_boxes', 'add_artisan_status_meta_box' );
+
+
+function render_artisan_status_meta_box( $post ) {
+    $status = get_post_meta( $post->ID, 'artisan_status', true );
+    $options = array(
+        'pending'   => __( 'Pending', 'textdomain' ),
+        'approved'  => __( 'Approved', 'textdomain' ),
+        'rejected'  => __( 'Rejected', 'textdomain' ),
+    );
+
+    // Security nonce field
+    wp_nonce_field( 'save_artisan_status_meta_box', 'artisan_status_nonce' );
+
+    echo '<select name="artisan_status" id="artisan_status" class="widefat">';
+    foreach ( $options as $value => $label ) {
+        echo '<option value="' . esc_attr( $value ) . '" ' . selected( $status, $value, false ) . '>' . esc_html( $label ) . '</option>';
+    }
+    echo '</select>';
+}
+
+
+
+function save_artisan_status_meta_box( $post_id ) {
+    // Security checks
+    if ( ! isset( $_POST['artisan_status_nonce'] ) || 
+         ! wp_verify_nonce( $_POST['artisan_status_nonce'], 'save_artisan_status_meta_box' ) ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+    if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+
+    // Save the artisan status
+    if ( isset( $_POST['artisan_status'] ) ) {
+        update_post_meta( $post_id, 'artisan_status', sanitize_text_field( $_POST['artisan_status'] ) );
+    }
+}
+add_action( 'save_post', 'save_artisan_status_meta_box' );

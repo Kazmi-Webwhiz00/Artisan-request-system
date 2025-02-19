@@ -62,7 +62,11 @@ function kazverse_artisan_process_form() {
         'post_author'  => $user_id,
         'post_status' => 'publish',  // or 'pending'
     ));
-    if ( is_wp_error($post_id) ) {
+
+    if ( ! is_wp_error($post_id) ) {
+        // Set the default status to "pending" on first creation
+        update_post_meta( $post_id, 'artisan_status', 'pending' );
+    } else {
         wp_die( __('Failed to create Artisan post.', 'textdomain') );
     }
 

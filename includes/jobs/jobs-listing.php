@@ -40,6 +40,23 @@ function artisan_job_listings_shortcode() {
         return '<p>' . esc_html__( 'No artisan profile found for your account.', 'kazverse-artisan-plugin' ) . '</p>';
     }
     $artisan_post_id = $artisan_post[0]->ID;
+
+    $artisan_status = get_post_meta( $artisan_post_id, 'artisan_status', true );
+    if ( $artisan_status === 'pending' ) {
+        return '<div class="artisan-status-message artisan-status-pending">
+                    <strong>' . esc_html__( 'Profile Under Review', 'kazverse-artisan-plugin' ) . '</strong>
+                    <p>' . esc_html__( 'Your artisan profile is under review. Please wait for approval before accessing job listings.', 'kazverse-artisan-plugin' ) . '</p>
+                </div>';
+    }
+
+    if ( $artisan_status === 'rejected' ) {
+        return '<div class="artisan-status-message artisan-status-rejected">
+                    <strong>' . esc_html__( 'Profile Rejected', 'kazverse-artisan-plugin' ) . '</strong>
+                    <p>' . esc_html__( 'Your artisan profile has been rejected. Please contact support for further assistance.', 'kazverse-artisan-plugin' ) . '</p>
+                </div>';
+    }
+
+
     $artisan_trades = wp_get_post_terms( $artisan_post_id, 'global_services', array( 'fields' => 'names' ) );
     if ( empty( $artisan_trades ) ) {
         return '<p>' . esc_html__( 'No trade type found for your artisan profile.', 'kazverse-artisan-plugin' ) . '</p>';

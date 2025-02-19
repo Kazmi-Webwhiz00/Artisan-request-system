@@ -162,3 +162,44 @@
         transform: translateY(0);
     }
 }
+
+
+
+.status-pending {
+    color: #ff9800;
+    font-weight: bold;
+}
+
+.status-approved {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: #F44336;
+    font-weight: bold;
+}
+
+
+
+.wp-list-table .rejct-button{
+    background: #f8d7da; /* Light red */
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.wp-list-table .rejct-button:hover {
+    background: #f1b0b7; /* Slightly darker red on hover */
+    border-color: #f1b0b7;
+}
+
+
+.wp-list-table .button-primary{
+    background-color: #2d9131;
+    border: none;
+   
+}
+
+.wp-list-table .button-primary:hover {
+    background: #2a862e; 
+}
