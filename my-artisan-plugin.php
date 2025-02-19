@@ -2,7 +2,7 @@
 /*
 Plugin Name: Kazverse Artisan Plugin
 Description: A custom WordPress plugin by Kazverse for managing artisan registration and service requests.
-Version: 1.0.8
+Version: 1.0.10
 Author: Kazverse
 Author URI: https://kazverse.com
 Text Domain: kazverse-artisan-plugin
