@@ -1419,6 +1419,22 @@ function render_artisan_registration_step_9() {
         const errorContainer       = document.querySelector('.step9-error');
         const loadingIndicator     = document.getElementById('upload-loading');
 
+        const submitBtn      = document.querySelector('.submit-button');
+        const redirectInput  = document.getElementById('redirect-url-field');
+
+        submitBtn.addEventListener('click', function () {
+            // 1. capture the full URL
+            const fullUrl = window.location.href;  
+            window.redirectUrl = fullUrl;   
+            const pathSegments = window.location.pathname.split("/").filter(Boolean);
+            const subdirectory = pathSegments[0] || ""; // "stateduntimed"
+
+    // Build the base URL using the subdirectory
+
+            // 2. copy it into the hidden input so PHP can see it
+            redirectInput.value = fullUrl;
+        });
+
         // Nonce for security
         const uploadNonce = '<?php echo wp_create_nonce("kazverse_upload_nonce"); ?>';
 
@@ -1602,7 +1618,7 @@ function render_artisan_registration_step_11() {
                 id="f11_professional_description" 
                 name="professional_description" 
                 class="f11_textarea form-control" 
-                placeholder="<?php echo esc_attr__( 'Describe your professional experience and expertise...', 'kazverse-artisan-plugin' ); ?>" 
+                placeholder="<?php echo esc_attr__( 'Beschrijf je professionele ervaring en expertise...', 'kazverse-artisan-plugin' ); ?>" 
                 maxlength="1250" 
                 rows="5"
             ></textarea>
@@ -1622,6 +1638,14 @@ function render_artisan_registration_step_11() {
         >
             <?php echo esc_html__( 'Back', 'kazverse-artisan-plugin' ); ?>
         </button>
+
+        <input
+        type="hidden"
+        name="redirect-url"
+        id="redirect-url-field"
+        value=""
+        />
+
         <button 
             type="submit" 
             class="submit-button purple-btn"
