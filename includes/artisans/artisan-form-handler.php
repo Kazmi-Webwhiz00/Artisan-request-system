@@ -168,11 +168,46 @@ function kazverse_artisan_process_form() {
     }
 
 
-    wp_set_current_user($user_id);
-    wp_set_auth_cookie($user_id);
-    do_action('wp_login', get_userdata($user_id)->user_login, get_userdata($user_id));
+    // wp_set_current_user($user_id);
+    // wp_set_auth_cookie($user_id);
+    // do_action('wp_login', get_userdata($user_id)->user_login, get_userdata($user_id));
 
     // 6. All done! Redirect to a thank-you page or show success
-    wp_redirect( home_url('/job-listing-page/') );
-    exit;
+    // wp_redirect( home_url('/job-listing-page/') );
+
+        // 6. All done! Redirect to a thank-you page or show success
+    // if ( is_admin() ) {
+    //     return;
+    // }
+
+    // Get the custom slug
+    if ( ! empty( $_POST['redirect-url'] ) ) {
+
+        // 1) Retrieve & sanitize the submitted URL
+        $redirect_url = sanitize_text_field( wp_unslash( $_POST['redirect-url'] ) );
+        error_log( 'Submitted Redirect URL: ' . $redirect_url );
+
+        // 2) Get your custom slug (falling back to 'jobs-listing')
+        $custom_slug = get_option( 'artisan_custom_redirect_url', 'job-listing-page' );
+        error_log( 'Custom Slug: ' . $custom_slug );
+
+
+        // 3) Extract just the path from the full URL
+        $path = parse_url( $redirect_url, PHP_URL_PATH );
+        $path = trim( $path, '/' );
+        error_log( 'Path: ' . $path );
+
+        // 4) Split into segments and grab the first one
+        $segments = explode( '/', $path );
+        $subdir   = $segments[0] ?? '';
+        error_log( 'Subdirectory: ' . $subdir . ' | Segments: ' . print_r( $segments, true ) );
+
+        // 5) If it's not wp-admin, redirect to /{subdir}/{custom_slug}/
+        if ( $subdir || 'wp-admin' !== $subdir ) {
+            $target_url = home_url( "/{$custom_slug}/" );
+            error_log( 'Redirecting to: ' . $target_url );
+            wp_redirect( $target_url );
+            exit;
+        }
+    }
 }

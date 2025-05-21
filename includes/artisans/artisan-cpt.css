@@ -1,205 +1,467 @@
 .artisan-meta-box-container {
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f7f7f7;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f7;
 }
 
 .artisan-meta-group {
-    border: 1px solid #ccc;
-    background: #ffffff;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border: 1px solid #ccc;
+  background: #ffffff;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .artisan-meta-group:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .artisan-meta-group-title {
-    padding: 15px 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #444;
-    cursor: pointer;
-    background-color: #f2f2f2;
-    border-bottom: 1px solid #ddd;
-    border-radius: 10px 10px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 15px 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #444;
+  cursor: pointer;
+  background-color: #f2f2f2;
+  border-bottom: 1px solid #ddd;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .artisan-meta-group-title:hover {
-    background-color: #e6e6e6;
-    color: #333;
+  background-color: #e6e6e6;
+  color: #333;
 }
 
 .artisan-meta-group-title:after {
-    content: "▼";
-    font-size: 0.9em;
-    color: #888;
-    transition: transform 0.3s ease;
+  content: "▼";
+  font-size: 0.9em;
+  color: #888;
+  transition: transform 0.3s ease;
 }
 
 .artisan-meta-group-title.active:after {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .artisan-meta-group-content {
-    display: none; /* Hidden by default */
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 0 0 10px 10px;
-    border-top: 1px solid #ddd;
+  display: none; /* Hidden by default */
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 0 0 10px 10px;
+  border-top: 1px solid #ddd;
 }
 
 .artisan-meta-group-content.open {
-    display: block;
-    animation: fadeIn 0.4s ease-in-out;
+  display: block;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 .artisan-meta-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #555;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
 }
 
 .artisan-meta-group input[type="text"],
 .artisan-meta-group input[type="email"],
 .artisan-meta-group textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #ffffff;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .artisan-meta-group input[type="text"]:focus,
 .artisan-meta-group input[type="email"]:focus,
 .artisan-meta-group textarea:focus {
-    border-color: #888;
-    box-shadow: 0 0 5px rgba(136, 136, 136, 0.4);
-    outline: none;
+  border-color: #888;
+  box-shadow: 0 0 5px rgba(136, 136, 136, 0.4);
+  outline: none;
 }
 
 .artisan-meta-group input[type="checkbox"] {
-    margin-right: 8px;
-    transform: scale(1.2);
+  margin-right: 8px;
+  transform: scale(1.2);
 }
 
-
 .kz-business-license-admin-preview {
-    margin-top: 10px;
-    text-align: start;
+  margin-top: 10px;
+  text-align: start;
 }
 
 .kz-business-license-admin-preview img {
-    max-width: 300px;
-    max-height: 300px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+  max-height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .kz-view-license {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 8px 12px;
-    background-color: #0073aa;
-    color: #ffffff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #0073aa;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .kz-view-license:hover {
-    background-color: #2b589c;
+  background-color: #2b589c;
 }
 
-
 .trade-bubbles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .trade-bubble {
-    display: inline-block;
-    background-color: #f8f8f8d6;
-    color: #515151;
-    padding: 5px 10px;
-    border: 1px solid #c4c4c4;
-    border-radius: 15px;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
+  display: inline-block;
+  background-color: #f8f8f8d6;
+  color: #515151;
+  padding: 5px 10px;
+  border: 1px solid #c4c4c4;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
 }
 
 .trade-bubble:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
-
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-
-
 .status-pending {
-    color: #ff9800;
-    font-weight: bold;
+  color: #ff9800;
+  font-weight: bold;
 }
 
 .status-approved {
-    color: #4CAF50;
-    font-weight: bold;
+  color: #4caf50;
+  font-weight: bold;
 }
 
 .status-rejected {
-    color: #F44336;
-    font-weight: bold;
+  color: #f44336;
+  font-weight: bold;
 }
 
-
-
-.wp-list-table .rejct-button{
-    background: #f8d7da; /* Light red */
-    border: 1px solid #f5c6cb;
-    color: #721c24;
+.wp-list-table .rejct-button {
+  background: #f8d7da; /* Light red */
+  border: 1px solid #f5c6cb;
+  color: #721c24;
 }
 
 .wp-list-table .rejct-button:hover {
-    background: #f1b0b7; /* Slightly darker red on hover */
-    border-color: #f1b0b7;
+  background: #f1b0b7; /* Slightly darker red on hover */
+  border-color: #f1b0b7;
 }
 
-
-.wp-list-table .button-primary{
-    background-color: #2d9131;
-    border: none;
-   
+.wp-list-table .button-primary {
+  background-color: #2d9131;
+  border: none;
 }
 
 .wp-list-table .button-primary:hover {
-    background: #2a862e; 
+  background: #2a862e;
+}
+
+.kw-settings-field {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.kw-settings-notice-box {
+  display: flex;
+  align-items: start;
+  padding: 10px;
+  background-color: #f5f7fa;
+  border-left: 4px solid #007cba; /* Blue highlight */
+  margin-bottom: 20px;
+  border-radius: 3px;
+  font-size: 16px;
+}
+
+.kw-settings-icon {
+  font-size: 16px;
+  margin-right: 10px;
+  color: #007cba;
+}
+
+.kw-settings-notice-content a {
+  color: #007cba;
+  text-decoration: underline;
+}
+
+.kw-artisan-nav-tab-wrapper {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding: 0;
+  display: flex;
+}
+
+/* Individual tabs */
+.kw-artisan-nav-tab {
+  padding: 10px 20px;
+  margin-right: 2px;
+  background-color: #f1f1f1;
+  color: #0073aa;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Active tab */
+.kw-artisan-nav-tab-active {
+  background-color: #fff;
+  border-bottom: 1px solid #fff;
+  color: #23282d;
+  font-weight: bold;
+}
+
+/* Hover effect for tabs */
+.kw-artisan-nav-tab:hover {
+  background-color: #e1e1e1;
+}
+
+.kw-artisan-tab-content {
+  border: 1px solid #ccc;
+  border-radius: 0 4px 4px 4px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+/* Individual tab pane (hidden by default) */
+.kw-artisan-tab-pane {
+  display: none;
+}
+
+/* Ensure visible pane is styled properly */
+.kw-artisan-tab-pane:target,
+.kw-artisan-tab-pane[style*="display: block"] {
+  display: block;
+}
+
+.kw-artisan-tab-content {
+  border: 1px solid #ccc;
+  border-radius: 0 4px 4px 4px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.nav-tab-active {
+  background-color: #0073aa;
+  color: #fff;
+}
+
+.copy-button {
+  margin-left: 10px;
+  padding: 6px 12px;
+  background-color: #0073aa;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0px 10px;
+}
+
+.shortcode-box {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.hidden-input {
+  position: absolute;
+  left: -9999px;
+}
+.copy-message {
+  display: none;
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.kw-settings-wrap {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  margin: 0; /* Remove any centering margin */
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-wrap: wrap; /* Enable wrapping for sections */
+  justify-content: flex-start; /* Align sections to the left */
+  align-content: flex-start; /* Align all rows to the top */
+  align-items: flex-start; /* Align individual items to the top */
+  gap: 20px; /* Add spacing between sections */
+  box-sizing: border-box; /* Include padding in width/height */
+}
+
+.kw-settings-wrap h1 {
+  font-size: 1.75rem;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007cba;
+  padding-bottom: 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.kw-settings-wrap form {
+  width: 100%;
+}
+
+.kw-settings-section {
+  background-color: #f9f9f9;
+  padding: 20px; /* Increased padding inside each section */
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Softer edges for sections */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow for better separation */
+  min-width: 300px; /* Minimum width for smaller screens */
+  flex: 0 0 calc(50% - 20px); /* Prevent growth or shrinkage */
+  margin-bottom: 20px; /* Add space between sections */
+  align-self: flex-start; /* Ensure each section aligns to the top */
+}
+
+.kw-settings-wrap form .kw-settings-section h2 {
+  font-size: 1.25rem; /* Consistent font size for section headers */
+  margin-bottom: 20px;
+  color: #444;
+  text-align: left;
+  width: 100%;
+}
+
+.kw-settings-wrap form label {
+  display: block; /* Ensure labels appear above inputs */
+  font-weight: bold;
+  margin-bottom: 8px; /* Increased space between label and input */
+  font-size: 1rem; /* Slightly larger label font */
+  color: #333; /* Darker text for better readability */
+  padding-left: 2px; /* Subtle padding for alignment consistency */
+}
+
+.kw-settings-wrap form input[type="text"],
+.kw-settings-wrap form input[type="number"],
+.kw-settings-wrap form select {
+  width: 100%; /* Full width inputs */
+  max-width: 500px;
+  padding: 10px; /* Larger padding for better spacing */
+  font-size: 1rem; /* Consistent font size */
+  border: 1px solid #ccc; /* Standard border */
+  border-radius: 6px; /* Softer rounded corners */
+  background-color: #f9f9f9; /* Slightly gray background */
+  margin-bottom: 16px; /* Add space below inputs for better separation */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.kw-settings-wrap form input[type="text"]:focus,
+.kw-settings-wrap form input[type="number"]:focus,
+.kw-settings-wrap form select:focus {
+  border-color: #007cba; /* Highlight border on focus */
+  box-shadow: 0 0 5px rgba(0, 124, 186, 0.5); /* Subtle shadow on focus */
+  outline: none; /* Remove default focus outline */
+  background-color: #ffffff; /* Bright background on focus */
+}
+
+.kw-settings-wrap form select {
+  appearance: none; /* Remove browser-specific dropdown styles */
+  -moz-appearance: none; /* Firefox compatibility */
+  -webkit-appearance: none; /* Safari compatibility */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23333' stroke-width='2' d='M7 7l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 40px; /* Add space for dropdown arrow */
+}
+
+.kw-settings-wrap form .description {
+  font-size: 0.9rem; /* Slightly larger for better readability */
+  color: #666; /* Muted color for description text */
+  margin-top: -8px; /* Reduce gap between input and description */
+  margin-bottom: 16px; /* Add consistent space below descriptions */
+  line-height: 1.5; /* Improve readability */
+}
+
+.kw-settings-wrap form input.small-text {
+  max-width: 100px; /* Restrict size for smaller inputs */
+  padding: 10px; /* Add consistent padding for smaller inputs */
+  font-size: 0.9rem;
+  text-align: center; /* Center-align text for numeric inputs */
+}
+
+/* Buttons */
+button,
+.kw-settings-wrap form input[type="submit"] {
+  background-color: #007cba;
+  color: #fff;
+  border: none;
+  padding: 14px 24px; /* Add larger padding for better spacing */
+  font-size: 1rem;
+  border-radius: 6px; /* Softer edges */
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+button:hover,
+.kw-settings-wrap form input[type="submit"]:hover {
+  background-color: #005f8d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .kw-settings-wrap {
+    padding: 15px;
+  }
+
+  .kw-settings-wrap form .kw-settings-section {
+    width: 100%; /* Full width on small screens */
+    flex: 0 0 100%; /* Prevent wrapping issues */
+  }
+
+  .kw-settings-wrap h1 {
+    font-size: 1.5rem;
+  }
+
+  button,
+  .kw-settings-wrap form input[type="submit"] {
+    font-size: 0.9rem;
+    padding: 12px 20px;
+  }
 }
