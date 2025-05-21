@@ -23,6 +23,26 @@ function artisan_register_general_settings() {
         )
     );
 
+    register_setting(
+        'artisan_general_settings', // Option group
+        'artisan_login_redirect_url',  // Option name
+        array(
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default'           => '',
+        )
+    );
+
+    register_setting(
+        'artisan_general_settings', // Option group
+        'artisan_signup_redirect_url',  // Option name
+        array(
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default'           => 'register',
+        )
+    );
+
     // Register the section
     add_settings_section(
         'redirectUrl_section', // Section ID
